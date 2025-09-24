@@ -1,0 +1,330 @@
+@font-face {
+    font-family: 'Clear Sans';
+    font-weight: 100;
+    font-style: normal;
+    src: url(fonts/ClearSans-Thin-webfont.woff) format('woff');
+}
+
+@font-face {
+    font-family: 'Clear Sans';
+    font-weight: 300;
+    font-style: normal;
+    src: url(fonts/ClearSans-Light-webfont.woff) format('woff');
+}
+
+@font-face {
+    font-family: 'Clear Sans';
+    font-weight: 400;
+    font-style: normal;
+    src: url(fonts/ClearSans-Regular-webfont.woff) format('woff');
+}
+
+@font-face {
+    font-family: 'Clear Sans';
+    font-weight: 400;
+    font-style: italic;
+    src: url(fonts/ClearSans-Italic-webfont.woff) format('woff');
+}
+
+@font-face {
+    font-family: 'Clear Sans';
+    font-weight: 500;
+    font-style: normal;
+    src: url(fonts/ClearSans-Medium-webfont.woff) format('woff');
+}
+
+@font-face {
+    font-family: 'Clear Sans';
+    font-weight: 500;
+    font-style: italic;
+    src: url(fonts/ClearSans-MediumItalic-webfont.woff) format('woff');
+}
+
+@font-face {
+    font-family: 'Clear Sans';
+    font-weight: 700;
+    font-style: normal;
+    src: url(fonts/ClearSans-Bold-webfont.woff) format('woff');
+}
+
+@font-face {
+    font-family: 'Clear Sans';
+    font-weight: 700;
+    font-style: italic;
+    src: url(fonts/ClearSans-BoldItalic-webfont.woff) format('woff');
+}
+
+@keyframes pop-in {
+    0% {
+        transform: scale(0.6);
+        filter: blur(calc(0.5vw + 0.5vh));
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        filter: blur(0);
+        opacity: 1;
+    }
+}
+
+:root {
+    --grid-size: 4;
+}
+body {
+    font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+    background: #faf8ef;
+    margin: 0;
+    padding: 0;
+    color: #776e65;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    width: 100vw;
+    height: 100vh;
+    font-size: 2vh;
+    overflow: hidden;
+}
+
+p {
+    margin: 0;
+}
+
+.game-container {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    grid-template-columns: auto 1fr;
+    gap: calc(1vw + 1vh);
+    padding: calc(1vw + 1vh);
+    justify-content: flex-start;
+    align-content: flex-start;
+}
+
+.header {
+    grid-column: span 2;
+}
+
+.header h1 {
+    font-size: calc(1vw + 3vh);
+    font-weight: 700;
+    margin: 0;
+}
+
+.beta {
+    font-size: 0.9em;
+    background: #776e6533;
+    padding: 0 0.2em;
+    border-radius: 0.2em;
+}
+
+.grid-container {
+    position: relative;
+    width: calc(80vh - 1vw);
+    height: calc(80vh - 1vw);
+    font-size: calc(80vh - 1vw);
+}
+
+.grid-container-inner {
+    width: 100%;
+    height: 100%;
+    background: #bbada0;
+    border-radius: calc(10% / var(--grid-size));
+    padding: calc(10% / var(--grid-size));
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: repeat(var(--grid-size), 1fr);
+    grid-template-rows: repeat(var(--grid-size), 1fr);
+    gap: calc(10% / var(--grid-size));
+}
+
+.grid-container .grid-cell {
+    width: 100%;
+    height: 100%;
+    background: rgba(238, 228, 218, 0.35);
+    border-radius: 5%;
+    box-sizing: border-box;
+}
+
+.tile {
+    position: absolute;
+    /* The following ensures the tile size matches the grid cell size, accounting for gap */
+    width: calc((95% - (var(--grid-size) - 1) * (calc(10% / var(--grid-size)))) / var(--grid-size));
+    height: calc((95% - (var(--grid-size) - 1) * (calc(10% / var(--grid-size)))) / var(--grid-size));
+    background: #eee4da;
+    border-radius: 5%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: calc(50% / var(--grid-size));
+    font-weight: 700;
+    color: #776e65;
+    transition: top 0.18s cubic-bezier(0.4, 0.7, 0.5, 1), left 0.18s cubic-bezier(0.4, 0.7, 0.5, 1), transform 0.1s ease-in-out;
+    box-sizing: border-box;
+    filter: blur(0);
+}
+
+.tile.new {
+    animation: pop-in 200ms;
+}
+
+.tile.tile-2    { background: #eee4da; color: #776e65; }
+.tile.tile-4    { background: #ede0c8; color: #776e65; }
+.tile.tile-8    { background: #f2b179; color: #f9f6f2; }
+.tile.tile-16   { background: #f59563; color: #f9f6f2; }
+.tile.tile-32   { background: #f67c5f; color: #f9f6f2; }
+.tile.tile-64   { background: #f65e3b; color: #f9f6f2; }
+.tile.tile-128  { background: #edcf72; color: #f9f6f2; font-size: calc(40% / var(--grid-size)); }
+.tile.tile-256  { background: #edcc61; color: #f9f6f2; font-size: calc(40% / var(--grid-size)); }
+.tile.tile-512  { background: #edc850; color: #f9f6f2; font-size: calc(40% / var(--grid-size)); }
+.tile.tile-1024 { background: #edc53f; color: #f9f6f2; font-size: calc(32% / var(--grid-size)); }
+.tile.tile-2048 { background: #edc22e; color: #f9f6f2; font-size: calc(32% / var(--grid-size)); }
+
+.game-over-container, .game-won-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: calc(10% / var(--grid-size));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3;
+    -webkit-backdrop-filter: blur(calc(1vw + 1vh));
+    backdrop-filter: blur(calc(1vw + 1vh));
+    pointer-events: auto;
+    transition: all 0.3s ease;
+}
+
+.game-over-container {
+    background: rgba(238, 228, 218, 0.5);
+}
+
+.game-won-container {
+    background: rgba(237, 194, 46, 0.5);
+}
+
+.game-over-container.hidden, .game-won-container.hidden {
+    background: transparent;
+    pointer-events: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+.game-over-container .game-over-message, .game-won-container .game-won-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.game-over-container.hidden .game-over-message, .game-won-container.hidden .game-won-message {
+    opacity: 0;
+    transform: scale(0.8);
+    filter: blur(calc(0.5vw + 0.5vh));
+}
+
+.game-over-container .game-over-message p, .game-won-container .game-won-message p {
+    font-size: 10%;
+    font-weight: 700;
+    color: #776e65;
+}
+
+.game-won-container .game-won-message p {
+    color: #f9f6f2;
+}
+
+.game-over-container .game-over-message button, .game-won-container .game-won-message button {
+    margin-top: 2.5%;
+    padding: 2.5% 5%;
+    font-size: 5%;
+    font-family: inherit;
+    font-weight: 500;
+    color: #f9f6f2;
+    background: #8f7a66;
+    border: none;
+    border-radius: calc(0.5vw + 0.5vh);
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.score-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: stretch;
+    margin-bottom: calc(1vw + 1vh);
+}
+
+.score-container > div {
+    background: #bbada0;
+    color: #f9f6f2;
+    font-weight: 700;
+    flex: 15vw;
+    border-radius: calc(0.5vw + 0.5vh);
+    padding: calc(0.5vw + 0.5vh) calc(1vw + 1vh);
+    box-sizing: border-box;
+    text-align: center;
+    margin: calc(0.5vw + 0.5vh);
+}
+
+.score-container > div h2 {
+    font-size: calc(0.2vw + 1.5vh);
+    margin: 0;
+    opacity: 0.7;
+}
+
+.score-container > div p {
+    font-size: calc(1vw + 3vh);
+    margin: 0;
+}
+
+.button-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: calc(-1vw - 1vh);
+}
+
+.button-container button {
+    background: #8f7a66;
+    color: #f9f6f2;
+    flex: 1;
+    font-family: inherit;
+    font-weight: 500;
+    border: none;
+    border-radius: calc(0.5vw + 0.5vh);
+    padding: calc(0.5vw + 0.5vh) calc(1vw + 1vh);
+    margin: calc(0.5vw + 0.5vh);
+    font-size: calc(0.7vw + 2vh);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background 0.3s ease;
+}
+
+.button-container button i {
+    margin-right: calc(0.5vw + 0.5vh);
+}
+
+.button-container button:hover {
+    background: #9f8b7a;
+}
+
+@media screen and (orientation: portrait) {
+    .game-container {
+        grid-template-rows: auto auto auto;
+        grid-template-columns: 100%;
+    }
+    
+    .header {
+        grid-column: span 1;
+    }
+
+    .grid-container {
+        width: calc(50vh - 1vw);
+        max-width: 90vw;
+        height: calc(50vh - 1vw);
+        max-height: 90vw;
+        font-size: calc(50vh - 1vw);
+        justify-self: center;
+    }
+}
