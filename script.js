@@ -186,7 +186,7 @@ function isGameOver() {
 
 function isGameWon() {
 	for (const t of tiles) {
-		if (t.value === 16) return true;
+		if (t.value === 2048) return true;
 	}
 	return false;
 }
