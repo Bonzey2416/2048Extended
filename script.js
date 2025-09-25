@@ -279,11 +279,13 @@ const undoButton = document.getElementById('undo-button');
 if (undoButton) {
 	undoButton.addEventListener('click', function () {
 		if (undoStack.length > 1) {
+			// Only pop one state and restore the previous
+			const prevState = undoStack[undoStack.length - 2];
 			redoStack.push(undoStack.pop());
-			restoreState(undoStack[undoStack.length - 1]);
-            // Hide game over screen if visible
-            const gameOverContainer = document.getElementById('game-over-container');
-            if (gameOverContainer) gameOverContainer.classList.add('hidden');
+			restoreState(prevState);
+			// Hide game over screen if visible
+			const gameOverContainer = document.getElementById('game-over-container');
+			if (gameOverContainer) gameOverContainer.classList.add('hidden');
 		}
 	});
 }
@@ -357,8 +359,9 @@ document.addEventListener('keydown', function (e) {
 	if ((e.ctrlKey || e.metaKey) && !e.shiftKey) {
 		if (e.key === 'z' || e.key === 'Z') {
 			if (undoStack.length > 1) {
+				const prevState = undoStack[undoStack.length - 2];
 				redoStack.push(undoStack.pop());
-				restoreState(undoStack[undoStack.length - 1]);
+				restoreState(prevState);
 				const gameOverContainer = document.getElementById('game-over-container');
 				if (gameOverContainer) gameOverContainer.classList.add('hidden');
 			}

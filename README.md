@@ -1,5 +1,8 @@
 # 2048Extended
 ## Changelog
+### Version 0.2.1
+Date of update: 2025-09-25
+* Fixed a issue where sometimes when undoing, it undoes two moves instead of one
 ### Version 0.2
 Date of update: 2025-09-25
 * Undo/redo shortcuts (Ctrl + Z/Ctrl + Y)
