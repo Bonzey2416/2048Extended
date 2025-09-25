@@ -1,5 +1,8 @@
 # 2048Extended
 ## Changelog
+### Version 0.4
+Date of update: 2025-09-25
+* AI Mode: AI plays the game for you, with adjustable move delay
 ### Version 0.3
 Date of update: 2025-09-25
 * Added grid size selection (3x3, 4x4, 5x5, 6x6, 7x7, 8x8)

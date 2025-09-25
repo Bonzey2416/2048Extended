@@ -11,7 +11,12 @@ let hasShownGameWon = false;
 let undoStack = [];
 let redoStack = [];
 
+let aiModeActive = false;
+let aiIntervalId = null;
+let aiMoveDelay = 100;
+
 function initGrid() {
+	generateGridCells();
 	grid = Array(GRID_SIZE)
 		.fill()
 		.map(() => Array(GRID_SIZE).fill(null));
@@ -166,6 +171,7 @@ function move(direction) {
         updateUI();
 
         if (isGameOver()) {
+            stopAIMode();
             setTimeout(() => {
                 const gameOverContainer = document.getElementById('game-over-container');
                 if (gameOverContainer) gameOverContainer.classList.remove('hidden');
@@ -173,6 +179,7 @@ function move(direction) {
         }
         if (isGameWon() && !hasShownGameWon) {
             hasShownGameWon = true;
+            stopAIMode();
             setTimeout(() => {
                 const gameWonContainer = document.getElementById('game-won-container');
                 if (gameWonContainer) gameWonContainer.classList.remove('hidden');
@@ -552,8 +559,11 @@ document.addEventListener('DOMContentLoaded', function () {
 (function() {
     const modeButton = document.getElementById('mode-button');
     const modesMenu = document.getElementById('modes-menu');
-    const overlayBackdrop = document.getElementById('overlay-backdrop');
     const closeModes = document.getElementById('close-modes-menu');
+	const aiOptionButton = document.getElementById('ai-option-button');
+	const aiOptionsMenu = document.getElementById('ai-options-menu');
+	const closeAiOptions = document.getElementById('close-ai-options-menu');
+    const overlayBackdrop = document.getElementById('overlay-backdrop');
 
     function showModesMenu() {
         if (modesMenu && overlayBackdrop) {
@@ -569,14 +579,32 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+	function showAiOptionsMenu() {
+		if (aiOptionsMenu && overlayBackdrop) {
+			aiOptionsMenu.classList.remove('hidden');
+			overlayBackdrop.classList.remove('hidden');
+		}
+	}
+
+	function hideAiOptionsMenu() {
+		if (aiOptionsMenu && overlayBackdrop) {
+			aiOptionsMenu.classList.add('hidden');
+			overlayBackdrop.classList.add('hidden');
+		}
+	}
+
     if (modeButton) modeButton.addEventListener('click', showModesMenu);
     if (closeModes) closeModes.addEventListener('click', hideModesMenu);
     if (overlayBackdrop) overlayBackdrop.addEventListener('click', hideModesMenu);
+	if (aiOptionButton) aiOptionButton.addEventListener('click', showAiOptionsMenu);
+	if (closeAiOptions) closeAiOptions.addEventListener('click', hideAiOptionsMenu);
+	if (overlayBackdrop) overlayBackdrop.addEventListener('click', hideAiOptionsMenu);
 
     // Close with ESC
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
             hideModesMenu();
+			hideAiOptionsMenu();
         }
     });
 })();
@@ -595,3 +623,94 @@ if (gridSizeDropdown) {
 }
 
 window.onload = initGrid;
+
+// AI mode functions
+function updateGridContainerAnimations() {
+	const gridContainer = document.querySelector('.grid-container');
+	if (!gridContainer) return;
+	if (aiModeActive && aiMoveDelay < 50) {
+		gridContainer.classList.add('no-animations');
+	} else {
+		gridContainer.classList.remove('no-animations');
+	}
+}
+
+function startAIMode() {
+	if (aiModeActive) return;
+	aiModeActive = true;
+	updateGridContainerAnimations();
+	aiIntervalId = setInterval(() => {
+		if (!aiModeActive) return;
+		const direction = Math.floor(Math.random() * 4);
+		move(direction);
+	}, aiMoveDelay);
+}
+
+function stopAIMode() {
+	aiModeActive = false;
+	if (aiIntervalId) {
+		clearInterval(aiIntervalId);
+		aiIntervalId = null;
+	}
+	updateGridContainerAnimations();
+	const aiStatus = document.getElementById('ai-status');
+	if (aiStatus) aiStatus.textContent = 'AI Mode: Off';
+	const aiToggleButtonIcon = document.getElementById('ai-toggle-button-icon');
+	if (aiToggleButtonIcon) aiToggleButtonIcon.className = 'fas fa-play';
+}
+
+// Example: wire up AI controls (customize IDs as needed)
+document.addEventListener('DOMContentLoaded', function () {
+	const aiToggleButton = document.getElementById('ai-toggle-button');
+	const aiToggleButtonIcon = document.getElementById('ai-toggle-button-icon');
+	const aiStatus = document.getElementById('ai-status');
+	const aiMoveDurationInput = document.getElementById('ai-move-duration-input');
+
+	function updateAIToggleButton() {
+		if (aiToggleButton && aiToggleButtonIcon && aiStatus) {
+			if (aiModeActive) {
+				aiToggleButton.title = 'Stop AI Mode';
+				aiToggleButtonIcon.className = 'fas fa-stop';
+				aiStatus.textContent = 'AI Mode: On';
+			} else {
+				aiToggleButton.title = 'Start AI Mode';
+				aiToggleButtonIcon.className = 'fas fa-play';
+				aiStatus.textContent = 'AI Mode: Off';
+			}
+		}
+	}
+
+	if (aiToggleButton) {
+		aiToggleButton.addEventListener('click', function () {
+			if (!aiModeActive) {
+				let val = parseInt(aiMoveDurationInput.value, 10);
+				if (!isNaN(val) && val > 0) aiMoveDelay = val;
+				else aiMoveDelay = 100;
+				startAIMode();
+			} else {
+				stopAIMode();
+			}
+			updateAIToggleButton();
+		});
+		updateAIToggleButton();
+	}
+
+	aiMoveDurationInput.addEventListener('change', function () {
+		let val = parseInt(aiMoveDurationInput.value, 10);
+		if (!isNaN(val) && val > 0) {
+			aiMoveDelay = val;
+			if (aiModeActive) {
+				stopAIMode();
+				startAIMode();
+			}
+		}
+	});
+	if (aiMoveDurationInput) {
+		aiMoveDurationInput.addEventListener('input', function () {
+			let val = parseInt(aiMoveDurationInput.value, 10);
+			if (!isNaN(val) && val > 0) aiMoveDelay = val;
+			else aiMoveDelay = 100;
+			updateGridContainerAnimations();
+		});
+	}
+});

@@ -206,6 +206,14 @@ p {
 .tile.tile-1024 { background: #edc53f; color: #f9f6f2; font-size: calc(32% / var(--grid-size)); }
 .tile.tile-2048 { background: #edc22e; color: #f9f6f2; font-size: calc(32% / var(--grid-size)); }
 
+
+.grid-container.no-animations .tile {
+    transition: none;
+}
+
+.grid-container.no-animations .tile.merged {
+    animation: none;
+}
 .game-over-container, .game-won-container {
     position: absolute;
     top: 0;
@@ -337,6 +345,43 @@ p {
     background: #9f8b7a;
 }
 
+.ai-container {
+    display: flex;
+    align-items: center;
+    margin: calc(0.5vw + 0.5vh);
+    padding: calc(0.5vw + 0.5vh) calc(1vw + 1vh);
+    border-radius: calc(0.5vw + 0.5vh);
+    font-size: calc(0.7vw + 2vh);
+    background-color: #8f7a66;
+    color: #f9f6f2;
+}
+
+.ai-container i {
+    margin-right: calc(0.5vw + 0.5vh);
+}
+
+.ai-container .ai-status {
+    flex: 1;
+}
+
+.ai-container button {
+    background: #9f8b7a;
+    border: none;
+    color: #f9f6f2;
+    border-radius: calc(0.25vw + 0.25vh);
+    cursor: pointer;
+    font-size: calc(0.7vw + 2vh);
+    margin-left: calc(0.5vw + 0.5vh);
+    line-height: calc(2vw + 2vh);
+    width: calc(2vw + 2vh);
+    padding: 0;
+}
+
+.ai-container button i {
+    margin: 0;
+    line-height: calc(2vw + 2vh);
+}
+
 .overlay-backdrop {
     position: fixed;
     top: 0;
@@ -398,28 +443,33 @@ p {
     font-weight: 700;
 }
 
-.overlay-menu .dropdown-container {
+.overlay-menu .dropdown-container, .overlay-menu .input-container {
     margin: calc(1vw + 1vh) 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.overlay-menu .dropdown-container .label-title {
+.overlay-menu .label-title {
     font-size: calc(0.7vw + 1.5vh);
     font-weight: 500;
 }
 
-.overlay-menu .dropdown-container select {
+.overlay-menu .dropdown-container select, .overlay-menu .input-container input {
     font-size: calc(0.7vw + 1.5vh);
     font-family: inherit;
     font-weight: 400;
     padding: calc(0.3vw + 0.3vh) calc(0.5vw + 0.5vh);
+    margin-left: calc(0.5vw + 0.5vh);
     border-radius: calc(0.3vw + 0.3vh);
-    border: 1px solid #776e65;
+    border: calc(0.1vw + 0.1vh) solid #776e65;
     background: transparent;
     color: #776e65;
     cursor: pointer;
+}
+
+.overlay-menu .input-container input {
+    width: 30%;
 }
 
 @media screen and (orientation: portrait) {
