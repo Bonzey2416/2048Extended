@@ -1,8 +1,15 @@
 # 2048Extended
 ## Changelog
+### Version 0.2
+Date of update: 2025-09-25
+* Undo/redo shortcuts (Ctrl + Z/Ctrl + Y)
+* Move tiles using WASD keys
+* Fixed text scaling, especially on mobile
+* Fix game over container not hidden if undid
+* Improved undoing/redoing reliability
 ### Version 0.1.1
 Date of update: 2025-09-24
-Forgot to change goal back to 2048
+* Forgot to change goal back to 2048
 ### Version 0.1
 Date of update: 2025-09-24
-Initial beta release
+* Initial beta release

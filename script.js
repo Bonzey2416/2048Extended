@@ -262,8 +262,16 @@ function restoreState(state) {
 // Patch move to save state before moving
 const originalMove = move;
 move = function(direction) {
-	saveState();
+	// Check if move will change the grid
+	let oldGrid = JSON.stringify(grid);
 	originalMove(direction);
+	let newGrid = JSON.stringify(grid);
+	if (oldGrid !== newGrid) {
+		saveState();
+	} else {
+		// If nothing changed, revert grid and tiles to previous state
+		restoreState(undoStack[undoStack.length - 1]);
+	}
 };
 
 // Undo button
@@ -273,6 +281,9 @@ if (undoButton) {
 		if (undoStack.length > 1) {
 			redoStack.push(undoStack.pop());
 			restoreState(undoStack[undoStack.length - 1]);
+            // Hide game over screen if visible
+            const gameOverContainer = document.getElementById('game-over-container');
+            if (gameOverContainer) gameOverContainer.classList.add('hidden');
 		}
 	});
 }
@@ -285,6 +296,11 @@ if (redoButton) {
 			const state = redoStack.pop();
 			undoStack.push(state);
 			restoreState(state);
+			// Show game over container if the restored state is game over
+			if (isGameOver()) {
+				const gameOverContainer = document.getElementById('game-over-container');
+				if (gameOverContainer) gameOverContainer.classList.remove('hidden');
+			}
 		}
 	});
 }
@@ -308,20 +324,56 @@ initGrid = function() {
 };
 
 document.addEventListener('keydown', function (e) {
-	e.preventDefault(); // Prevent scrolling
+	// Prevent scrolling for movement keys only
+	if (["ArrowLeft","ArrowUp","ArrowRight","ArrowDown","w","a","s","d","W","A","S","D"].includes(e.key)) {
+		e.preventDefault();
+	}
+
+	// Movement keys
 	switch (e.key) {
 		case 'ArrowLeft':
-			move(0); // left (no rotation needed)
+		case 'a':
+		case 'A':
+			move(0); // left
 			break;
 		case 'ArrowUp':
-			move(3); // up (rotate once clockwise)
+		case 'w':
+		case 'W':
+			move(3); // up
 			break;
 		case 'ArrowRight':
-			move(2); // right (rotate twice)
+		case 'd':
+		case 'D':
+			move(2); // right
 			break;
 		case 'ArrowDown':
-			move(1); // down (rotate three times clockwise)
+		case 's':
+		case 'S':
+			move(1); // down
 			break;
+	}
+
+	// Undo/Redo shortcuts
+	if ((e.ctrlKey || e.metaKey) && !e.shiftKey) {
+		if (e.key === 'z' || e.key === 'Z') {
+			if (undoStack.length > 1) {
+				redoStack.push(undoStack.pop());
+				restoreState(undoStack[undoStack.length - 1]);
+				const gameOverContainer = document.getElementById('game-over-container');
+				if (gameOverContainer) gameOverContainer.classList.add('hidden');
+			}
+		} else if (e.key === 'y' || e.key === 'Y') {
+			if (redoStack.length > 0) {
+				const state = redoStack.pop();
+				undoStack.push(state);
+				restoreState(state);
+				// Show game over container if the restored state is game over
+				if (isGameOver()) {
+					const gameOverContainer = document.getElementById('game-over-container');
+					if (gameOverContainer) gameOverContainer.classList.remove('hidden');
+				}
+			}
+		}
 	}
 });
 

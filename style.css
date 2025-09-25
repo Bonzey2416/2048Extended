@@ -81,7 +81,7 @@ body {
     -moz-osx-font-smoothing: grayscale;
     width: 100vw;
     height: 100vh;
-    font-size: 2vh;
+    font-size: calc(0.6vw + 1.4vh);
     overflow: hidden;
 }
 
@@ -325,6 +325,7 @@ p {
         height: calc(50vh - 1vw);
         max-height: 90vw;
         font-size: calc(50vh - 1vw);
+        font-size: min(calc(50vh - 1vw), 90vw);
         justify-self: center;
     }
 }
