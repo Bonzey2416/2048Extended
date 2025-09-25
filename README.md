@@ -1,5 +1,10 @@
 # 2048Extended
 ## Changelog
+### Version 0.3
+Date of update: 2025-09-25
+* Added grid size selection (3x3, 4x4, 5x5, 6x6, 7x7, 8x8)
+* Fixed undo/redo handling when restarting via game over/game won container
+* Fixed tile positioning bug when changing grid size
 ### Version 0.2.1
 Date of update: 2025-09-25
 * Fixed a issue where sometimes when undoing, it undoes two moves instead of one

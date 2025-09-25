@@ -16,7 +16,7 @@
             </section>
             <section class="game-board">
                 <div class="grid-container">
-                    <div class="grid-container-inner">
+                    <div class="grid-container-inner" id="grid-container-inner">
                         <div class="grid-cell" id="cell-0-0"></div>
                         <div class="grid-cell" id="cell-0-1"></div>
                         <div class="grid-cell" id="cell-0-2"></div>
@@ -66,9 +66,29 @@
                     <button id="undo-button" title="Undo (Ctrl+Z)"><i class="fas fa-undo"></i> Undo</button>
                     <button id="redo-button" title="Redo (Ctrl+Y)"><i class="fas fa-redo"></i> Redo</button>
                     <button id="reset-button" title="Reset Game"><i class="fas fa-sync-alt"></i> Reset</button>
+                    <button id="mode-button" title="Change Mode"><i class="fas fa-adjust"></i> Mode</button>
                 </div>
-                <p>Version 0.2.1; last updated 2025-09-25</p>
+                </div>
+                <p>Version 0.3; last updated 2025-09-25</p>
             </section>
         </main>
+        <div class="overlay-backdrop hidden" id="overlay-backdrop"></div>
+        <div class="overlay-menu hidden" id="modes-menu">
+            <i class="fas fa-times close-button" id="close-modes-menu"></i>
+            <h2>Select Game Mode</h2>
+            <div class="dropdown-container">
+                <label for="grid-size-select">
+                    <p class="label-title">Grid size</p>
+                    <p class="label-subtitle">Choose the grid size for your game</p>
+                </label>
+                <select id="grid-size-select">
+                    <option value="3">3x3</option>
+                    <option value="4" selected>4x4</option>
+                    <option value="5">5x5</option>
+                    <option value="6">6x6</option>
+                    <option value="7">7x7</option>
+                    <option value="8">8x8</option>
+            </div>
+        </div>
     </body>
 </html>

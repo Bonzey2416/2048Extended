@@ -144,11 +144,21 @@ p {
     box-sizing: border-box;
 }
 
+/*
+ * calc(10% / var(--grid-size))
+ * calc(10% + 10% / var(--grid-size))
+ * calc(90% - 10% / var(--grid-size))
+ * calc((90% - 10% / var(--grid-size)) / var(--grid-size))
+ */
+
+ /* calc(10% / var(--grid-size))
+  */
+
 .tile {
     position: absolute;
     /* The following ensures the tile size matches the grid cell size, accounting for gap */
-    width: calc((95% - (var(--grid-size) - 1) * (calc(10% / var(--grid-size)))) / var(--grid-size));
-    height: calc((95% - (var(--grid-size) - 1) * (calc(10% / var(--grid-size)))) / var(--grid-size));
+    width: calc((90% - 10% / var(--grid-size)) / var(--grid-size));
+    height: calc((90% - 10% / var(--grid-size)) / var(--grid-size));
     background: #eee4da;
     border-radius: 5%;
     display: flex;
@@ -164,6 +174,24 @@ p {
 
 .tile.new {
     animation: pop-in 200ms;
+}
+
+.tile.merged {
+    animation: merged 200ms ease-out;
+    z-index: 3;
+}
+
+@keyframes merged {
+    0% {
+        transform: scale(1.2);
+        opacity: 0;
+        filter: blur(calc(0.5vw + 0.5vh));
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+        filter: none;
+    }
 }
 
 .tile.tile-2    { background: #eee4da; color: #776e65; }
@@ -188,9 +216,9 @@ p {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 3;
-    -webkit-backdrop-filter: blur(calc(1vw + 1vh));
-    backdrop-filter: blur(calc(1vw + 1vh));
+    z-index: 4;
+    -webkit-backdrop-filter: blur(calc(1vw + 1vh)) saturate(150%);
+    backdrop-filter: blur(calc(1vw + 1vh)) saturate(150%);
     pointer-events: auto;
     transition: all 0.3s ease;
 }
@@ -309,6 +337,91 @@ p {
     background: #9f8b7a;
 }
 
+.overlay-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    -webkit-backdrop-filter: blur(calc(1vw + 1vh)) saturate(150%);
+    backdrop-filter: blur(calc(1vw + 1vh)) saturate(150%);
+    z-index: 1000;
+    pointer-events: auto;
+    transition: all 0.3s ease;
+}
+
+.overlay-backdrop.hidden {
+    pointer-events: none;
+    background-color: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+.overlay-menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    background: #faf8efbb;
+    border-radius: calc(1vw + 1vh);
+    padding: calc(2vw + 2vh);
+    box-sizing: border-box;
+    width: 80vw;
+    max-width: 100vh;
+    max-height: 90vh;
+    z-index: 1050;
+    pointer-events: auto;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 calc(1vw + 1vh) #00000055;
+}
+
+.overlay-menu.hidden {
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0;
+    filter: blur(calc(0.5vw + 0.5vh));
+}
+
+.overlay-menu .close-button {
+    float: right;
+    cursor: pointer;
+    font-size: calc(1vw + 2.5vh);
+    color: #776e65;
+    transition: color 0.3s ease;
+    line-height: 1;
+}
+
+.overlay-menu h2 {
+    margin-top: 0;
+    font-size: calc(1vw + 2vh);
+    font-weight: 700;
+}
+
+.overlay-menu .dropdown-container {
+    margin: calc(1vw + 1vh) 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.overlay-menu .dropdown-container .label-title {
+    font-size: calc(0.7vw + 1.5vh);
+    font-weight: 500;
+}
+
+.overlay-menu .dropdown-container select {
+    font-size: calc(0.7vw + 1.5vh);
+    font-family: inherit;
+    font-weight: 400;
+    padding: calc(0.3vw + 0.3vh) calc(0.5vw + 0.5vh);
+    border-radius: calc(0.3vw + 0.3vh);
+    border: 1px solid #776e65;
+    background: transparent;
+    color: #776e65;
+    cursor: pointer;
+}
+
 @media screen and (orientation: portrait) {
     .game-container {
         grid-template-rows: auto auto auto;
@@ -327,5 +440,22 @@ p {
         font-size: calc(50vh - 1vw);
         font-size: min(calc(50vh - 1vw), 90vw);
         justify-self: center;
+    }
+
+    .overlay-menu {
+        bottom: 0;
+        top: auto;
+        left: 0;
+        right: 0;
+        transform: translate(0%, 0%) scale(1);
+        width: auto;
+        max-width: 100%;
+        max-height: 70vh;
+        overflow-y: auto;
+        border-radius: calc(1vw + 1vh) calc(1vw + 1vh) 0 0;
+    }
+
+    .overlay-menu.hidden {
+        transform: translate(0%, 120%) scale(1);
     }
 }

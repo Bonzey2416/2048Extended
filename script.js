@@ -1,5 +1,5 @@
 // 2048 Game Logic
-const GRID_SIZE = 4;
+let GRID_SIZE = 4;
 let grid = [];
 let score = 0;
 let tiles = [];
@@ -49,41 +49,67 @@ function getTileById(id) {
 }
 
 function slide(row) {
-	const newRow = Array(GRID_SIZE).fill(null);
-	let insert = 0;
-	for (let i = 0; i < GRID_SIZE; i++) {
-		if (row[i] !== null) {
-			newRow[insert] = row[i];
-			insert++;
-		}
-	}
-	return newRow;
+    const newRow = Array(GRID_SIZE).fill(null);
+    let insert = 0;
+    for (let i = 0; i < GRID_SIZE; i++) {
+        if (row[i] !== null) {
+            newRow[insert] = row[i];
+            insert++;
+        }
+    }
+    return newRow;
 }
 
 function combine(row) {
-	for (let i = 0; i < GRID_SIZE - 1; i++) {
-		const tileA = row[i] ? getTileById(row[i]) : null;
-		const tileB = row[i + 1] ? getTileById(row[i + 1]) : null;
-		if (tileA && tileB && tileA.value === tileB.value) {
-			if (tileA.merged) continue; // Only merge into a tile once per move
-			tileA.value *= 2;
-			tileA.merged = true;
-			score += tileA.value;
-			// Remove tileB from tiles array
-			grid[tileB.row][tileB.col] = null;
-			tiles = tiles.filter(t => t.id !== tileB.id);
-			row[i + 1] = null;
-			i++; // Skip next index to prevent double merge
-		}
-	}
-	return row;
+    let rowChanged = false; // Track if any changes occur in the row
+
+    for (let i = 0; i < GRID_SIZE - 1; i++) {
+        const tileA = row[i] ? getTileById(row[i]) : null;
+        const tileB = row[i + 1] ? getTileById(row[i + 1]) : null;
+        if (tileA && tileB && tileA.value === tileB.value) {
+            if (tileA.merged || tileB.merged) continue; // Prevent double merges
+
+            // Merge tiles
+            tileA.value *= 2;
+            tileA.merged = true;
+            score += tileA.value;
+
+            // Remove tileB from data structures
+            const tileBEl = document.getElementById('tile-' + tileB.id);
+            if (tileBEl) tileBEl.remove();
+
+            grid[tileB.row][tileB.col] = null;
+            tiles = tiles.filter(t => t.id !== tileB.id);
+            row[i + 1] = null;
+
+            rowChanged = true; // Mark that the row has changed
+            i++; // Skip next index to prevent double merge
+        }
+    }
+
+    return { row, rowChanged };
 }
 
 function operate(row) {
-	row = slide(row);
-	row = combine(row);
-	row = slide(row);
-	return row;
+    let rowChanged = false;
+
+    const afterFirstSlide = slide(row);
+    if (JSON.stringify(afterFirstSlide) !== JSON.stringify(row)) {
+        rowChanged = true; // sliding changed the row
+    }
+
+    row = afterFirstSlide;
+    const combineResult = combine(row);
+    row = combineResult.row;
+    if (combineResult.rowChanged) rowChanged = true;
+
+    const afterSecondSlide = slide(row);
+    if (JSON.stringify(afterSecondSlide) !== JSON.stringify(row)) {
+        rowChanged = true;
+    }
+    row = afterSecondSlide;
+
+    return { row, rowChanged };
 }
 
 function rotateGrid(grid) {
@@ -100,62 +126,70 @@ function rotateGrid(grid) {
 }
 
 function move(direction) {
-	// Reset merged state
-	tiles.forEach(t => t.merged = false);
-	
-	// Store initial state to check if anything moved
-	let oldGrid = JSON.stringify(grid);
-	
-	// Create a copy of the grid for rotation
-	let currentGrid = grid.map(row => [...row]);
-	
-	// Rotate to make all moves work like moving left
-	for (let i = 0; i < direction; i++) {
-		currentGrid = rotateGrid(currentGrid);
-	}
-	
-	// Process each row
-	for (let r = 0; r < GRID_SIZE; r++) {
-		const newRow = operate(currentGrid[r]);
-		currentGrid[r] = newRow;
-	}
-	
-	// Rotate back
-	for (let i = 0; i < (4 - direction) % 4; i++) {
-		currentGrid = rotateGrid(currentGrid);
-	}
-	
-	// Update the main grid and tile positions
-	grid = currentGrid;
-	for (let r = 0; r < GRID_SIZE; r++) {
-		for (let c = 0; c < GRID_SIZE; c++) {
-			const id = grid[r][c];
-			if (id) {
-				const tile = getTileById(id);
-				if (tile) {
-					tile.row = r;
-					tile.col = c;
-				}
-			}
+    resetMergedState();
+
+    let oldGrid = JSON.stringify(grid);
+    let currentGrid = grid.map(row => [...row]);
+
+    for (let i = 0; i < direction; i++) {
+        currentGrid = rotateGrid(currentGrid);
+    }
+
+    let anyTileMoved = false;
+    for (let r = 0; r < GRID_SIZE; r++) {
+        const operateResult = operate(currentGrid[r]);
+        currentGrid[r] = operateResult.row;
+        if (operateResult.rowChanged) {
+            anyTileMoved = true;
+        }
+    }
+
+    for (let i = 0; i < (4 - direction) % 4; i++) {
+        currentGrid = rotateGrid(currentGrid);
+    }
+
+    if (anyTileMoved) {
+        grid = currentGrid;
+        for (let r = 0; r < GRID_SIZE; r++) {
+            for (let c = 0; c < GRID_SIZE; c++) {
+                const id = grid[r][c];
+                if (id) {
+                    const tile = getTileById(id);
+                    if (tile) {
+                        tile.row = r;
+                        tile.col = c;
+                    }
+                }
+            }
+        }
+        addRandomTile();
+        updateUI();
+
+        if (isGameOver()) {
+            setTimeout(() => {
+                const gameOverContainer = document.getElementById('game-over-container');
+                if (gameOverContainer) gameOverContainer.classList.remove('hidden');
+            }, 100);
+        }
+        if (isGameWon() && !hasShownGameWon) {
+            hasShownGameWon = true;
+            setTimeout(() => {
+                const gameWonContainer = document.getElementById('game-won-container');
+                if (gameWonContainer) gameWonContainer.classList.remove('hidden');
+            }, 100);
+        }
+    }
+}
+
+// Ensure merged animation only triggers once per move
+function resetMergedState() {
+	tiles.forEach(tile => {
+		tile.merged = false;
+		const tileElement = document.getElementById('tile-' + tile.id);
+		if (tileElement) {
+			tileElement.classList.remove('merged');
 		}
-	}
-	if (JSON.stringify(grid) !== oldGrid) {
-		addRandomTile();
-		updateUI();
-		if (isGameOver()) {
-			setTimeout(() => {
-				const gameOverContainer = document.getElementById('game-over-container');
-				if (gameOverContainer) gameOverContainer.classList.remove('hidden');
-			}, 100);
-		}
-		if (isGameWon() && !hasShownGameWon) {
-			hasShownGameWon = true;
-			setTimeout(() => {
-				const gameWonContainer = document.getElementById('game-won-container');
-				if (gameWonContainer) gameWonContainer.classList.remove('hidden');
-			}, 100);
-		}
-	}
+	});
 }
 
 function isGameOver() {
@@ -192,11 +226,17 @@ function isGameWon() {
 }
 
 function updateUI() {
+    console.log("Updating UI with grid:", grid);
 	const tileContainer = document.getElementById('tile-container');
 	// Remove DOM tiles that no longer exist, but keep the game over and game won containers
+	// Only remove tiles that are not in the tiles array
 	const tileIds = new Set(tiles.map(t => 'tile-' + t.id));
 	Array.from(tileContainer.children).forEach(tile => {
-		if (!tileIds.has(tile.id) && tile.id !== 'game-over-container' && tile.id !== 'game-won-container') {
+		// Never remove tiles that are in the merge animation or special containers
+		if (!tileIds.has(tile.id) && 
+			tile.id !== 'game-over-container' && 
+			tile.id !== 'game-won-container' && 
+			!tile.classList.contains('merging')) {
 			tileContainer.removeChild(tile);
 		}
 	});
@@ -220,9 +260,41 @@ function updateUI() {
 			if (t.id === lastNewTileId) tile.classList.add('new');
 			else tile.classList.remove('new');
 		}
+		// Animation classes
+		if (t.sliding) {
+			tile.classList.add('sliding');
+			if (t.merging) {
+				tile.classList.add('merging');
+			}
+				tile.classList.remove('sliding');
+				t.sliding = false;
+				// Only remove 'merging' class for original tiles, not merged tile
+				if (t.merging) {
+					tile.classList.remove('merging');
+					t.merging = false;
+				}
+				if (t.merged) {
+					tile.classList.add('merged');
+					setTimeout(() => tile.classList.remove('merged'), 300);
+				}
+		} else {
+			tile.classList.remove('sliding');
+			// Only add 'merging' class for original tiles, not merged tile
+			if (t.merging) {
+				tile.classList.add('merging');
+			} else {
+				tile.classList.remove('merging');
+			}
+			if (t.merged) {
+				tile.classList.add('merged');
+				setTimeout(() => tile.classList.remove('merged'), 300);
+			} else {
+				tile.classList.remove('merged');
+			}
+		}
 		// Always update position
-		tile.style.top = (t.row * 87.5 / GRID_SIZE + 12.5 * (t.row + 1) / (GRID_SIZE + 1)) + '%';
-		tile.style.left = (t.col * 87.5 / GRID_SIZE + 12.5 * (t.col + 1) / (GRID_SIZE + 1)) + '%';
+		tile.style.top = ((100 - 10 / GRID_SIZE) / GRID_SIZE * t.row + 10 / GRID_SIZE) + '%';
+		tile.style.left = ((100 - 10 / GRID_SIZE) / GRID_SIZE * t.col + 10 / GRID_SIZE) + '%';
 	}
 	lastNewTileId = null;
 	// Update score
@@ -269,8 +341,9 @@ move = function(direction) {
 	if (oldGrid !== newGrid) {
 		saveState();
 	} else {
-		// If nothing changed, revert grid and tiles to previous state
-		restoreState(undoStack[undoStack.length - 1]);
+		// Nothing changed: don't restore previous state to avoid reintroducing
+		// transient animation flags (merged/merging). Just skip saving.
+		console.log('Move had no effect; no state saved.');
 	}
 };
 
@@ -311,11 +384,15 @@ if (redoButton) {
 const resetButton = document.getElementById('reset-button');
 if (resetButton) {
 	resetButton.addEventListener('click', function () {
+		clearHistory();
 		initGrid();
-		undoStack = [];
-		redoStack = [];
 		saveState();
 	});
+}
+
+function clearHistory() {
+	undoStack = [];
+	redoStack = [];
 }
 
 // Save initial state after grid is initialized
@@ -323,6 +400,36 @@ const originalInitGrid = initGrid;
 initGrid = function() {
 	originalInitGrid();
 	saveState();
+};
+
+function generateGridCells() {
+	const gridContainerInner = document.querySelector('.grid-container-inner');
+	if (!gridContainerInner) return;
+	// Remove all existing grid cells
+	while (gridContainerInner.firstChild) {
+		gridContainerInner.removeChild(gridContainerInner.firstChild);
+	}
+	// Generate new grid cells
+	for (let r = 0; r < GRID_SIZE; r++) {
+		for (let c = 0; c < GRID_SIZE; c++) {
+			const cell = document.createElement('div');
+			cell.className = 'grid-cell';
+			cell.id = `cell-${r}-${c}`;
+			gridContainerInner.appendChild(cell);
+		}
+	}
+	// Update CSS variable
+	const gridContainer = document.querySelector('.grid-container');
+	if (gridContainer) {
+		gridContainer.style.setProperty('--grid-size', GRID_SIZE);
+	}
+}
+
+// Call generateGridCells whenever grid size changes
+const originalInitGrid2 = initGrid;
+initGrid = function() {
+	generateGridCells();
+	originalInitGrid2();
 };
 
 document.addEventListener('keydown', function (e) {
@@ -417,6 +524,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	const restartButton = document.getElementById('restart-button');
 	if (restartButton) {
 		restartButton.addEventListener('click', function () {
+			clearHistory();
 			initGrid();
 		});
 	}
@@ -426,6 +534,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		gameWonRestart.addEventListener('click', function () {
 			const gameWonContainer = document.getElementById('game-won-container');
 			if (gameWonContainer) gameWonContainer.classList.add('hidden');
+			clearHistory();
 			initGrid();
 		});
 	}
@@ -438,5 +547,51 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	}
 });
+
+// Modes overlay handlers
+(function() {
+    const modeButton = document.getElementById('mode-button');
+    const modesMenu = document.getElementById('modes-menu');
+    const overlayBackdrop = document.getElementById('overlay-backdrop');
+    const closeModes = document.getElementById('close-modes-menu');
+
+    function showModesMenu() {
+        if (modesMenu && overlayBackdrop) {
+            modesMenu.classList.remove('hidden');
+            overlayBackdrop.classList.remove('hidden');
+        }
+    }
+
+    function hideModesMenu() {
+        if (modesMenu && overlayBackdrop) {
+            modesMenu.classList.add('hidden');
+            overlayBackdrop.classList.add('hidden');
+        }
+    }
+
+    if (modeButton) modeButton.addEventListener('click', showModesMenu);
+    if (closeModes) closeModes.addEventListener('click', hideModesMenu);
+    if (overlayBackdrop) overlayBackdrop.addEventListener('click', hideModesMenu);
+
+    // Close with ESC
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            hideModesMenu();
+        }
+    });
+})();
+
+// Grid size change handler
+const gridSizeDropdown = document.getElementById('grid-size-select');
+if (gridSizeDropdown) {
+	gridSizeDropdown.addEventListener('change', function () {
+		const newSize = parseInt(gridSizeDropdown.value, 10);
+		if (!isNaN(newSize) && newSize > 1 && newSize <= 8) {
+			GRID_SIZE = newSize;
+			clearHistory();
+			initGrid();
+		}
+	});
+}
 
 window.onload = initGrid;
