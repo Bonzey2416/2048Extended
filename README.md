@@ -1,5 +1,8 @@
 # 2048Extended
 ## Changelog
+### Version 0.5.2
+Date of update: 2025-09-26
+* Fixed a bug where, while undoing, it sometimes undoes two moves instead of one
 ### Version 0.5.1
 Date of update: 2025-09-26
 * Fixed a bug when pressing Ctrl + Z after disabling AI mode causes an to re-enable AI mode

@@ -579,9 +579,10 @@ document.addEventListener('keydown', function (e) {
 	if ((e.ctrlKey || e.metaKey) && !e.shiftKey) {
 		if (e.key === 'z' || e.key === 'Z') {
 			if (undoStack.length > 1) {
-				const prevState = undoStack[undoStack.length - 2];
-				redoStack.push(undoStack.pop());
-				restoreState(prevState);
+				const prevState = undoStack.pop(); // Pop current state
+				redoStack.push(prevState);
+				const restoreStateObj = undoStack[undoStack.length - 1]; // Restore previous state
+				restoreState(restoreStateObj);
 				const gameOverContainer = document.getElementById('game-over-container');
 				if (gameOverContainer) gameOverContainer.classList.add('hidden');
 			}
