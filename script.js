@@ -425,26 +425,19 @@ function restoreState(state) {
 	lastNewTileId = state.lastNewTileId;
 	hasShownGameWon = state.hasShownGameWon;
 
-	// Handle AI state restoration
-	if (state.aiState) {
-		// Stop current AI mode if active
-		if (aiModeActive) {
-			stopAIMode();
-		}
-		
-		// Set the AI move delay first
+	// Prevent AI mode from starting on undo/redo
+	if (aiModeActive) {
+		stopAIMode();
+	}
+	if (typeof state.aiState !== 'undefined') {
 		aiMoveDelay = state.aiState.aiMoveDelay;
 		const aiMoveDurationInput = document.getElementById('ai-move-duration-input');
 		if (aiMoveDurationInput) {
 			aiMoveDurationInput.value = aiMoveDelay;
 		}
-
-		// Restore AI mode if it was active
-		if (state.aiState.aiModeActive) {
-			startAIMode();
-		}
+		// Do NOT start AI mode automatically on restore
+		aiModeActive = false;
 	}
-	
 	updateUI();
 	updateGridContainerAnimations();
 }
