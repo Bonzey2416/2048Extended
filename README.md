@@ -1,5 +1,8 @@
 # 2048Extended
 ## Changelog
+### Version 0.6.1
+Date of update: 2025-09-26
+* Fixed a bug where, while undoing, it sometimes undoes two moves instead of one
 ### Version 0.6
 Date of update: 2025-09-26
 * Added tile colors up to 2097152

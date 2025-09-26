@@ -317,7 +317,7 @@ function isGameWon() {
 }
 
 function updateUI() {
-    console.log("Updating UI with grid:", grid);
+	console.debug("Updating UI with grid:", grid);
 	const tileContainer = document.getElementById('tile-container');
 	// Remove DOM tiles that no longer exist, but keep the game over and game won containers
 	// Only remove tiles that are not in the tiles array
@@ -400,7 +400,7 @@ function updateUI() {
 }
 
 function saveState() {
-	undoStack.push({
+	const newState = {
 		grid: grid.map(row => [...row]),
 		tiles: tiles.map(t => ({ ...t })),
 		score,
@@ -412,9 +412,13 @@ function saveState() {
 			aiMoveDelay,
 			aiIntervalId
 		}
-	});
+	};
+	// Always push a new state after a valid move
+	undoStack.push(newState);
 	if (undoStack.length > 100) undoStack.shift(); // Limit stack size
+	// debug: state pushed
 	redoStack = [];
+	// debug: redoStack cleared
 }
 
 function restoreState(state) {
@@ -451,10 +455,10 @@ move = function(direction) {
 	let newGrid = JSON.stringify(grid);
 	if (oldGrid !== newGrid) {
 		saveState();
+		redoStack = [];
 	} else {
-		// Nothing changed: don't restore previous state to avoid reintroducing
-		// transient animation flags (merged/merging). Just skip saving.
-		console.log('Move had no effect; no state saved.');
+	// Nothing changed: don't restore previous state to avoid reintroducing
+	// transient animation flags (merged/merging). Just skip saving.
 	}
 };
 
@@ -462,11 +466,11 @@ move = function(direction) {
 const undoButton = document.getElementById('undo-button');
 if (undoButton) {
 	undoButton.addEventListener('click', function () {
+		// Only undo if there is a previous state to go back to
 		if (undoStack.length > 1) {
-			// Only pop one state and restore the previous
-			const prevState = undoStack[undoStack.length - 2];
-			redoStack.push(undoStack.pop());
-			restoreState(prevState);
+			redoStack.push(undoStack.pop()); // Move current state to redo
+			// debug: undo performed
+			restoreState(undoStack[undoStack.length - 1]); // Restore previous state
 			// Hide game over screen if visible
 			const gameOverContainer = document.getElementById('game-over-container');
 			if (gameOverContainer) gameOverContainer.classList.add('hidden');
@@ -499,7 +503,7 @@ if (resetButton) {
 	resetButton.addEventListener('click', function () {
 		clearHistory();
 		initGrid();
-		saveState();
+		// Do not call saveState() here; only save after a real move
 	});
 }
 
@@ -512,7 +516,7 @@ function clearHistory() {
 const originalInitGrid = initGrid;
 initGrid = function() {
 	originalInitGrid();
-	saveState();
+	// Do not call saveState() here; only save after a real move
 };
 
 function generateGridCells() {
@@ -579,9 +583,8 @@ document.addEventListener('keydown', function (e) {
 	if ((e.ctrlKey || e.metaKey) && !e.shiftKey) {
 		if (e.key === 'z' || e.key === 'Z') {
 			if (undoStack.length > 1) {
-				const prevState = undoStack[undoStack.length - 2];
 				redoStack.push(undoStack.pop());
-				restoreState(prevState);
+				restoreState(undoStack[undoStack.length - 1]);
 				const gameOverContainer = document.getElementById('game-over-container');
 				if (gameOverContainer) gameOverContainer.classList.add('hidden');
 			}
@@ -746,34 +749,7 @@ function updateGridContainerAnimations() {
 	}
 }
 
-// Patch undo/redo to NOT call updateGridContainerAnimations
-if (undoButton) {
-	undoButton.addEventListener('click', function () {
-		if (undoStack.length > 1) {
-			const prevState = undoStack[undoStack.length - 2];
-			redoStack.push(undoStack.pop());
-			restoreState(prevState);
-			const gameOverContainer = document.getElementById('game-over-container');
-			if (gameOverContainer) gameOverContainer.classList.add('hidden');
-			// Do NOT call updateGridContainerAnimations here
-		}
-	});
-}
-
-if (redoButton) {
-	redoButton.addEventListener('click', function () {
-		if (redoStack.length > 0) {
-			const state = redoStack.pop();
-			undoStack.push(state);
-			restoreState(state);
-			if (isGameOver()) {
-				const gameOverContainer = document.getElementById('game-over-container');
-				if (gameOverContainer) gameOverContainer.classList.remove('hidden');
-			}
-			// Do NOT call updateGridContainerAnimations here
-		}
-	});
-}
+// (Removed duplicate undo/redo patch handlers to avoid double-undo)
 
 function startAIMode() {
 	if (aiModeActive) return;
