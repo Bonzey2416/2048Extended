@@ -1,5 +1,9 @@
 # 2048Extended
 ## Changelog
+### Version 0.5
+Date of update: 2025-09-26
+* Fibonacci mode: New game mode where tiles follow the Fibonacci sequence.
+* Goal tile is dynamically calculated based on grid size.
 ### Version 0.4
 Date of update: 2025-09-25
 * AI Mode: AI plays the game for you, with adjustable move delay

@@ -15,6 +15,8 @@ let aiModeActive = false;
 let aiIntervalId = null;
 let aiMoveDelay = 100;
 
+let GAME_MODE = 'classic';
+
 function initGrid() {
 	generateGridCells();
 	grid = Array(GRID_SIZE)
@@ -33,19 +35,24 @@ function initGrid() {
 }
 
 function addRandomTile() {
-	const emptyCells = [];
-	for (let r = 0; r < GRID_SIZE; r++) {
-		for (let c = 0; c < GRID_SIZE; c++) {
-			if (grid[r][c] === null) emptyCells.push([r, c]);
-		}
-	}
-	if (emptyCells.length === 0) return;
-	const [r, c] = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-	const value = Math.random() < 0.9 ? 2 : 4;
-	const tile = { id: tileIdCounter++, value, row: r, col: c, merged: false };
-	tiles.push(tile);
-	grid[r][c] = tile.id;
-	lastNewTileId = tile.id;
+    const emptyCells = [];
+    for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0; c < GRID_SIZE; c++) {
+            if (grid[r][c] === null) emptyCells.push([r, c]);
+        }
+    }
+    if (emptyCells.length === 0) return;
+    const [r, c] = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    let value;
+    if (GAME_MODE === 'fibonacci') {
+        value = Math.random() < 0.9 ? 1 : 2;
+    } else {
+        value = Math.random() < 0.9 ? 2 : 4;
+    }
+    const tile = { id: tileIdCounter++, value, row: r, col: c, merged: false };
+    tiles.push(tile);
+    grid[r][c] = tile.id;
+    lastNewTileId = tile.id;
 }
 
 
@@ -65,33 +72,66 @@ function slide(row) {
     return newRow;
 }
 
-function combine(row) {
-    let rowChanged = false; // Track if any changes occur in the row
+function getFibonacciSequence(maxValue) {
+    const fib = [1, 1];
+    while (fib[fib.length - 1] < maxValue) {
+        fib.push(fib[fib.length - 1] + fib[fib.length - 2]);
+    }
+    return fib;
+}
 
+function areFibonacciMergeable(a, b, fibSeq) {
+    // 1+1, 1+2, 2+1, 2+3, 3+2, 3+5, 5+3, ...
+    for (let i = 0; i < fibSeq.length - 1; i++) {
+        if ((a === 1 && b === 1) ||
+            (fibSeq[i] === a && fibSeq[i + 1] === b) ||
+            (fibSeq[i] === b && fibSeq[i + 1] === a)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function combine(row) {
+    let rowChanged = false;
+    if (GAME_MODE === 'fibonacci') {
+        const fibSeq = getFibonacciSequence(Math.pow(2, 20));
+        for (let i = 0; i < GRID_SIZE - 1; i++) {
+            const tileA = row[i] ? getTileById(row[i]) : null;
+            const tileB = row[i + 1] ? getTileById(row[i + 1]) : null;
+            if (tileA && tileB && areFibonacciMergeable(tileA.value, tileB.value, fibSeq)) {
+                if (tileA.merged || tileB.merged) continue;
+                tileA.value = tileA.value + tileB.value;
+                tileA.merged = true;
+                score += tileA.value;
+                const tileBEl = document.getElementById('tile-' + tileB.id);
+                if (tileBEl) tileBEl.remove();
+                grid[tileB.row][tileB.col] = null;
+                tiles = tiles.filter(t => t.id !== tileB.id);
+                row[i + 1] = null;
+                rowChanged = true;
+                i++;
+            }
+        }
+        return { row, rowChanged };
+    }
     for (let i = 0; i < GRID_SIZE - 1; i++) {
         const tileA = row[i] ? getTileById(row[i]) : null;
         const tileB = row[i + 1] ? getTileById(row[i + 1]) : null;
         if (tileA && tileB && tileA.value === tileB.value) {
             if (tileA.merged || tileB.merged) continue; // Prevent double merges
-
-            // Merge tiles
             tileA.value *= 2;
             tileA.merged = true;
             score += tileA.value;
-
-            // Remove tileB from data structures
             const tileBEl = document.getElementById('tile-' + tileB.id);
             if (tileBEl) tileBEl.remove();
-
             grid[tileB.row][tileB.col] = null;
             tiles = tiles.filter(t => t.id !== tileB.id);
             row[i + 1] = null;
-
-            rowChanged = true; // Mark that the row has changed
+            rowChanged = true;
             i++; // Skip next index to prevent double merge
         }
     }
-
     return { row, rowChanged };
 }
 
@@ -207,6 +247,26 @@ function isGameOver() {
 		}
 	}
 	// Check for possible merges
+	if (GAME_MODE === 'fibonacci') {
+		const fibSeq = getFibonacciSequence(Math.pow(2, 20));
+		for (let r = 0; r < GRID_SIZE; r++) {
+			for (let c = 0; c < GRID_SIZE; c++) {
+				const tile = getTileById(grid[r][c]);
+				// Check right
+				if (c < GRID_SIZE - 1) {
+					const rightTile = getTileById(grid[r][c + 1]);
+					if (tile && rightTile && areFibonacciMergeable(tile.value, rightTile.value, fibSeq)) return false;
+				}
+				// Check down
+				if (r < GRID_SIZE - 1) {
+					const downTile = getTileById(grid[r + 1][c]);
+					if (tile && downTile && areFibonacciMergeable(tile.value, downTile.value, fibSeq)) return false;
+				}
+			}
+		}
+		return true;
+	}
+	// Classic mode
 	for (let r = 0; r < GRID_SIZE; r++) {
 		for (let c = 0; c < GRID_SIZE; c++) {
 			const tile = getTileById(grid[r][c]);
@@ -225,11 +285,35 @@ function isGameOver() {
 	return true;
 }
 
+function getGoalValue(size) {
+    if (GAME_MODE === 'fibonacci') {
+        const n = Math.pow(size, 2);
+        const idx = Math.round(n * 0.77 + 5);
+        // Generate Fibonacci sequence up to idx
+        const fib = [1, 1];
+        while (fib.length <= idx) {
+            fib.push(fib[fib.length - 1] + fib[fib.length - 2]);
+        }
+        return fib[idx];
+    } else {
+        // Classic mode
+        return Math.pow(2, Math.round(Math.pow(size, 2) * 0.53 + 3));
+    }
+}
+
+function updateGoalDisplay() {
+    const goalValue = getGoalValue(GRID_SIZE);
+    document.querySelectorAll('.goal-number').forEach(el => {
+        el.textContent = goalValue;
+    });
+}
+
 function isGameWon() {
-	for (const t of tiles) {
-		if (t.value === 2048) return true;
-	}
-	return false;
+    const goalValue = getGoalValue(GRID_SIZE);
+    for (const t of tiles) {
+        if (t.value === goalValue) return true;
+    }
+    return false;
 }
 
 function updateUI() {
@@ -322,7 +406,12 @@ function saveState() {
 		score,
 		tileIdCounter,
 		lastNewTileId,
-		hasShownGameWon
+		hasShownGameWon,
+		aiState: {
+			aiModeActive,
+			aiMoveDelay,
+			aiIntervalId
+		}
 	});
 	if (undoStack.length > 100) undoStack.shift(); // Limit stack size
 	redoStack = [];
@@ -335,7 +424,29 @@ function restoreState(state) {
 	tileIdCounter = state.tileIdCounter;
 	lastNewTileId = state.lastNewTileId;
 	hasShownGameWon = state.hasShownGameWon;
+
+	// Handle AI state restoration
+	if (state.aiState) {
+		// Stop current AI mode if active
+		if (aiModeActive) {
+			stopAIMode();
+		}
+		
+		// Set the AI move delay first
+		aiMoveDelay = state.aiState.aiMoveDelay;
+		const aiMoveDurationInput = document.getElementById('ai-move-duration-input');
+		if (aiMoveDurationInput) {
+			aiMoveDurationInput.value = aiMoveDelay;
+		}
+
+		// Restore AI mode if it was active
+		if (state.aiState.aiModeActive) {
+			startAIMode();
+		}
+	}
+	
 	updateUI();
+	updateGridContainerAnimations();
 }
 
 // Patch move to save state before moving
@@ -366,6 +477,7 @@ if (undoButton) {
 			// Hide game over screen if visible
 			const gameOverContainer = document.getElementById('game-over-container');
 			if (gameOverContainer) gameOverContainer.classList.add('hidden');
+			// Do NOT call updateGridContainerAnimations here
 		}
 	});
 }
@@ -383,6 +495,7 @@ if (redoButton) {
 				const gameOverContainer = document.getElementById('game-over-container');
 				if (gameOverContainer) gameOverContainer.classList.remove('hidden');
 			}
+			// Do NOT call updateGridContainerAnimations here
 		}
 	});
 }
@@ -618,11 +731,16 @@ if (gridSizeDropdown) {
 			GRID_SIZE = newSize;
 			clearHistory();
 			initGrid();
+			updateGoalDisplay();
 		}
 	});
 }
 
-window.onload = initGrid;
+// Update goal display on initial load
+window.onload = function() {
+    initGrid();
+    updateGoalDisplay();
+};
 
 // AI mode functions
 function updateGridContainerAnimations() {
@@ -635,8 +753,46 @@ function updateGridContainerAnimations() {
 	}
 }
 
+// Patch undo/redo to NOT call updateGridContainerAnimations
+if (undoButton) {
+	undoButton.addEventListener('click', function () {
+		if (undoStack.length > 1) {
+			const prevState = undoStack[undoStack.length - 2];
+			redoStack.push(undoStack.pop());
+			restoreState(prevState);
+			const gameOverContainer = document.getElementById('game-over-container');
+			if (gameOverContainer) gameOverContainer.classList.add('hidden');
+			// Do NOT call updateGridContainerAnimations here
+		}
+	});
+}
+
+if (redoButton) {
+	redoButton.addEventListener('click', function () {
+		if (redoStack.length > 0) {
+			const state = redoStack.pop();
+			undoStack.push(state);
+			restoreState(state);
+			if (isGameOver()) {
+				const gameOverContainer = document.getElementById('game-over-container');
+				if (gameOverContainer) gameOverContainer.classList.remove('hidden');
+			}
+			// Do NOT call updateGridContainerAnimations here
+		}
+	});
+}
+
 function startAIMode() {
 	if (aiModeActive) return;
+	const aiMoveDurationInput = document.getElementById('ai-move-duration-input');
+	if (aiMoveDurationInput) {
+		let val = parseInt(aiMoveDurationInput.value, 10);
+		if (!isNaN(val) && val > 0) {
+			aiMoveDelay = val;
+		}
+		// Always keep input value in sync with actual delay
+		aiMoveDurationInput.value = aiMoveDelay;
+	}
 	aiModeActive = true;
 	updateGridContainerAnimations();
 	aiIntervalId = setInterval(() => {
@@ -714,3 +870,15 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	}
 });
+
+// Listen for game mode changes
+const gameModeDropdown = document.getElementById('game-mode-select');
+if (gameModeDropdown) {
+    gameModeDropdown.addEventListener('change', function () {
+        GAME_MODE = gameModeDropdown.value;
+        clearHistory();
+        initGrid();
+        updateGoalDisplay(); // Ensure goal updates when mode changes
+    });
+    GAME_MODE = gameModeDropdown.value;
+}

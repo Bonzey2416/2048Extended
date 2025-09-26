@@ -12,7 +12,7 @@
         <main class="game-container">
             <section class="header">
                 <h1 class="title">2048 Extended <span class="beta">Beta</span></h1>
-                <p>Join the numbers and get to the 2048 tile!</p>
+                <p>Join the numbers and get to the <span class="goal-number">2048</span> tile!</p>
             </section>
             <section class="game-board">
                 <div class="grid-container">
@@ -75,13 +75,24 @@
                     <button id="ai-option-button" title="AI Options"><i id="ai-options-button-icon" class="fas fa-gear"></i></button>
                 </div>
                 </div>
-                <p>Version 0.4; last updated 2025-09-25</p>
+                <p>Version 0.5; last updated 2025-09-26</p>
             </section>
         </main>
         <div class="overlay-backdrop hidden" id="overlay-backdrop"></div>
         <div class="overlay-menu hidden" id="modes-menu">
             <i class="fas fa-times close-button" id="close-modes-menu"></i>
             <h2>Select Game Mode</h2>
+            <p>Goal: <span class="goal-number">2048</span></p>
+            <div class="dropdown-container">
+                <label for="game-mode-select">
+                    <p class="label-title">Game mode</p>
+                    <p class="label-subtitle">Choose the mode for your game</p>
+                </label>
+                <select id="game-mode-select">
+                    <option value="classic" selected>Classic</option>
+                    <option value="fibonacci">Fibonacci</option>
+                </select>
+            </div>
             <div class="dropdown-container">
                 <label for="grid-size-select">
                     <p class="label-title">Grid size</p>
