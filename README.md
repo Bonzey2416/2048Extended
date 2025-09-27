@@ -1,5 +1,9 @@
 # 2048Extended
 ## Changelog
+### Version 0.8
+Date of update: 2025-09-27
+* You can now use different AI strategies: Random, Corner, Swing, and Swirl.
+* About menu: Here you can view the tutorial, current version, contributors, and changelog.
 ### Version 0.7.2
 Date of update: 2025-09-27
 * Fixed a double restart bug once the page loads.

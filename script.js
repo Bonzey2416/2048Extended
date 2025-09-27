@@ -839,18 +839,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Modes overlay handlers
 (function() {
+	const gameContainer = document.getElementById('game-container');
     const modeButton = document.getElementById('mode-button');
     const modesMenu = document.getElementById('modes-menu');
     const closeModes = document.getElementById('close-modes-menu');
 	const aiOptionButton = document.getElementById('ai-option-button');
 	const aiOptionsMenu = document.getElementById('ai-options-menu');
 	const closeAiOptions = document.getElementById('close-ai-options-menu');
+	const aboutButton = document.getElementById('about-button');
+	const aboutMenu = document.getElementById('about-menu');
+	const closeAbout = document.getElementById('close-about-menu');
     const overlayBackdrop = document.getElementById('overlay-backdrop');
 
     function showModesMenu() {
         if (modesMenu && overlayBackdrop) {
             modesMenu.classList.remove('hidden');
             overlayBackdrop.classList.remove('hidden');
+			gameContainer.classList.add('covered');
         }
     }
 
@@ -858,6 +863,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (modesMenu && overlayBackdrop) {
             modesMenu.classList.add('hidden');
             overlayBackdrop.classList.add('hidden');
+			gameContainer.classList.remove('covered');
         }
     }
 
@@ -865,6 +871,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (aiOptionsMenu && overlayBackdrop) {
 			aiOptionsMenu.classList.remove('hidden');
 			overlayBackdrop.classList.remove('hidden');
+			gameContainer.classList.add('covered');
 		}
 	}
 
@@ -872,6 +879,23 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (aiOptionsMenu && overlayBackdrop) {
 			aiOptionsMenu.classList.add('hidden');
 			overlayBackdrop.classList.add('hidden');
+			gameContainer.classList.remove('covered');
+		}
+	}
+
+	function showAboutMenu() {
+		if (aboutMenu && overlayBackdrop) {
+			aboutMenu.classList.remove('hidden');
+			overlayBackdrop.classList.remove('hidden');
+			gameContainer.classList.add('covered');
+		}
+	}
+
+	function hideAboutMenu() {
+		if (aboutMenu && overlayBackdrop) {
+			aboutMenu.classList.add('hidden');
+			overlayBackdrop.classList.add('hidden');
+			gameContainer.classList.remove('covered');
 		}
 	}
 
@@ -881,6 +905,9 @@ document.addEventListener('DOMContentLoaded', function () {
 	if (aiOptionButton) aiOptionButton.addEventListener('click', showAiOptionsMenu);
 	if (closeAiOptions) closeAiOptions.addEventListener('click', hideAiOptionsMenu);
 	if (overlayBackdrop) overlayBackdrop.addEventListener('click', hideAiOptionsMenu);
+	if (aboutButton) aboutButton.addEventListener('click', showAboutMenu);
+	if (closeAbout) closeAbout.addEventListener('click', hideAboutMenu);
+	if (overlayBackdrop) overlayBackdrop.addEventListener('click', hideAboutMenu);
 
     // Close with ESC
     document.addEventListener('keydown', function (e) {
@@ -911,7 +938,208 @@ window.onload = function() {
     updateGoalDisplay();
 };
 
-// AI mode functions
+// AI Strategies
+
+const AI_STRATEGIES = {
+	'random': {
+		name: 'Random',
+		getMove: function() {
+			// Pick a random valid move direction
+			const dirs = [0, 1, 2, 3];
+			const valid = dirs.filter(canMove);
+			if (valid.length === 0) return 0;
+			return valid[Math.floor(Math.random() * valid.length)];
+		}
+	},
+	'corner': {
+		name: 'Corner',
+		getMove: (function() {
+			let state = 'primary'; // 'primary' (left/up) or 'recovery' (right/up)
+			let lastPrimary = 'up';
+			let lastRecovery = 'up';
+
+			return function() {
+				const canLeft = canMove(0);
+				const canUp = canMove(3);
+				const canRight = canMove(2);
+				const canDown = canMove(1);
+
+				// Determine current state based on available moves
+				if (state === 'primary' && !canLeft && !canUp) {
+					state = 'recovery';
+				} else if (state === 'recovery' && !canRight && !canUp) {
+					state = 'primary';
+				}
+
+				// Execute move based on the determined state
+				if (state === 'primary') {
+					// Alternate between left and up
+					if (lastPrimary === 'up' && canLeft) {
+						lastPrimary = 'left';
+						return 0; // Move Left
+					}
+					if (canUp) {
+						lastPrimary = 'up';
+						return 3; // Move Up
+					}
+					if (canLeft) { // Fallback if only left is possible
+						lastPrimary = 'left';
+						return 0; // Move Left
+					}
+				}
+
+				if (state === 'recovery') {
+					// Alternate between right and up
+					if (lastRecovery === 'up' && canRight) {
+						lastRecovery = 'right';
+						return 2; // Move Right
+					}
+					if (canUp) {
+						lastRecovery = 'up';
+						return 3; // Move Up
+					}
+					if (canRight) { // Fallback if only right is possible
+						lastRecovery = 'right';
+						return 2; // Move Right
+					}
+				}
+
+				// Last resort if no moves in the current or switched state are possible
+				if (canDown) {
+					return 1; // Move Down
+				}
+
+				// Should only be reached if game is over
+				return 0;
+			};
+		})()
+	},
+	'swirl': {
+		name: 'Swirl',
+		getMove: (function() {
+			let idx = 0;
+			const order = [3, 2, 1, 0]; // up, right, down, left
+			return function() {
+				for (let i = 0; i < 4; i++) {
+					const dir = order[(idx + i) % 4];
+					if (canMove(dir)) {
+						idx = (idx + 1) % 4;
+						return dir;
+					}
+				}
+				return 0;
+			};
+		})()
+	},
+	'swing': {
+		name: 'Swing',
+		getMove: (function() {
+			let state = 'primary'; // 'primary' (up/down) or 'recovery' (left/right)
+			let lastPrimary = 'down';
+			let lastRecovery = 'right';
+
+			return function() {
+				const canUp = canMove(3);
+				const canDown = canMove(1);
+				const canLeft = canMove(0);
+				const canRight = canMove(2);
+
+				// Prioritize returning to primary state if possible
+				if (state === 'recovery' && !canLeft && !canRight) {
+					state = 'primary';
+				}
+				
+				// Switch to recovery if primary moves are not possible
+				if (state === 'primary' && !canUp && !canDown) {
+					state = 'recovery';
+				}
+
+				if (state === 'primary') {
+					// Alternate between up and down
+					if (lastPrimary === 'down' && canUp) {
+						lastPrimary = 'up';
+						return 3; // Move Up
+					}
+					if (canDown) {
+						lastPrimary = 'down';
+						return 1; // Move Down
+					}
+					if (canUp) { // Fallback if only up is possible
+						lastPrimary = 'up';
+						return 3; // Move Up
+					}
+				}
+
+				if (state === 'recovery') {
+					// Alternate between left and right
+					if (lastRecovery === 'right' && canLeft) {
+						lastRecovery = 'left';
+						return 0; // Move Left
+					}
+					if (canRight) {
+						lastRecovery = 'right';
+						return 2; // Move Right
+					}
+					if (canLeft) { // Fallback if only left is possible
+						lastRecovery = 'left';
+						return 0; // Move Left
+					}
+				}
+				
+				// Last resort if no moves are possible
+				return Math.floor(Math.random() * 4);
+			};
+		})()
+	}
+};
+
+let aiStrategy = 'random';
+
+function canMove(direction) {
+	// Simulate a move and see if it changes the grid
+	let testGrid = grid.map(row => [...row]);
+	let testTiles = tiles.map(t => ({ ...t }));
+	let before = JSON.stringify(testGrid);
+	// Use a copy of move logic, but don't update real state
+	// Only check if any tile would move or merge
+	// We'll use operate/slide/combine logic, but on testGrid/testTiles
+	// For brevity, just check if any row/col would change
+	function testOperate(row) {
+		let afterFirstSlide = slide(row);
+		let combineResult = combineTest(row);
+		let afterSecondSlide = slide(combineResult.row);
+		return JSON.stringify(row) !== JSON.stringify(afterSecondSlide);
+	}
+	function combineTest(row) {
+		let rowChanged = false;
+		for (let i = 0; i < GRID_SIZE - 1; i++) {
+			const a = row[i], b = row[i + 1];
+			if (a && b) {
+				const tileA = testTiles.find(t => t.id === a);
+				const tileB = testTiles.find(t => t.id === b);
+				if (tileA && tileB && tileA.value === tileB.value) {
+					row[i] = a;
+					row[i + 1] = null;
+					tileA.value *= 2;
+					rowChanged = true;
+					i++;
+				}
+			}
+		}
+		return { row, rowChanged };
+	}
+	// Rotate testGrid as in move()
+	let g = testGrid.map(row => [...row]);
+	for (let i = 0; i < direction; i++) g = rotateGrid(g);
+	let changed = false;
+	for (let r = 0; r < GRID_SIZE; r++) {
+		if (testOperate(g[r])) changed = true;
+	}
+	for (let i = 0; i < (4 - direction) % 4; i++) g = rotateGrid(g);
+	if (JSON.stringify(g) !== before) return true;
+	return changed;
+}
+
 function updateGridContainerAnimations() {
 	const gridContainer = document.querySelector('.grid-container');
 	if (!gridContainer) return;
@@ -932,14 +1160,18 @@ function startAIMode() {
 		if (!isNaN(val) && val > 0) {
 			aiMoveDelay = val;
 		}
-		// Always keep input value in sync with actual delay
 		aiMoveDurationInput.value = aiMoveDelay;
 	}
 	aiModeActive = true;
 	updateGridContainerAnimations();
 	aiIntervalId = setInterval(() => {
 		if (!aiModeActive) return;
-		const direction = Math.floor(Math.random() * 4);
+		let direction = 0;
+		if (AI_STRATEGIES[aiStrategy]) {
+			direction = AI_STRATEGIES[aiStrategy].getMove();
+		} else {
+			direction = Math.floor(Math.random() * 4);
+		}
 		move(direction);
 	}, aiMoveDelay);
 }
@@ -1009,6 +1241,16 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (!isNaN(val) && val > 0) aiMoveDelay = val;
 			else aiMoveDelay = 100;
 			updateGridContainerAnimations();
+		});
+	}
+
+	const aiStrategySelect = document.getElementById('ai-strategy-select');
+	if (aiStrategySelect) {
+		// Set initial strategy from dropdown on load
+		aiStrategy = aiStrategySelect.value;
+		// Update strategy when the user changes the selection
+		aiStrategySelect.addEventListener('change', function() {
+			aiStrategy = this.value;
 		});
 	}
 });

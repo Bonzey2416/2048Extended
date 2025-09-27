@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/aquawolf04/font-awesome-pro@5cd1511/css/all.css"  crossorigin="anonymous" referrerpolicy="no-referrer" />
     </head>
     <body>
-        <main class="game-container">
+        <main class="game-container" id="game-container">
             <section class="header">
                 <h1 class="title">2048 Extended <span class="beta">Beta</span></h1>
                 <p>Join the numbers and get to the <span class="goal-number">2048</span> tile!</p>
@@ -67,15 +67,15 @@
                     <button id="redo-button" class="hidden" title="Redo (Ctrl+Y)"><i class="fas fa-redo"></i> Redo</button>
                     <button id="restart-button" title="Restart Game"><i class="fas fa-sync-alt"></i> Restart</button>
                     <button id="mode-button" title="Change Mode"><i class="fas fa-adjust"></i> Mode</button>
+                    <button id="about-button" title="About 2048 Extended"><i class="fas fa-info-circle"></i> About</button>
                 </div>
                 <div class="ai-container">
                     <i class="fas fa-robot"></i>
                     <div class="ai-status" id="ai-status">AI Mode: Off</div>
-                    <button id="ai-toggle-button" title="Toggle AI Mode"><i id="ai-toggle-button-icon" class="fas fa-play"></i></button>
-                    <button id="ai-option-button" title="AI Options"><i id="ai-options-button-icon" class="fas fa-gear"></i></button>
+                        <button id="ai-toggle-button" title="Toggle AI Mode"><i id="ai-toggle-button-icon" class="fas fa-play"></i></button>
+                        <button id="ai-option-button" title="AI Options"><i id="ai-options-button-icon" class="fas fa-gear"></i></button>
+                    </div>
                 </div>
-                </div>
-                <p>Version 0.7.2; last updated 2025-09-27</p>
             </section>
         </main>
         <div class="overlay-backdrop hidden" id="overlay-backdrop"></div>
@@ -121,13 +121,153 @@
         <div class="overlay-menu hidden" id="ai-options-menu">
             <i class="fas fa-times close-button" id="close-ai-options-menu"></i>
             <h2>AI Options</h2>
+            <div class="dropdown-container">
+                <label for="ai-strategy-select">
+                    <p class="label-title">AI strategy</p>
+                    <p class="label-subtitle">Choose the strategy for the AI</p>
+                </label>
+                <select id="ai-strategy-select">
+                    <option value="random" selected>Random</option>
+                    <option value="corner">Corner</option>
+                    <option value="swing">Swing</option>
+                    <option value="swirl">Swirl</option>
+                </select>
+            </div>
             <div class="input-container">
                 <label for="ai-move-duration-input">
-                    <p class="label-title">AI Move Duration</p>
+                    <p class="label-title">AI move duration</p>
                     <p class="label-subtitle">Set the duration for AI moves in milliseconds</p>
                 </label>
                 <input type="number" id="ai-move-duration-input" min="0" value="100">
             </div>
+        </div>
+        <div class="overlay-menu hidden" id="about-menu">
+            <i class="fas fa-times close-button" id="close-about-menu"></i>
+            <h2>About 2048 Extended</h2>
+            <p style="font-style: italic;">Version 0.8. Last updated 2025-09-27.</p>
+            <p>2048 Extended is an enhanced version of the classic 2048 game, featuring multiple game modes, grid sizes, and an AI mode.</p>
+            <h3>How to play</h3>
+            <p>
+                Use the arrow keys or WASD to move the tiles. When two tiles with the same number touch, they merge into one!
+                The goal is to create a tile with the number 2048 (or higher when using larger grid sizes).
+                You can also enable Practice mode to allow undoing and redoing moves using Ctrl + Z and Ctrl + Y respectively.
+            </p>
+            <h3>Contributors</h3>
+            <ul class="contributors-list">
+                <li>
+                    <img src="images/Bonzey2416.png" alt="Bonzey2416" class="contributor-avatar">
+                    <div class="contributor-info">
+                        <a class="contributor-name" href="https://github.com/Bonzey2416">Bonzey2416</a>
+                        <p>Main developer of 2048 Extended</p>
+                    </div>
+                </li>
+                <li>
+                    <img src="images/GithubCopilot.svg" alt="GitHub Copilot" class="contributor-avatar">
+                    <div class="contributor-info">
+                        <a class="contributor-name" href="https://github.com/features/copilot">GitHub Copilot</a>
+                        <p>AI pair programmer powered by OpenAI</p>
+                    </div>
+                </li>
+                <li>
+                    <img src="images/GabrieleCirulli.jpg" alt="Gabriele Cirulli" class="contributor-avatar">
+                    <div class="contributor-info">
+                        <a class="contributor-name" href="https://github.com/GabrieleCirulli">Gabriele Cirulli</a>
+                        <p>Original creator of 2048</p>
+                    </div>
+                </li>
+            </ul>
+            <h3>Changelog</h3>
+            <h4>Version 0.8</h4>
+            <p class="update-date">Date of update: 2025-09-27</p>
+            <ul>
+                <li>You can now use different AI strategies: Random, Corner, Swing, and Swirl.</li>
+                <li>About menu: Here you can view the tutorial, current version, contributors, and changelog.</li>
+            </ul>
+            <h4>Version 0.7.2</h4>
+            <p class="update-date">Date of update: 2025-09-27</p>
+            <ul>
+                <li>Fixed a double restart bug once the page loads.</li>
+                <li>Fixed an issue when not in practice mode, pressing Ctrl + Z would still undo moves</li>
+                <li>Improved compatibility in older browsers</li>
+            </ul>
+            <h4>Version 0.7.1</h4>
+            <p class="update-date">Date of update: 2025-09-27</p>
+            <ul>
+                <li>Made a minor tweak to the overlay menu</li>
+            </ul>
+            <h4>Version 0.7</h4>
+            <p class="update-date">Date of update: 2025-09-27</p>
+            <ul>
+                <li>Practice mode is now toggleable (disabled by default). In practice mode, you can undo/redo moves; useful if you made a mistake or want to try different strategies.</li>
+            </ul>
+            <h4>Version 0.6.2</h4>
+            <p class="update-date">Date of update: 2025-09-27</p>
+            <ul>
+                <li>Added merging transitions</li>
+                <li>Updated reset button text to "Restart" to improve clarity</li>
+            </ul>
+            <h4>Version 0.6.1</h4>
+            <p class="update-date">Date of update: 2025-09-26</p>
+            <ul>
+                <li>Fixed a bug where, while undoing, it sometimes undoes two moves instead of one</li>
+            </ul>
+            <h4>Version 0.6</h4>
+            <p class="update-date">Date of update: 2025-09-26</p>
+            <ul>
+                <li>Added tile colors up to 2097152</li>
+            </ul>
+            <h4>Version 0.5.2</h4>
+            <p class="update-date">Date of update: 2025-09-26</p>
+            <ul>
+                <li>Fixed a bug where, while undoing, it sometimes undoes two moves instead of one</li>
+            </ul>
+            <h4>Version 0.5.1</h4>
+            <p class="update-date">Date of update: 2025-09-26</p>
+            <ul>
+                <li>Fixed a bug when pressing Ctrl + Z after disabling AI mode causes an to re-enable AI mode</li>
+            </ul>
+            <h4>Version 0.5</h4>
+            <p class="update-date">Date of update: 2025-09-26</p>
+            <ul>
+                <li>Fibonacci mode: New game mode where tiles follow the Fibonacci sequence.</li>
+                <li>Goal tile is dynamically calculated based on grid size.</li>
+            </ul>
+            <h4>Version 0.4</h4>
+            <p class="update-date">Date of update: 2025-09-25</p>
+            <ul>
+                <li>AI Mode: AI plays the game for you, with adjustable move delay</li>
+            </ul>
+            <h4>Version 0.3</h4>
+            <p class="update-date">Date of update: 2025-09-25</p>
+            <ul>
+                <li>Added grid size selection (3x3, 4x4, 5x5, 6x6, 7x7, 8x8)</li>
+                <li>Fixed undo/redo handling when restarting via game over/game won container</li>
+                <li>Fixed tile positioning bug when changing grid size</li>
+            </ul>
+            <h4>Version 0.2.1</h4>
+            <p class="update-date">Date of update: 2025-09-25</p>
+            <ul>
+                <li>Fixed a issue where sometimes when undoing, it undoes two moves instead of one</li>
+            </ul>
+            <h4>Version 0.2</h4>
+            <p class="update-date">Date of update: 2025-09-25</p>
+            <ul>
+                <li>Undo/redo shortcuts (Ctrl + Z/Ctrl + Y)</li>
+                <li>Move tiles using WASD keys</li>
+                <li>Fixed text scaling, especially on mobile</li>
+                <li>Fix game over container not hidden if undid</li>
+                <li>Improved undoing/redoing reliability</li>
+            </ul>
+            <h4>Version 0.1.1</h4>
+            <p class="update-date">Date of update: 2025-09-24</p>
+            <ul>
+                <li>Forgot to change goal back to 2048</li>
+            </ul>
+            <h4>Version 0.1</h4>
+            <p class="update-date">Date of update: 2025-09-24</p>
+            <ul>
+                <li>Initial beta release</li>
+            </ul>
         </div>
     </body>
 </html>
