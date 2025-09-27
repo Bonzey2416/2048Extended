@@ -1,5 +1,9 @@
 # 2048Extended
 ## Changelog
+### Version 0.8.1
+Date of update: 2025-09-27
+* Prevent tiles from moving outside the grid boundaries or when menus are open.
+* Prevent the game from zooming in.
 ### Version 0.8
 Date of update: 2025-09-27
 * You can now use different AI strategies: Random, Corner, Swing, and Swirl.

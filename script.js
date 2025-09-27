@@ -721,6 +721,11 @@ initGrid = function() {
 };
 
 document.addEventListener('keydown', function (e) {
+	const overlayBackdrop = document.getElementById('overlay-backdrop');
+	if (overlayBackdrop && !overlayBackdrop.classList.contains('hidden')) {
+		return; // Do nothing if overlay is visible
+	}
+
 	// Prevent scrolling for movement keys only
 	if (["ArrowLeft","ArrowUp","ArrowRight","ArrowDown","w","a","s","d","W","A","S","D"].includes(e.key)) {
 		e.preventDefault();
@@ -779,15 +784,28 @@ document.addEventListener('keydown', function (e) {
 // Touch swipe support
 let touchStartX = 0;
 let touchStartY = 0;
+let touchOnGrid = false;
 
 document.addEventListener('touchstart', function (e) {
-	if (e.touches.length === 1) {
+	const overlayBackdrop = document.getElementById('overlay-backdrop');
+	if (overlayBackdrop && !overlayBackdrop.classList.contains('hidden')) {
+		touchOnGrid = false;
+		return;
+	}
+
+	const gridContainer = e.target.closest('.grid-container');
+	if (gridContainer && e.touches.length === 1) {
 		touchStartX = e.touches[0].clientX;
 		touchStartY = e.touches[0].clientY;
+		touchOnGrid = true;
+	} else {
+		touchOnGrid = false;
 	}
 });
 
 document.addEventListener('touchend', function (e) {
+	if (!touchOnGrid) return;
+
 	if (e.changedTouches.length === 1) {
 		const dx = e.changedTouches[0].clientX - touchStartX;
 		const dy = e.changedTouches[0].clientY - touchStartY;

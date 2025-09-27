@@ -489,6 +489,10 @@ p {
     margin-top: calc(0.8vw + 0.8vh);
 }
 
+.overlay-menu ul {
+    padding-inline-start: 2em;
+}
+
 .dropdown-container, .input-container, .toggle-container {
     margin: calc(1vw + 1vh) 0;
     display: flex;
@@ -576,6 +580,7 @@ p {
 .contributors-list {
     list-style: none;
     padding: 0;
+    padding-inline-start: 0 !important;
     margin: 0;
     display: flex;
     flex-direction: column;
