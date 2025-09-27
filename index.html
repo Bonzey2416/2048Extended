@@ -63,8 +63,8 @@
                     </div>
                 </div>
                 <div class="button-container">
-                    <button id="undo-button" title="Undo (Ctrl+Z)"><i class="fas fa-undo"></i> Undo</button>
-                    <button id="redo-button" title="Redo (Ctrl+Y)"><i class="fas fa-redo"></i> Redo</button>
+                    <button id="undo-button" class="hidden" title="Undo (Ctrl+Z)"><i class="fas fa-undo"></i> Undo</button>
+                    <button id="redo-button" class="hidden" title="Redo (Ctrl+Y)"><i class="fas fa-redo"></i> Redo</button>
                     <button id="restart-button" title="Restart Game"><i class="fas fa-sync-alt"></i> Restart</button>
                     <button id="mode-button" title="Change Mode"><i class="fas fa-adjust"></i> Mode</button>
                 </div>
@@ -75,7 +75,7 @@
                     <button id="ai-option-button" title="AI Options"><i id="ai-options-button-icon" class="fas fa-gear"></i></button>
                 </div>
                 </div>
-                <p>Version 0.6.2; last updated 2025-09-27</p>
+                <p>Version 0.7; last updated 2025-09-27</p>
             </section>
         </main>
         <div class="overlay-backdrop hidden" id="overlay-backdrop"></div>
@@ -83,6 +83,16 @@
             <i class="fas fa-times close-button" id="close-modes-menu"></i>
             <h2>Select Game Mode</h2>
             <p>Goal: <span class="goal-number">2048</span></p>
+            <div class="toggle-container">
+                <div>
+                    <p class="label-title">Practice mode</p>
+                    <p class="label-subtitle">Enables the ability to undo/redo moves</p>
+                </div>
+                <label class="switch" for="practice-mode-toggle">
+                    <input type="checkbox" id="practice-mode-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
             <div class="dropdown-container">
                 <label for="game-mode-select">
                     <p class="label-title">Game mode</p>

@@ -367,6 +367,10 @@ p {
     background: #9f8b7a;
 }
 
+.button-container button.hidden {
+    display: none;
+}
+
 .ai-container {
     display: flex;
     align-items: center;
@@ -465,7 +469,7 @@ p {
     font-weight: 700;
 }
 
-.overlay-menu .dropdown-container, .overlay-menu .input-container {
+.dropdown-container, .input-container, .toggle-container {
     margin: calc(1vw + 1vh) 0;
     display: flex;
     justify-content: space-between;
@@ -477,7 +481,7 @@ p {
     font-weight: 500;
 }
 
-.overlay-menu .dropdown-container select, .overlay-menu .input-container input {
+.dropdown-container select, .input-container input {
     font-size: calc(0.7vw + 1.5vh);
     font-family: inherit;
     font-weight: 400;
@@ -490,8 +494,63 @@ p {
     cursor: pointer;
 }
 
-.overlay-menu .input-container input {
+
+.input-container input {
     width: 30%;
+}
+
+.toggle-container .switch {
+    display: inline-block;
+    position: relative;
+    width: calc(3vw + 6vh);
+    height: calc(1.2vw + 2.4vh);
+    margin-left: calc(0.5vw + 0.5vh);
+}
+
+.toggle-container .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-container .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #0001;
+    transition: 0.4s;
+    border-radius: calc(1.2vw + 2.4vh);
+}
+
+.toggle-container .slider:before {
+    position: absolute;
+    content: "";
+    width: calc(1.5vw + 3vh);
+    left: calc(0.1vw + 0.2vh);
+    top: calc(0.1vw + 0.2vh);
+    bottom: calc(0.1vw + 0.2vh);
+    background-color: #faf8ef;
+    box-shadow: 0 calc(0.05vw + 0.1vh) calc(0.1vw + 0.2vh) #0003;
+    transition: 0.4s;
+    border-radius: calc(1vw + 2vh);
+    -webkit-backdrop-filter: blur(calc(0.1vw + 0.2vh)) saturate(150%);
+    backdrop-filter: blur(calc(0.1vw + 0.2vh)) saturate(150%);
+}
+
+.toggle-container .switch input:focus + .slider:before {
+    transform: scale(1.5);
+    background-color: #faf8efbb;
+}
+
+.toggle-container .switch input:checked + .slider {
+    background-color: #776e65;
+}
+
+.toggle-container .switch input:checked + .slider:before {
+    left: calc(1.4vw + 2.8vh);
 }
 
 @media screen and (orientation: portrait) {

@@ -604,38 +604,70 @@ move = function(direction) {
 };
 
 // Undo button
+
 const undoButton = document.getElementById('undo-button');
+const redoButton = document.getElementById('redo-button');
+const practiceModeToggle = document.getElementById('practice-mode-toggle');
+
+function setUndoRedoEnabled(enabled) {
+	if (undoButton) undoButton.disabled = !enabled;
+	if (redoButton) redoButton.disabled = !enabled;
+}
+
+function clearUndoRedoStacks() {
+	undoStack = [];
+	redoStack = [];
+}
+
+function handlePracticeModeChange() {
+	const enabled = practiceModeToggle && practiceModeToggle.checked;
+	setUndoRedoEnabled(enabled);
+	// Always restart game on toggle
+	clearHistory();
+	initGrid();
+	// Show/hide undo/redo buttons
+	if (undoButton) {
+		if (enabled) undoButton.classList.remove('hidden');
+		else undoButton.classList.add('hidden');
+	}
+	if (redoButton) {
+		if (enabled) redoButton.classList.remove('hidden');
+		else redoButton.classList.add('hidden');
+	}
+	if (!enabled) {
+		clearUndoRedoStacks();
+	}
+}
+
 if (undoButton) {
 	undoButton.addEventListener('click', function () {
-		// Only undo if there is a previous state to go back to
+		if (practiceModeToggle && !practiceModeToggle.checked) return;
 		if (undoStack.length > 1) {
-			redoStack.push(undoStack.pop()); // Move current state to redo
-			// debug: undo performed
-			restoreState(undoStack[undoStack.length - 1]); // Restore previous state
-			// Hide game over screen if visible
+			redoStack.push(undoStack.pop());
+			restoreState(undoStack[undoStack.length - 1]);
 			const gameOverContainer = document.getElementById('game-over-container');
 			if (gameOverContainer) gameOverContainer.classList.add('hidden');
-			// Do NOT call updateGridContainerAnimations here
 		}
 	});
 }
-
-// Redo button
-const redoButton = document.getElementById('redo-button');
 if (redoButton) {
 	redoButton.addEventListener('click', function () {
+		if (practiceModeToggle && !practiceModeToggle.checked) return;
 		if (redoStack.length > 0) {
 			const state = redoStack.pop();
 			undoStack.push(state);
 			restoreState(state);
-			// Show game over container if the restored state is game over
 			if (isGameOver()) {
 				const gameOverContainer = document.getElementById('game-over-container');
 				if (gameOverContainer) gameOverContainer.classList.remove('hidden');
 			}
-			// Do NOT call updateGridContainerAnimations here
 		}
 	});
+}
+if (practiceModeToggle) {
+	practiceModeToggle.addEventListener('change', handlePracticeModeChange);
+	// On load, set initial state
+	handlePracticeModeChange();
 }
 
 // Restart button
