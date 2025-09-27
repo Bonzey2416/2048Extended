@@ -1,5 +1,9 @@
 # 2048Extended
 ## Changelog
+### Version 0.6.2
+Date of update: 2025-09-27
+* Added merging transitions
+* Updated reset button text to "Restart" to improve clarity
 ### Version 0.6.1
 Date of update: 2025-09-26
 * Fixed a bug where, while undoing, it sometimes undoes two moves instead of one

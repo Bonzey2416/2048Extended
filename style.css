@@ -177,21 +177,18 @@ p {
 }
 
 .tile.merged {
-    animation: merged 200ms ease-out;
+    animation: merged 300ms ease-out;
     z-index: 3;
 }
 
 @keyframes merged {
-    0% {
-        transform: scale(1.2);
-        opacity: 0;
-        filter: blur(calc(0.5vw + 0.5vh));
-    }
-    100% {
+    0%, 33%, 100% {
         transform: scale(1);
-        opacity: 1;
-        filter: none;
     }
+    50% {
+        transform: scale(1.2);
+    }
+    
 }
 
 .tile.tile-1       { background: #f0eee8; color: #776e65; }

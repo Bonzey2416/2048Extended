@@ -17,6 +17,11 @@ let aiMoveDelay = 100;
 
 let GAME_MODE = 'classic';
 
+// Track merges for animation
+let mergeAnimations = [];
+// Snapshot of tile positions before a move (id -> {row,col})
+let beforeMovePositions = null;
+
 function initGrid() {
 	generateGridCells();
 	grid = Array(GRID_SIZE)
@@ -29,6 +34,8 @@ function initGrid() {
 	addRandomTile();
 	addRandomTile();
 	updateUI();
+	// Save the initial state so undo works after the first move
+	saveState();
 	// Hide game over container
 	const gameOverContainer = document.getElementById('game-over-container');
 	if (gameOverContainer) gameOverContainer.classList.add('hidden');
@@ -101,12 +108,26 @@ function combine(row) {
             const tileB = row[i + 1] ? getTileById(row[i + 1]) : null;
             if (tileA && tileB && areFibonacciMergeable(tileA.value, tileB.value, fibSeq)) {
                 if (tileA.merged || tileB.merged) continue;
+                // Determine starting positions for animation (use beforeMovePositions when available)
+                const fromA = (beforeMovePositions && beforeMovePositions[tileA.id]) ? beforeMovePositions[tileA.id] : { row: tileA.row, col: tileA.col };
+                const fromB = (beforeMovePositions && beforeMovePositions[tileB.id]) ? beforeMovePositions[tileB.id] : { row: tileB.row, col: tileB.col };
+				// Record merge animation info. Keep the id of the merged (kept) tile
+				mergeAnimations.push({
+					from: { id: tileA.id, row: fromA.row, col: fromA.col, value: tileA.value },
+					from2: { id: tileB.id, row: fromB.row, col: fromB.col, value: tileB.value },
+					mergedId: tileA.id,
+					to: { row: tileA.row, col: tileA.col },
+					mergedValue: tileA.value + tileB.value
+				});
                 tileA.value = tileA.value + tileB.value;
                 tileA.merged = true;
                 score += tileA.value;
                 const tileBEl = document.getElementById('tile-' + tileB.id);
-                if (tileBEl) tileBEl.remove();
+                // mark DOMs as merging so they persist for animation
+				// Remove the non-alias (removed) tile DOM immediately so only the alias and merged tile remain
+				if (tileBEl) tileBEl.remove();
                 grid[tileB.row][tileB.col] = null;
+                // remove tileB logically
                 tiles = tiles.filter(t => t.id !== tileB.id);
                 row[i + 1] = null;
                 rowChanged = true;
@@ -118,13 +139,26 @@ function combine(row) {
     for (let i = 0; i < GRID_SIZE - 1; i++) {
         const tileA = row[i] ? getTileById(row[i]) : null;
         const tileB = row[i + 1] ? getTileById(row[i + 1]) : null;
-        if (tileA && tileB && tileA.value === tileB.value) {
+			if (tileA && tileB && tileA.value === tileB.value) {
             if (tileA.merged || tileB.merged) continue; // Prevent double merges
+            const fromA = (beforeMovePositions && beforeMovePositions[tileA.id]) ? beforeMovePositions[tileA.id] : { row: tileA.row, col: tileA.col };
+            const fromB = (beforeMovePositions && beforeMovePositions[tileB.id]) ? beforeMovePositions[tileB.id] : { row: tileB.row, col: tileB.col };
+            // Record merge animation info
+				// Record merge animation info. Store mergedId so we can reliably
+				// target the final DOM element for the merged tile.
+				mergeAnimations.push({
+					from: { id: tileA.id, row: fromA.row, col: fromA.col, value: tileA.value },
+					from2: { id: tileB.id, row: fromB.row, col: fromB.col, value: tileB.value },
+					mergedId: tileA.id,
+					to: { row: tileA.row, col: tileA.col },
+					mergedValue: tileA.value * 2
+				});
             tileA.value *= 2;
             tileA.merged = true;
             score += tileA.value;
             const tileBEl = document.getElementById('tile-' + tileB.id);
-            if (tileBEl) tileBEl.remove();
+            // Mark DOMs as merging so they persist for animation
+			if (tileBEl) tileBEl.remove();
             grid[tileB.row][tileB.col] = null;
             tiles = tiles.filter(t => t.id !== tileB.id);
             row[i + 1] = null;
@@ -135,20 +169,45 @@ function combine(row) {
     return { row, rowChanged };
 }
 
+// Patch operate to record merge targets after final slide
 function operate(row) {
     let rowChanged = false;
-
     const afterFirstSlide = slide(row);
     if (JSON.stringify(afterFirstSlide) !== JSON.stringify(row)) {
-        rowChanged = true; // sliding changed the row
+        rowChanged = true;
     }
-
     row = afterFirstSlide;
-    const combineResult = combine(row);
+	// Track merges created by this combine call so we can map their final positions
+	const beforeCombineCount = mergeAnimations.length;
+	const combineResult = combine(row);
     row = combineResult.row;
     if (combineResult.rowChanged) rowChanged = true;
-
     const afterSecondSlide = slide(row);
+	// Map the mergeAnimations entries created by this combine call to their
+	// final positions after the second slide. We use mergedId to locate the
+	// kept tile and set anim.to accordingly.
+	const newAnims = mergeAnimations.slice(beforeCombineCount);
+	newAnims.forEach(anim => {
+		if (anim.mergedId) {
+			// After we've updated positions below, the merged tile should be
+			// present in the global tiles list with updated row/col.
+			const mergedTile = getTileById(anim.mergedId);
+			if (mergedTile) {
+				anim.to = { row: mergedTile.row, col: mergedTile.col };
+			} else {
+				// Fallback: scan the afterSecondSlide for a tile with matching value
+				for (let i = 0; i < afterSecondSlide.length; i++) {
+					const id = afterSecondSlide[i];
+					if (!id) continue;
+					const tile = getTileById(id);
+					if (tile && tile.value === anim.mergedValue) {
+						anim.to = { row: tile.row, col: tile.col };
+						break;
+					}
+				}
+			}
+		}
+	});
     if (JSON.stringify(afterSecondSlide) !== JSON.stringify(row)) {
         rowChanged = true;
     }
@@ -172,6 +231,15 @@ function rotateGrid(grid) {
 
 function move(direction) {
     resetMergedState();
+
+    // Snapshot positions before the move (use current grid)
+    beforeMovePositions = {};
+    for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0; c < GRID_SIZE; c++) {
+            const id = grid[r] && grid[r][c];
+            if (id) beforeMovePositions[id] = { row: r, col: c };
+        }
+    }
 
     let oldGrid = JSON.stringify(grid);
     let currentGrid = grid.map(row => [...row]);
@@ -209,6 +277,9 @@ function move(direction) {
         }
         addRandomTile();
         updateUI();
+
+        // clear snapshot after UI updated
+        beforeMovePositions = null;
 
         if (isGameOver()) {
             stopAIMode();
@@ -344,9 +415,12 @@ function updateUI() {
 			tileContainer.appendChild(tile);
 		} else {
 			// Update value and class if changed
-			if (!tile.classList.contains(`tile-${t.value}`)) {
-				tile.className = `tile tile-${t.value}`;
-			}
+			const existingMerging = tile.classList.contains('merging');
+            if (!tile.classList.contains(`tile-${t.value}`)) {
+                tile.className = `tile tile-${t.value}`;
+            }
+            // restore merging class if it was present
+            if (existingMerging) tile.classList.add('merging');
 			tile.textContent = t.value;
 			if (t.id === lastNewTileId) tile.classList.add('new');
 			else tile.classList.remove('new');
@@ -387,7 +461,74 @@ function updateUI() {
 		tile.style.top = ((100 - 10 / GRID_SIZE) / GRID_SIZE * t.row + 10 / GRID_SIZE) + '%';
 		tile.style.left = ((100 - 10 / GRID_SIZE) / GRID_SIZE * t.col + 10 / GRID_SIZE) + '%';
 	}
-	lastNewTileId = null;
+	// Animate merge alias tiles
+	mergeAnimations.forEach(anim => {
+		const tileContainer = document.getElementById('tile-container');
+		// First merging alias at original pre-move position
+		const alias1 = document.createElement('div');
+		alias1.id = `tile-${anim.from.id}-merge`;
+		alias1.className = `tile tile-${anim.from.value} tile-merging merging`;
+		alias1.textContent = anim.from.value;
+		alias1.style.position = 'absolute';
+		alias1.style.top = ((100 - 10 / GRID_SIZE) / GRID_SIZE * anim.from.row + 10 / GRID_SIZE) + '%';
+		alias1.style.left = ((100 - 10 / GRID_SIZE) / GRID_SIZE * anim.from.col + 10 / GRID_SIZE) + '%';
+		alias1.style.opacity = '1';
+		alias1.style.zIndex = '100';
+		tileContainer.appendChild(alias1);
+		// Second merging alias at original pre-move position
+		const alias2 = document.createElement('div');
+		alias2.id = `tile-${anim.from2.id}-merge`;
+		alias2.className = `tile tile-${anim.from2.value} tile-merging merging`;
+		alias2.textContent = anim.from2.value;
+		alias2.style.position = 'absolute';
+		alias2.style.top = ((100 - 10 / GRID_SIZE) / GRID_SIZE * anim.from2.row + 10 / GRID_SIZE) + '%';
+		alias2.style.left = ((100 - 10 / GRID_SIZE) / GRID_SIZE * anim.from2.col + 10 / GRID_SIZE) + '%';
+		alias2.style.opacity = '1';
+		alias2.style.zIndex = '100';
+		tileContainer.appendChild(alias2);
+		if (aiModeActive && aiMoveDelay < 50) {
+			// Instantly move and fade out aliases (no transition)
+			const top = ((100 - 10 / GRID_SIZE) / GRID_SIZE * anim.to.row + 10 / GRID_SIZE) + '%';
+			const left = ((100 - 10 / GRID_SIZE) / GRID_SIZE * anim.to.col + 10 / GRID_SIZE) + '%';
+			alias1.style.top = top;
+			alias1.style.left = left;
+			alias2.style.top = top;
+			alias2.style.left = left;
+			alias1.style.opacity = '0';
+			alias2.style.opacity = '0';
+			// Remove immediately after a short timeout
+			setTimeout(() => {
+				if (alias1.parentNode) alias1.parentNode.removeChild(alias1);
+				if (alias2.parentNode) alias2.parentNode.removeChild(alias2);
+				const removedOrig = document.getElementById('tile-' + anim.from2.id);
+				if (removedOrig && removedOrig.classList.contains('merging')) removedOrig.remove();
+			}, 30);
+		} else {
+			// Animate to merged position and fade out
+			setTimeout(() => {
+				alias1.style.transition = 'all 0.25s cubic-bezier(0.4,0,0.2,1), opacity 0.25s';
+				alias2.style.transition = 'all 0.25s cubic-bezier(0.4,0,0.2,1), opacity 0.25s';
+				const top = ((100 - 10 / GRID_SIZE) / GRID_SIZE * anim.to.row + 10 / GRID_SIZE) + '%';
+				const left = ((100 - 10 / GRID_SIZE) / GRID_SIZE * anim.to.col + 10 / GRID_SIZE) + '%';
+				alias1.style.top = top;
+				alias1.style.left = left;
+				alias2.style.top = top;
+				alias2.style.left = left;
+				alias1.style.opacity = '0';
+				alias2.style.opacity = '0';
+			}, 10);
+			setTimeout(() => {
+				if (alias1.parentNode) alias1.parentNode.removeChild(alias1);
+				if (alias2.parentNode) alias2.parentNode.removeChild(alias2);
+				// Remove only the original tile that was removed as part of the
+				// merge (anim.from2). Do NOT remove the merged/kept tile (mergedId)
+				// as it should remain in the DOM and show the merged value.
+				const removedOrig = document.getElementById('tile-' + anim.from2.id);
+				if (removedOrig && removedOrig.classList.contains('merging')) removedOrig.remove();
+			}, 300);
+		}
+	});
+    mergeAnimations = [];
 	// Update score
 	document.getElementById('score').textContent = score;
 	// Optionally update best score
@@ -497,10 +638,10 @@ if (redoButton) {
 	});
 }
 
-// Reset button
-const resetButton = document.getElementById('reset-button');
-if (resetButton) {
-	resetButton.addEventListener('click', function () {
+// Restart button
+const restartButton = document.getElementById('restart-button');
+if (restartButton) {
+	restartButton.addEventListener('click', function () {
 		clearHistory();
 		initGrid();
 		// Do not call saveState() here; only save after a real move
@@ -637,9 +778,9 @@ document.addEventListener('touchend', function (e) {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-	const restartButton = document.getElementById('restart-button');
-	if (restartButton) {
-		restartButton.addEventListener('click', function () {
+	const gameOverRestart = document.getElementById('game-over-restart');
+	if (gameOverRestart) {
+		gameOverRestart.addEventListener('click', function () {
 			clearHistory();
 			initGrid();
 		});
