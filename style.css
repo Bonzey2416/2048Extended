@@ -254,11 +254,11 @@ p {
 }
 
 .game-over-container {
-    background: rgba(238, 228, 218, 0.5);
+    background: rgba(238, 228, 218, 0.75);
 }
 
 .game-won-container {
-    background: rgba(237, 194, 46, 0.5);
+    background: rgba(237, 194, 46, 0.75);
 }
 
 .game-over-container.hidden, .game-won-container.hidden {
@@ -434,7 +434,7 @@ p {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(1);
-    background: #faf8efbb;
+    background: #faf8ef;
     border-radius: calc(1vw + 1vh);
     padding: calc(2vw + 2vh);
     box-sizing: border-box;
@@ -568,9 +568,9 @@ p {
         max-width: 90vw;
         height: calc(50vh - 1vw);
         max-height: 90vw;
+        margin: auto;
         font-size: calc(50vh - 1vw);
         font-size: min(calc(50vh - 1vw), 90vw);
-        justify-self: center;
     }
 
     .overlay-menu {
@@ -588,5 +588,17 @@ p {
 
     .overlay-menu.hidden {
         transform: translate(0%, 120%) scale(1);
+    }
+}
+
+@supports (-webkit-backdrop-filter: none) or (backdrop-filter: none) {
+    .game-over-container {
+        background-color: rgba(238, 228, 218, 0.5);
+    }
+    .game-won-container {
+        background-color: rgba(237, 194, 46, 0.5);
+    }
+    .overlay-menu {
+        background-color: #faf8efbb;
     }
 }

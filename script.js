@@ -666,8 +666,6 @@ if (redoButton) {
 }
 if (practiceModeToggle) {
 	practiceModeToggle.addEventListener('change', handlePracticeModeChange);
-	// On load, set initial state
-	handlePracticeModeChange();
 }
 
 // Restart button
@@ -752,8 +750,10 @@ document.addEventListener('keydown', function (e) {
 			break;
 	}
 
-	// Undo/Redo shortcuts
+	// Undo/Redo shortcuts (only if practice mode is enabled)
 	if ((e.ctrlKey || e.metaKey) && !e.shiftKey) {
+		const practiceEnabled = practiceModeToggle && practiceModeToggle.checked;
+		if (!practiceEnabled) return;
 		if (e.key === 'z' || e.key === 'Z') {
 			if (undoStack.length > 1) {
 				redoStack.push(undoStack.pop());

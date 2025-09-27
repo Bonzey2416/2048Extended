@@ -1,5 +1,9 @@
 # 2048Extended
 ## Changelog
+### Version 0.7.2
+Date of update: 2025-09-27
+* Fixed an issue when not in practice mode, pressing Ctrl + Z would still undo moves
+* Improved compatibility in older browsers
 ### Version 0.7.1
 Date of update: 2025-09-27
 * Made a minor tweak to the overlay menu
