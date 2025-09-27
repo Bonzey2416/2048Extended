@@ -417,8 +417,8 @@ p {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    right: 0;
+    bottom: 0;
     background: rgba(0, 0, 0, 0.5);
     -webkit-backdrop-filter: blur(calc(1vw + 1vh)) saturate(150%);
     backdrop-filter: blur(calc(1vw + 1vh)) saturate(150%);
@@ -491,6 +491,12 @@ p {
 
 .overlay-menu ul {
     padding-inline-start: 2em;
+}
+
+.overlay-menu a {
+    font-weight: 500;
+    text-decoration: underline;
+    color: inherit;
 }
 
 .dropdown-container, .input-container, .toggle-container {
@@ -611,9 +617,9 @@ p {
 
 .contributor-name {
     font-size: calc(0.8vw + 1.5vh);
-    font-weight: 700;
+    font-weight: 700 !important;
     margin: 0;
-    text-decoration: none;
+    text-decoration: none !important;
     color: inherit;
 }
 

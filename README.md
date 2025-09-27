@@ -1,5 +1,8 @@
 # 2048Extended
 ## Changelog
+### Version 0.8.2
+Date of update: 2025-09-27
+* Added credits and contributing sections to About menu.
 ### Version 0.8.1
 Date of update: 2025-09-27
 * Prevent tiles from moving outside the grid boundaries or when menus are open.
