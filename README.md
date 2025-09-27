@@ -1,5 +1,8 @@
 # 2048Extended
 ## Changelog
+### Version 0.7.1
+Date of update: 2025-09-27
+* Made a minor tweak to the overlay menu
 ### Version 0.7
 Date of update: 2025-09-27
 * Practice mode is now toggleable (disabled by default). In practice mode, you can undo/redo moves; useful if you made a mistake or want to try different strategies.
