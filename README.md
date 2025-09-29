@@ -1,5 +1,8 @@
 # 2048Extended
 ## Changelog
+### Version 0.10.1
+Date of update: 2025-09-29
+* Fixed a bug on touchscreen devices the buttons doesn't do anything.
 ### Version 0.10
 Date of update: 2025-09-29
 * You can now restore from the last saved game on reload or size/mode change.

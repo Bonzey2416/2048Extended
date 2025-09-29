@@ -787,6 +787,16 @@ if (undoButton) {
 			if (gameOverContainer) gameOverContainer.classList.add('hidden');
 		}
 	});
+	undoButton.addEventListener('touchstart', function (event) {
+		event.preventDefault();
+		if (practiceModeToggle && !practiceModeToggle.checked) return;
+		if (undoStack.length > 1) {
+			redoStack.push(undoStack.pop());
+			restoreState(undoStack[undoStack.length - 1]);
+			const gameOverContainer = document.getElementById('game-over-container');
+			if (gameOverContainer) gameOverContainer.classList.add('hidden');
+		}
+	});
 }
 if (redoButton) {
 	redoButton.addEventListener('click', function () {
@@ -801,15 +811,38 @@ if (redoButton) {
 			}
 		}
 	});
+	redoButton.addEventListener('touchstart', function (event) {
+		event.preventDefault();
+		if (practiceModeToggle && !practiceModeToggle.checked) return;
+		if (redoStack.length > 0) {
+			const state = redoStack.pop();
+			undoStack.push(state);
+			restoreState(state);
+			if (isGameOver()) {
+				const gameOverContainer = document.getElementById('game-over-container');
+				if (gameOverContainer) gameOverContainer.classList.remove('hidden');
+			}
+		}
+	});
 }
 if (practiceModeToggle) {
 	practiceModeToggle.addEventListener('change', handlePracticeModeChange);
+	practiceModeToggle.addEventListener('touchstart', function (event) {
+		event.preventDefault();
+		handlePracticeModeChange();
+	});
 }
 
 // Restart button
 const restartButton = document.getElementById('restart-button');
 if (restartButton) {
 	restartButton.addEventListener('click', function () {
+		stopAIMode();
+		clearGameState(); // Clear saved state on restart
+		initGrid();
+	});
+	restartButton.addEventListener('touchstart', function (event) {
+		event.preventDefault();
 		stopAIMode();
 		clearGameState(); // Clear saved state on restart
 		initGrid();
@@ -824,6 +857,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			clearGameState(); // Clear saved state on restart
 			initGrid();
 		});
+		gameOverRestart.addEventListener('touchstart', function (event) {
+		event.preventDefault();
+		stopAIMode();
+		clearGameState(); // Clear saved state on restart
+		initGrid();
+		});
 	}
 
 	const gameWonRestart = document.getElementById('game-won-restart');
@@ -833,12 +872,23 @@ document.addEventListener('DOMContentLoaded', function () {
 			clearGameState(); // Clear saved state on restart
 			initGrid();
 		});
+		gameWonRestart.addEventListener('touchstart', function (event) {
+		event.preventDefault();
+		stopAIMode();
+		clearGameState(); // Clear saved state on restart
+		initGrid();
+		});
 	}
 
 	const gameWonKeepGoing = document.getElementById('game-won-keep-going');
 	if (gameWonKeepGoing) {
 		gameWonKeepGoing.addEventListener('click', function () {
 			const gameWonContainer = document.getElementById('game-won-container');
+			if (gameWonContainer) gameWonContainer.classList.add('hidden');
+		});
+		gameWonKeepGoing.addEventListener('touchstart', function (event) {
+		event.preventDefault();
+		const gameWonContainer = document.getElementById('game-won-container');
 			if (gameWonContainer) gameWonContainer.classList.add('hidden');
 		});
 	}
@@ -906,14 +956,42 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 
     if (modeButton) modeButton.addEventListener('click', showModesMenu);
+    if (modeButton) {
+        modeButton.addEventListener('touchstart', function (event) {
+            event.preventDefault();
+            showModesMenu();
+        });
+    }
     if (closeModes) closeModes.addEventListener('click', hideModesMenu);
-    if (overlayBackdrop) overlayBackdrop.addEventListener('click', hideModesMenu);
-	if (aiOptionButton) aiOptionButton.addEventListener('click', showAiOptionsMenu);
+    if (overlayBackdrop) {
+        overlayBackdrop.addEventListener('click', function () {
+            hideModesMenu();
+			hideAiOptionsMenu(); // Add this line to hide AI options menu as well
+            hideAboutMenu(); // Add this line to hide about menu as well
+        });
+        overlayBackdrop.addEventListener('touchstart', function (event) {
+            event.preventDefault();
+            hideModesMenu();
+			hideAiOptionsMenu(); // Add this line to hide AI options menu as well
+            hideAboutMenu(); // Add this line to hide about menu as well
+        });
+    }
+	if (aiOptionButton) {
+		aiOptionButton.addEventListener('click', showAiOptionsMenu);
+		aiOptionButton.addEventListener('touchstart', function (event) {
+			event.preventDefault();
+			showAiOptionsMenu();
+		});
+	}
 	if (closeAiOptions) closeAiOptions.addEventListener('click', hideAiOptionsMenu);
 	if (overlayBackdrop) overlayBackdrop.addEventListener('click', hideAiOptionsMenu);
 	if (aboutButton) aboutButton.addEventListener('click', showAboutMenu);
-	if (closeAbout) closeAbout.addEventListener('click', hideAboutMenu);
-	if (overlayBackdrop) overlayBackdrop.addEventListener('click', hideAboutMenu);
+	if (aboutButton) {
+        aboutButton.addEventListener('touchstart', function (event) {
+            event.preventDefault();
+            showAboutMenu();
+        });
+    }
 
     // Close with ESC
     document.addEventListener('keydown', function (e) {
