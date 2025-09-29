@@ -1,5 +1,8 @@
 # 2048Extended
 ## Changelog
+### Version 0.10
+Date of update: 2025-09-29
+* You can now restore from the last saved game on reload or size/mode change.
 ### Version 0.9
 Date of update: 2025-09-29
 * High scores change when different modes or grid sizes are selected.

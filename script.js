@@ -18,26 +18,137 @@ let aiMoveDelay = 100;
 let GAME_MODE = 'classic';
 let practiceMode = false;
 
+// Function to load game settings from local storage
+function loadSettings() {
+    const savedSettings = localStorage.getItem('gameSettings');
+    if (savedSettings) {
+        const settings = JSON.parse(savedSettings);
+        GRID_SIZE = settings.GRID_SIZE || 4;
+        GAME_MODE = settings.GAME_MODE || 'classic';
+        practiceMode = settings.practiceMode || false;
+
+        // Update UI elements
+        const gridSizeSelect = document.getElementById('grid-size-select');
+        if (gridSizeSelect) gridSizeSelect.value = GRID_SIZE;
+        document.documentElement.style.setProperty('--grid-size', GRID_SIZE);
+
+        const gameModeSelect = document.getElementById('game-mode-select');
+        if (gameModeSelect) gameModeSelect.value = GAME_MODE;
+
+        const practiceModeToggle = document.getElementById('practice-mode-toggle');
+        if (practiceModeToggle) practiceModeToggle.checked = practiceMode;
+        // Directly update undo/redo button visibility instead of calling handlePracticeModeChange()
+        const undoButton = document.getElementById('undo-button');
+        const redoButton = document.getElementById('redo-button');
+        if (undoButton) {
+            if (practiceMode) undoButton.classList.remove('hidden');
+            else undoButton.classList.add('hidden');
+        }
+        if (redoButton) {
+            if (practiceMode) redoButton.classList.remove('hidden');
+            else redoButton.classList.add('hidden');
+        }
+    }
+}
+
+// Function to save game settings to local storage
+function saveSettings() {
+    const settings = {
+        GRID_SIZE: GRID_SIZE,
+        GAME_MODE: GAME_MODE,
+        practiceMode: practiceMode
+    };
+    localStorage.setItem('gameSettings', JSON.stringify(settings));
+}
+
 // Track merges for animation
 let mergeAnimations = [];
 // Snapshot of tile positions before a move (id -> {row,col})
 let beforeMovePositions = null;
 
+function getGameStateKey(gameMode, practiceMode, gridSize) {
+    return `gameState-${gameMode}-${practiceMode ? 'practice' : 'normal'}-${gridSize}`;
+}
+
+function saveGameState() {
+    const gameState = {
+        grid: grid,
+        score: score,
+        tiles: tiles,
+		tileIdCounter: tileIdCounter,
+		hasShownGameWon: hasShownGameWon,
+		GRID_SIZE: GRID_SIZE,
+		GAME_MODE: GAME_MODE,
+		practiceMode: practiceMode
+    };
+    localStorage.setItem(getGameStateKey(GAME_MODE, practiceMode, GRID_SIZE), JSON.stringify(gameState));
+}
+
+function clearGameState() {
+    localStorage.removeItem(getGameStateKey(GAME_MODE, practiceMode, GRID_SIZE));
+}
+
+function restoreGameState() {
+    const savedState = localStorage.getItem(getGameStateKey(GAME_MODE, practiceMode, GRID_SIZE));
+    if (savedState) {
+        const gameState = JSON.parse(savedState);
+        grid = gameState.grid;
+        score = gameState.score;
+        tiles = gameState.tiles;
+		tileIdCounter = gameState.tileIdCounter;
+		hasShownGameWon = gameState.hasShownGameWon;
+		// Restore GRID_SIZE, GAME_MODE, and practiceMode
+		GRID_SIZE = gameState.GRID_SIZE || 4; // Default to 4 if not saved
+		GAME_MODE = gameState.GAME_MODE || 'classic'; // Default to 'classic' if not saved
+		practiceMode = gameState.practiceMode || false; // Default to false if not saved
+
+		// UI elements are now updated by loadSettings() before initGrid() is called
+
+        updateUI();
+		return true;
+    }
+	return false;
+}
+
+function generateGridCells() {
+    const gridContainerInner = document.getElementById('grid-container-inner');
+    if (!gridContainerInner) return;
+
+    // Clear existing grid cells
+    gridContainerInner.innerHTML = '';
+
+    // Create new grid cells
+    for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0; c < GRID_SIZE; c++) {
+            const cell = document.createElement('div');
+            cell.classList.add('grid-cell');
+            gridContainerInner.appendChild(cell);
+        }
+    }
+}
+
 function initGrid() {
-	generateGridCells();
-	grid = Array(GRID_SIZE)
-		.fill()
-		.map(() => Array(GRID_SIZE).fill(null));
-	tiles = [];
-	tileIdCounter = 1;
-	score = 0;
-	hasShownGameWon = false;
-	addRandomTile();
-	addRandomTile();
-	updateUI();
-	// Save the initial state so undo works after the first move
-	saveState();
-	// Hide game over container
+	// loadSettings(); // Removed: loadSettings should only be called once on initial page load
+	generateGridCells(); // Call to dynamically generate grid cells
+	if (restoreGameState()) {
+		// If state was restored, ensure UI is updated and then check for game over
+		// The game over check will be done after this if block
+	} else {
+		grid = Array(GRID_SIZE)
+			.fill()
+			.map(() => Array(GRID_SIZE).fill(null));
+		tiles = [];
+		tileIdCounter = 1;
+		score = 0;
+		hasShownGameWon = false;
+		addRandomTile();
+		addRandomTile();
+		updateUI();
+		// Save the initial state so undo works after the first move
+		saveState();
+	}
+
+	// Hide game over container initially, it will be shown if isGameOver() is true
 	const gameOverContainer = document.getElementById('game-over-container');
 	if (gameOverContainer) gameOverContainer.classList.add('hidden');
 
@@ -48,6 +159,12 @@ function initGrid() {
     } else {
         document.getElementById('high-score').textContent = '0';
     }
+
+	// Check for game over immediately after restoring state or initializing new game
+	if (isGameOver()) {
+		const gameOverContainer = document.getElementById('game-over-container');
+		if (gameOverContainer) gameOverContainer.classList.remove('hidden');
+	}
 }
 
 function addRandomTile() {
@@ -286,6 +403,7 @@ function move(direction) {
         }
         addRandomTile();
         updateUI();
+		saveGameState();
 
         // clear snapshot after UI updated
         beforeMovePositions = null;
@@ -633,6 +751,11 @@ function clearUndoRedoStacks() {
 	redoStack = [];
 }
 
+function clearHistory() {
+    clearUndoRedoStacks();
+    clearGameState();
+}
+
 function handlePracticeModeChange() {
 	const enabled = practiceModeToggle && practiceModeToggle.checked;
 	practiceMode = enabled; // Update the global practiceMode variable
@@ -687,166 +810,18 @@ if (practiceModeToggle) {
 const restartButton = document.getElementById('restart-button');
 if (restartButton) {
 	restartButton.addEventListener('click', function () {
-		clearHistory();
+		stopAIMode();
+		clearGameState(); // Clear saved state on restart
 		initGrid();
-		// Do not call saveState() here; only save after a real move
 	});
 }
-
-function clearHistory() {
-	undoStack = [];
-	redoStack = [];
-}
-
-// Save initial state after grid is initialized
-const originalInitGrid = initGrid;
-initGrid = function() {
-	originalInitGrid();
-	// Do not call saveState() here; only save after a real move
-};
-
-function generateGridCells() {
-	const gridContainerInner = document.querySelector('.grid-container-inner');
-	if (!gridContainerInner) return;
-	// Remove all existing grid cells
-	while (gridContainerInner.firstChild) {
-		gridContainerInner.removeChild(gridContainerInner.firstChild);
-	}
-	// Generate new grid cells
-	for (let r = 0; r < GRID_SIZE; r++) {
-		for (let c = 0; c < GRID_SIZE; c++) {
-			const cell = document.createElement('div');
-			cell.className = 'grid-cell';
-			cell.id = `cell-${r}-${c}`;
-			gridContainerInner.appendChild(cell);
-		}
-	}
-	// Update CSS variable
-	const gridContainer = document.querySelector('.grid-container');
-	if (gridContainer) {
-		gridContainer.style.setProperty('--grid-size', GRID_SIZE);
-	}
-}
-
-// Call generateGridCells whenever grid size changes
-const originalInitGrid2 = initGrid;
-initGrid = function() {
-	generateGridCells();
-	originalInitGrid2();
-};
-
-document.addEventListener('keydown', function (e) {
-	const overlayBackdrop = document.getElementById('overlay-backdrop');
-	if (overlayBackdrop && !overlayBackdrop.classList.contains('hidden')) {
-		return; // Do nothing if overlay is visible
-	}
-
-	// Prevent scrolling for movement keys only
-	if (["ArrowLeft","ArrowUp","ArrowRight","ArrowDown","w","a","s","d","W","A","S","D"].includes(e.key)) {
-		e.preventDefault();
-	}
-
-	// Movement keys
-	switch (e.key) {
-		case 'ArrowLeft':
-		case 'a':
-		case 'A':
-			move(0); // left
-			break;
-		case 'ArrowUp':
-		case 'w':
-		case 'W':
-			move(3); // up
-			break;
-		case 'ArrowRight':
-		case 'd':
-		case 'D':
-			move(2); // right
-			break;
-		case 'ArrowDown':
-		case 's':
-		case 'S':
-			move(1); // down
-			break;
-	}
-
-	// Undo/Redo shortcuts (only if practice mode is enabled)
-	if ((e.ctrlKey || e.metaKey) && !e.shiftKey) {
-		const practiceEnabled = practiceModeToggle && practiceModeToggle.checked;
-		if (!practiceEnabled) return;
-		if (e.key === 'z' || e.key === 'Z') {
-			if (undoStack.length > 1) {
-				redoStack.push(undoStack.pop());
-				restoreState(undoStack[undoStack.length - 1]);
-				const gameOverContainer = document.getElementById('game-over-container');
-				if (gameOverContainer) gameOverContainer.classList.add('hidden');
-			}
-		} else if (e.key === 'y' || e.key === 'Y') {
-			if (redoStack.length > 0) {
-				const state = redoStack.pop();
-				undoStack.push(state);
-				restoreState(state);
-				// Show game over container if the restored state is game over
-				if (isGameOver()) {
-					const gameOverContainer = document.getElementById('game-over-container');
-					if (gameOverContainer) gameOverContainer.classList.remove('hidden');
-				}
-			}
-		}
-	}
-});
-
-// Touch swipe support
-let touchStartX = 0;
-let touchStartY = 0;
-let touchOnGrid = false;
-
-document.addEventListener('touchstart', function (e) {
-	const overlayBackdrop = document.getElementById('overlay-backdrop');
-	if (overlayBackdrop && !overlayBackdrop.classList.contains('hidden')) {
-		touchOnGrid = false;
-		return;
-	}
-
-	const gridContainer = e.target.closest('.grid-container');
-	if (gridContainer && e.touches.length === 1) {
-		touchStartX = e.touches[0].clientX;
-		touchStartY = e.touches[0].clientY;
-		touchOnGrid = true;
-	} else {
-		touchOnGrid = false;
-	}
-});
-
-document.addEventListener('touchend', function (e) {
-	if (!touchOnGrid) return;
-
-	if (e.changedTouches.length === 1) {
-		const dx = e.changedTouches[0].clientX - touchStartX;
-		const dy = e.changedTouches[0].clientY - touchStartY;
-		if (Math.abs(dx) > 30 || Math.abs(dy) > 30) {
-			if (Math.abs(dx) > Math.abs(dy)) {
-				if (dx > 0) {
-					move(2); // swipe right
-				} else {
-					move(0); // swipe left
-				}
-			} else {
-				if (dy > 0) {
-					move(1); // swipe down
-				} else {
-					move(3); // swipe up
-				}
-			}
-		}
-	}
-});
 
 document.addEventListener('DOMContentLoaded', function () {
 	const gameOverRestart = document.getElementById('game-over-restart');
 	if (gameOverRestart) {
 		gameOverRestart.addEventListener('click', function () {
-			clearHistory();
+			stopAIMode();
+			clearGameState(); // Clear saved state on restart
 			initGrid();
 		});
 	}
@@ -854,9 +829,8 @@ document.addEventListener('DOMContentLoaded', function () {
 	const gameWonRestart = document.getElementById('game-won-restart');
 	if (gameWonRestart) {
 		gameWonRestart.addEventListener('click', function () {
-			const gameWonContainer = document.getElementById('game-won-container');
-			if (gameWonContainer) gameWonContainer.classList.add('hidden');
-			clearHistory();
+			stopAIMode();
+			clearGameState(); // Clear saved state on restart
 			initGrid();
 		});
 	}
@@ -872,8 +846,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Modes overlay handlers
 (function() {
-	const gameContainer = document.getElementById('game-container');
-    const modeButton = document.getElementById('mode-button');
+	const modeButton = document.getElementById('mode-button');
     const modesMenu = document.getElementById('modes-menu');
     const closeModes = document.getElementById('close-modes-menu');
 	const aiOptionButton = document.getElementById('ai-option-button');
@@ -947,8 +920,107 @@ document.addEventListener('DOMContentLoaded', function () {
         if (e.key === 'Escape') {
             hideModesMenu();
 			hideAiOptionsMenu();
+			hideAboutMenu();
         }
+
+		// Handle Ctrl+Z for undo and Ctrl+Y for redo
+		if (e.ctrlKey || e.metaKey) { // Check for Ctrl on Windows/Linux or Command on Mac
+            if (e.key === 'z' || e.key === 'Z') {
+                if (practiceModeToggle && practiceModeToggle.checked && undoStack.length > 1) {
+                    redoStack.push(undoStack.pop());
+                    restoreState(undoStack[undoStack.length - 1]);
+                    const gameOverContainer = document.getElementById('game-over-container');
+                    if (gameOverContainer) gameOverContainer.classList.add('hidden');
+                }
+                e.preventDefault();
+            } else if (e.key === 'y' || e.key === 'Y') {
+                if (practiceModeToggle && practiceModeToggle.checked && redoStack.length > 0) {
+                    const state = redoStack.pop();
+                    undoStack.push(state);
+                    restoreState(state);
+                    if (isGameOver()) {
+                        const gameOverContainer = document.getElementById('game-over-container');
+                        if (gameOverContainer) gameOverContainer.classList.remove('hidden');
+                    }
+                }
+                e.preventDefault();
+            }
+        }
+
+		if (modesMenu.classList.contains('hidden') && aiOptionsMenu.classList.contains('hidden') && aboutMenu.classList.contains('hidden')) {
+			switch (e.key) {
+				case 'ArrowLeft':
+				case 'a':
+					move(0); // Left
+					e.preventDefault();
+					break;
+				case 'ArrowDown':
+				case 's':
+					move(1); // Down
+					e.preventDefault();
+					break;
+				case 'ArrowRight':
+				case 'd':
+					move(2); // Right
+					e.preventDefault();
+					break;
+				case 'ArrowUp':
+				case 'w':
+					move(3); // Up
+					e.preventDefault();
+					break;
+			}
+		}
     });
+
+	// Touch event listeners for swipe gestures
+	let touchStartX = 0;
+	let touchStartY = 0;
+	const gameContainer = document.getElementById('game-container');
+
+	if (gameContainer) {
+		gameContainer.addEventListener('touchstart', function (e) {
+			touchStartX = e.touches[0].clientX;
+			touchStartY = e.touches[0].clientY;
+			e.preventDefault();
+		}, { passive: false });
+
+		gameContainer.addEventListener('touchmove', function (e) {
+			e.preventDefault();
+		}, { passive: false });
+
+		gameContainer.addEventListener('touchend', function (e) {
+			if (modesMenu.classList.contains('hidden') && aiOptionsMenu.classList.contains('hidden') && aboutMenu.classList.contains('hidden')) {
+				const touchEndX = e.changedTouches[0].clientX;
+				const touchEndY = e.changedTouches[0].clientY;
+
+				const dx = touchEndX - touchStartX;
+				const dy = touchEndY - touchStartY;
+
+				const absDx = Math.abs(dx);
+				const absDy = Math.abs(dy);
+
+				if (Math.max(absDx, absDy) > 10) { // Minimum swipe distance
+					if (absDx > absDy) {
+						// Horizontal swipe
+						if (dx > 0) {
+							move(2); // Right
+						} else {
+							move(0); // Left
+						}
+					} else {
+						// Vertical swipe
+						if (dy > 0) {
+							move(1); // Down
+						} else {
+							move(3); // Up
+						}
+					}
+				}
+			}
+			e.preventDefault();
+		});
+	}
 })();
 
 // Grid size change handler
@@ -958,15 +1030,17 @@ if (gridSizeDropdown) {
 		const newSize = parseInt(gridSizeDropdown.value, 10);
 		if (!isNaN(newSize) && newSize > 1 && newSize <= 8) {
 			GRID_SIZE = newSize;
-			clearHistory();
+			document.documentElement.style.setProperty('--grid-size', GRID_SIZE);
 			initGrid();
 			updateGoalDisplay();
+			saveSettings(); // Save settings after changing grid size
 		}
 	});
 }
 
 // Update goal display on initial load
 window.onload = function() {
+    loadSettings(); // Load settings once on initial page load
     initGrid();
     updateGoalDisplay();
 };
@@ -1308,16 +1382,35 @@ document.addEventListener('DOMContentLoaded', function () {
 			aiStrategy = this.value;
 		});
 	}
-});
+}); // This closes the DOMContentLoaded event listener
 
 // Listen for game mode changes
 const gameModeDropdown = document.getElementById('game-mode-select');
 if (gameModeDropdown) {
     gameModeDropdown.addEventListener('change', function () {
         GAME_MODE = gameModeDropdown.value;
-        clearHistory();
         initGrid();
         updateGoalDisplay(); // Ensure goal updates when mode changes
+		saveSettings(); // Save settings after changing game mode
     });
     GAME_MODE = gameModeDropdown.value;
 }
+
+// Listen for grid size changes
+document.getElementById('grid-size-select').addEventListener('change', (e) => {
+	GRID_SIZE = parseInt(e.target.value);
+	updateGoalDisplay();
+	// clearHistory(); // Removed: initGrid will handle state restoration
+	initGrid();
+});
+
+// Listen for practice mode toggle
+document.getElementById('practice-mode-toggle').addEventListener('change', (e) => {
+	practiceMode = e.target.checked;
+	initGrid();
+	saveSettings(); // Save settings after changing practice mode
+});
+
+// Initialize grid and UI
+initGrid();
+updateGoalDisplay();
