@@ -760,9 +760,10 @@ function handlePracticeModeChange() {
 	const enabled = practiceModeToggle && practiceModeToggle.checked;
 	practiceMode = enabled; // Update the global practiceMode variable
 	setUndoRedoEnabled(enabled);
-	// Always restart game on toggle
-	clearHistory();
+	// Do NOT clear history on toggle, initGrid will handle state restoration
+	// clearHistory(); // Removed
 	initGrid();
+	saveSettings(); // Save settings after changing practice mode
 	// Show/hide undo/redo buttons
 	if (undoButton) {
 		if (enabled) undoButton.classList.remove('hidden');
@@ -1421,6 +1422,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	if (aiToggleButton) {
 		aiToggleButton.addEventListener('click', function () {
+			if (!aiModeActive) {
+				let val = parseInt(aiMoveDurationInput.value, 10);
+				if (!isNaN(val) && val > 0) aiMoveDelay = val;
+				startAIMode();
+			} else {
+				stopAIMode();
+			}
+			updateAIToggleButton();
+		});
+		aiToggleButton.addEventListener('touchstart', function (event) {
+			event.preventDefault();
 			if (!aiModeActive) {
 				let val = parseInt(aiMoveDurationInput.value, 10);
 				if (!isNaN(val) && val > 0) aiMoveDelay = val;

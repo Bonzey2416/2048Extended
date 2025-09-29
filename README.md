@@ -1,5 +1,9 @@
 # 2048Extended
 ## Changelog
+### Version 0.10.3
+Date of update: 2025-09-29
+* Fix a bug when touching AI toggle button doesn't do anything on touchscreen devices.
+* Fix a bug when toggling practice mode doesn't restore the game.
 ### Version 0.10.2
 Date of update: 2025-09-29
 * Fixed a bug affecting close button in About menu.
