@@ -1,5 +1,11 @@
 # 2048Extended
 ## Changelog
+### Version 0.9
+Date of update: 2025-09-29
+* High scores change when different modes or grid sizes are selected.
+* Added fibonacci tile colours up to 2178309.
+* Fixed a bug where, in Fibonacci and using AI mode with Corner or Swing strategy, the tiles would sometimes be stuck.
+* Tweaked grid container to prevent overflowing.
 ### Version 0.8.2
 Date of update: 2025-09-27
 * Added credits and contributing sections to About menu.

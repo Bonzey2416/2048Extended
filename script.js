@@ -16,6 +16,7 @@ let aiIntervalId = null;
 let aiMoveDelay = 100;
 
 let GAME_MODE = 'classic';
+let practiceMode = false;
 
 // Track merges for animation
 let mergeAnimations = [];
@@ -39,6 +40,14 @@ function initGrid() {
 	// Hide game over container
 	const gameOverContainer = document.getElementById('game-over-container');
 	if (gameOverContainer) gameOverContainer.classList.add('hidden');
+
+	const highScoreKey = getHighScoreKey(GAME_MODE, practiceMode, GRID_SIZE);
+    const savedHighScore = localStorage.getItem(highScoreKey);
+    if (savedHighScore) {
+        document.getElementById('high-score').textContent = savedHighScore;
+    } else {
+        document.getElementById('high-score').textContent = '0';
+    }
 }
 
 function addRandomTile() {
@@ -387,8 +396,11 @@ function isGameWon() {
     return false;
 }
 
+function getHighScoreKey(gameMode, practiceMode, gridSize) {
+    return `highScore-${gameMode}-${practiceMode ? 'practice' : 'normal'}-${gridSize}`;
+}
+
 function updateUI() {
-	console.debug("Updating UI with grid:", grid);
 	const tileContainer = document.getElementById('tile-container');
 	// Remove DOM tiles that no longer exist, but keep the game over and game won containers
 	// Only remove tiles that are not in the tiles array
@@ -531,13 +543,15 @@ function updateUI() {
     mergeAnimations = [];
 	// Update score
 	document.getElementById('score').textContent = score;
-	// Optionally update best score
-	let best = localStorage.getItem('bestScore') || 0;
-	if (score > best) {
-		best = score;
-		localStorage.setItem('bestScore', best);
-	}
-	document.getElementById('best-score').textContent = best;
+	const highScoreKey = getHighScoreKey(GAME_MODE, practiceMode, GRID_SIZE);
+    let highScore = parseInt(localStorage.getItem(highScoreKey) || '0');
+    
+
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem(highScoreKey, highScore);
+    }
+    document.getElementById('high-score').textContent = highScore;
 }
 
 function saveState() {
@@ -621,6 +635,7 @@ function clearUndoRedoStacks() {
 
 function handlePracticeModeChange() {
 	const enabled = practiceModeToggle && practiceModeToggle.checked;
+	practiceMode = enabled; // Update the global practiceMode variable
 	setUndoRedoEnabled(enabled);
 	// Always restart game on toggle
 	clearHistory();
@@ -1130,6 +1145,29 @@ function canMove(direction) {
 	}
 	function combineTest(row) {
 		let rowChanged = false;
+		if (GAME_MODE === 'fibonacci') {
+			const fibSeq = getFibonacciSequence(Math.pow(2, 20));
+			for (let i = 0; i < GRID_SIZE - 1; i++) {
+				const a = row[i], b = row[i + 1];
+				if (a && b) {
+					const tileA = testTiles.find(t => t.id === a);
+					const tileB = testTiles.find(t => t.id === b);
+					if (tileA && tileB && areFibonacciMergeable(tileA.value, tileB.value, fibSeq)) {
+						row[i] = a;
+						row[i + 1] = null;
+						// Simulate the merge for subsequent checks in the same row
+						const mergedValue = tileA.value + tileB.value;
+						const originalTileAValue = tileA.value;
+						tileA.value = mergedValue;
+						rowChanged = true;
+						i++;
+						// Restore value after check to not affect other directions
+						setTimeout(() => tileA.value = originalTileAValue, 0);
+					}
+				}
+			}
+			return { row, rowChanged };
+		}
 		for (let i = 0; i < GRID_SIZE - 1; i++) {
 			const a = row[i], b = row[i + 1];
 			if (a && b) {
@@ -1233,7 +1271,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (!aiModeActive) {
 				let val = parseInt(aiMoveDurationInput.value, 10);
 				if (!isNaN(val) && val > 0) aiMoveDelay = val;
-				else aiMoveDelay = 100;
 				startAIMode();
 			} else {
 				stopAIMode();
