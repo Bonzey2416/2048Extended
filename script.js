@@ -984,6 +984,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	}
 	if (closeAiOptions) closeAiOptions.addEventListener('click', hideAiOptionsMenu);
+	if (closeAbout) closeAbout.addEventListener('click', hideAboutMenu);
 	if (overlayBackdrop) overlayBackdrop.addEventListener('click', hideAiOptionsMenu);
 	if (aboutButton) aboutButton.addEventListener('click', showAboutMenu);
 	if (aboutButton) {

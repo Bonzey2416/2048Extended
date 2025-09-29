@@ -1,5 +1,8 @@
 # 2048Extended
 ## Changelog
+### Version 0.10.2
+Date of update: 2025-09-29
+* Fixed a bug affecting close button in About menu.
 ### Version 0.10.1
 Date of update: 2025-09-29
 * Fixed a bug on touchscreen devices the buttons doesn't do anything.
