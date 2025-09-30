@@ -1,5 +1,8 @@
 # 2048Extended
 ## Changelog
+### Version 0.10.4
+Date of update: 2025-09-30
+* AI settings are now saved and can be restored on reload.
 ### Version 0.10.3
 Date of update: 2025-09-29
 * Fix a bug when touching AI toggle button doesn't do anything on touchscreen devices.

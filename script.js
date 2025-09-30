@@ -26,6 +26,8 @@ function loadSettings() {
         GRID_SIZE = settings.GRID_SIZE || 4;
         GAME_MODE = settings.GAME_MODE || 'classic';
         practiceMode = settings.practiceMode || false;
+        aiMoveDelay = settings.aiMoveDelay || 100;
+        aiStrategy = settings.aiStrategy || 'random';
 
         // Update UI elements
         const gridSizeSelect = document.getElementById('grid-size-select');
@@ -48,6 +50,17 @@ function loadSettings() {
             if (practiceMode) redoButton.classList.remove('hidden');
             else redoButton.classList.add('hidden');
         }
+
+        const aiMoveDelaySlider = document.getElementById('ai-move-delay-slider');
+        if (aiMoveDelaySlider) aiMoveDelaySlider.value = aiMoveDelay;
+        const aiMoveDelayValue = document.getElementById('ai-move-delay-value');
+        if (aiMoveDelayValue) aiMoveDelayValue.textContent = `${aiMoveDelay}ms`;
+
+        const aiMoveDurationInput = document.getElementById('ai-move-duration-input');
+        if (aiMoveDurationInput) aiMoveDurationInput.value = aiMoveDelay;
+
+        const aiStrategySelect = document.getElementById('ai-strategy-select');
+        if (aiStrategySelect) aiStrategySelect.value = aiStrategy;
     }
 }
 
@@ -56,7 +69,9 @@ function saveSettings() {
     const settings = {
         GRID_SIZE: GRID_SIZE,
         GAME_MODE: GAME_MODE,
-        practiceMode: practiceMode
+        practiceMode: practiceMode,
+        aiMoveDelay: aiMoveDelay,
+        aiStrategy: aiStrategy
     };
     localStorage.setItem('gameSettings', JSON.stringify(settings));
 }
@@ -1453,6 +1468,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				stopAIMode();
 				startAIMode();
 			}
+			saveSettings();
 		}
 	});
 	if (aiMoveDurationInput) {
@@ -1467,10 +1483,11 @@ document.addEventListener('DOMContentLoaded', function () {
 	const aiStrategySelect = document.getElementById('ai-strategy-select');
 	if (aiStrategySelect) {
 		// Set initial strategy from dropdown on load
-		aiStrategy = aiStrategySelect.value;
+		// aiStrategy = aiStrategySelect.value;
 		// Update strategy when the user changes the selection
 		aiStrategySelect.addEventListener('change', function() {
 			aiStrategy = this.value;
+			saveSettings();
 		});
 	}
 }); // This closes the DOMContentLoaded event listener
