@@ -194,6 +194,8 @@ function addRandomTile() {
     let value;
     if (GAME_MODE === 'fibonacci') {
         value = Math.random() < 0.9 ? 1 : 2;
+    } else if (GAME_MODE === 'power-of-three') {
+        value = 1;
     } else {
         value = Math.random() < 0.9 ? 2 : 4;
     }
@@ -273,6 +275,42 @@ function combine(row) {
                 row[i + 1] = null;
                 rowChanged = true;
                 i++;
+            }
+        }
+        return { row, rowChanged };
+    }
+    if (GAME_MODE === 'power-of-three') {
+        for (let i = 0; i < GRID_SIZE - 2; i++) {
+            const tileA = row[i] ? getTileById(row[i]) : null;
+            const tileB = row[i + 1] ? getTileById(row[i + 1]) : null;
+            const tileC = row[i + 2] ? getTileById(row[i + 2]) : null;
+            if (tileA && tileB && tileC && tileA.value === tileB.value && tileA.value === tileC.value) {
+                if (tileA.merged || tileB.merged || tileC.merged) continue;
+                const fromA = (beforeMovePositions && beforeMovePositions[tileA.id]) ? beforeMovePositions[tileA.id] : { row: tileA.row, col: tileA.col };
+                const fromB = (beforeMovePositions && beforeMovePositions[tileB.id]) ? beforeMovePositions[tileB.id] : { row: tileB.row, col: tileB.col };
+                const fromC = (beforeMovePositions && beforeMovePositions[tileC.id]) ? beforeMovePositions[tileC.id] : { row: tileC.row, col: tileC.col };
+                mergeAnimations.push({
+                    from: { id: tileA.id, row: fromA.row, col: fromA.col, value: tileA.value },
+                    from2: { id: tileB.id, row: fromB.row, col: fromB.col, value: tileB.value },
+                    from3: { id: tileC.id, row: fromC.row, col: fromC.col, value: tileC.value },
+                    mergedId: tileA.id,
+                    to: { row: tileA.row, col: tileA.col },
+                    mergedValue: tileA.value * 3
+                });
+                tileA.value *= 3;
+                tileA.merged = true;
+                score += tileA.value;
+                const tileBEl = document.getElementById('tile-' + tileB.id);
+                if (tileBEl) tileBEl.remove();
+                const tileCEl = document.getElementById('tile-' + tileC.id);
+                if (tileCEl) tileCEl.remove();
+                grid[tileB.row][tileB.col] = null;
+                grid[tileC.row][tileC.col] = null;
+                tiles = tiles.filter(t => t.id !== tileB.id && t.id !== tileC.id);
+                row[i + 1] = null;
+                row[i + 2] = null;
+                rowChanged = true;
+                i += 2;
             }
         }
         return { row, rowChanged };
@@ -479,6 +517,31 @@ function isGameOver() {
 		}
 		return true;
 	}
+	if (GAME_MODE === 'power-of-three') {
+		for (let r = 0; r < GRID_SIZE; r++) {
+			for (let c = 0; c < GRID_SIZE; c++) {
+				const tile = getTileById(grid[r][c]);
+				if (!tile) continue;
+				// Check right for 3-in-a-row
+				if (c < GRID_SIZE - 2) {
+					const rightTile1 = getTileById(grid[r][c + 1]);
+					const rightTile2 = getTileById(grid[r][c + 2]);
+					if (rightTile1 && rightTile2 && tile.value === rightTile1.value && tile.value === rightTile2.value) {
+						return false;
+					}
+				}
+				// Check down for 3-in-a-row
+				if (r < GRID_SIZE - 2) {
+					const downTile1 = getTileById(grid[r + 1][c]);
+					const downTile2 = getTileById(grid[r + 2][c]);
+					if (downTile1 && downTile2 && tile.value === downTile1.value && tile.value === downTile2.value) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
 	// Classic mode
 	for (let r = 0; r < GRID_SIZE; r++) {
 		for (let c = 0; c < GRID_SIZE; c++) {
@@ -508,6 +571,8 @@ function getGoalValue(size) {
             fib.push(fib[fib.length - 1] + fib[fib.length - 2]);
         }
         return fib[idx];
+	} else if (GAME_MODE === 'power-of-three') {
+		return Math.pow(3, Math.round(Math.pow(size, 2) * 0.2));
     } else {
         // Classic mode
         return Math.pow(2, Math.round(Math.pow(size, 2) * 0.53 + 3));
@@ -641,12 +706,28 @@ function updateUI() {
 			alias2.style.left = left;
 			alias1.style.opacity = '0';
 			alias2.style.opacity = '0';
+            if (anim.from3) {
+                const alias3 = document.getElementById(`tile-${anim.from3.id}-merge`);
+                if (alias3) {
+                    alias3.style.top = top;
+                    alias3.style.left = left;
+                    alias3.style.opacity = '0';
+                }
+            }
 			// Remove immediately after a short timeout
 			setTimeout(() => {
 				if (alias1.parentNode) alias1.parentNode.removeChild(alias1);
 				if (alias2.parentNode) alias2.parentNode.removeChild(alias2);
+                if (anim.from3) {
+                    const alias3 = document.getElementById(`tile-${anim.from3.id}-merge`);
+                    if (alias3 && alias3.parentNode) alias3.parentNode.removeChild(alias3);
+                }
 				const removedOrig = document.getElementById('tile-' + anim.from2.id);
 				if (removedOrig && removedOrig.classList.contains('merging')) removedOrig.remove();
+                if (anim.from3) {
+                    const removedOrig2 = document.getElementById('tile-' + anim.from3.id);
+                    if (removedOrig2 && removedOrig2.classList.contains('merging')) removedOrig2.remove();
+                }
 			}, 30);
 		} else {
 			// Animate to merged position and fade out
@@ -661,15 +742,32 @@ function updateUI() {
 				alias2.style.left = left;
 				alias1.style.opacity = '0';
 				alias2.style.opacity = '0';
+                if (anim.from3) {
+                    const alias3 = document.getElementById(`tile-${anim.from3.id}-merge`);
+                    if (alias3) {
+                        alias3.style.transition = 'all 0.25s cubic-bezier(0.4,0,0.2,1), opacity 0.25s';
+                        alias3.style.top = top;
+                        alias3.style.left = left;
+                        alias3.style.opacity = '0';
+                    }
+                }
 			}, 10);
 			setTimeout(() => {
 				if (alias1.parentNode) alias1.parentNode.removeChild(alias1);
 				if (alias2.parentNode) alias2.parentNode.removeChild(alias2);
+                if (anim.from3) {
+                    const alias3 = document.getElementById(`tile-${anim.from3.id}-merge`);
+                    if (alias3 && alias3.parentNode) alias3.parentNode.removeChild(alias3);
+                }
 				// Remove only the original tile that was removed as part of the
 				// merge (anim.from2). Do NOT remove the merged/kept tile (mergedId)
 				// as it should remain in the DOM and show the merged value.
 				const removedOrig = document.getElementById('tile-' + anim.from2.id);
 				if (removedOrig && removedOrig.classList.contains('merging')) removedOrig.remove();
+                if (anim.from3) {
+                    const removedOrig2 = document.getElementById('tile-' + anim.from3.id);
+                    if (removedOrig2 && removedOrig2.classList.contains('merging')) removedOrig2.remove();
+                }
 			}, 300);
 		}
 	});
@@ -703,10 +801,11 @@ function saveState() {
 	};
 	// Always push a new state after a valid move
 	undoStack.push(newState);
-	if (undoStack.length > 100) undoStack.shift(); // Limit stack size
+	if (undoStack.length > 256) undoStack.shift(); // Limit stack size
 	// debug: state pushed
 	redoStack = [];
 	// debug: redoStack cleared
+	updateUndoRedoUI();
 }
 
 function restoreState(state) {
@@ -732,6 +831,7 @@ function restoreState(state) {
 	}
 	updateUI();
 	updateGridContainerAnimations();
+	updateUndoRedoUI();
 }
 
 // Patch move to save state before moving
@@ -744,6 +844,7 @@ move = function(direction) {
 	if (oldGrid !== newGrid) {
 		saveState();
 		redoStack = [];
+		updateUndoRedoUI();
 	} else {
 	// Nothing changed: don't restore previous state to avoid reintroducing
 	// transient animation flags (merged/merging). Just skip saving.
@@ -756,6 +857,15 @@ const undoButton = document.getElementById('undo-button');
 const redoButton = document.getElementById('redo-button');
 const practiceModeToggle = document.getElementById('practice-mode-toggle');
 
+function updateUndoRedoUI() {
+	const undoCounter = document.getElementById('undo-counter');
+	const redoCounter = document.getElementById('redo-counter');
+	if (undoCounter) undoCounter.textContent = Math.max(0, undoStack.length - 1);
+	if (redoCounter) redoCounter.textContent = redoStack.length;
+	if (undoButton) undoButton.disabled = undoStack.length <= 1;
+	if (redoButton) redoButton.disabled = redoStack.length === 0;
+}
+
 function setUndoRedoEnabled(enabled) {
 	if (undoButton) undoButton.disabled = !enabled;
 	if (redoButton) redoButton.disabled = !enabled;
@@ -764,6 +874,7 @@ function setUndoRedoEnabled(enabled) {
 function clearUndoRedoStacks() {
 	undoStack = [];
 	redoStack = [];
+	updateUndoRedoUI();
 }
 
 function clearHistory() {
@@ -801,6 +912,7 @@ if (undoButton) {
 			restoreState(undoStack[undoStack.length - 1]);
 			const gameOverContainer = document.getElementById('game-over-container');
 			if (gameOverContainer) gameOverContainer.classList.add('hidden');
+			updateUndoRedoUI();
 		}
 	});
 	undoButton.addEventListener('touchstart', function (event) {
@@ -811,6 +923,7 @@ if (undoButton) {
 			restoreState(undoStack[undoStack.length - 1]);
 			const gameOverContainer = document.getElementById('game-over-container');
 			if (gameOverContainer) gameOverContainer.classList.add('hidden');
+			updateUndoRedoUI();
 		}
 	});
 }
@@ -825,6 +938,7 @@ if (redoButton) {
 				const gameOverContainer = document.getElementById('game-over-container');
 				if (gameOverContainer) gameOverContainer.classList.remove('hidden');
 			}
+			updateUndoRedoUI();
 		}
 	});
 	redoButton.addEventListener('touchstart', function (event) {
@@ -838,6 +952,7 @@ if (redoButton) {
 				const gameOverContainer = document.getElementById('game-over-container');
 				if (gameOverContainer) gameOverContainer.classList.remove('hidden');
 			}
+			updateUndoRedoUI();
 		}
 	});
 }
@@ -1026,6 +1141,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     restoreState(undoStack[undoStack.length - 1]);
                     const gameOverContainer = document.getElementById('game-over-container');
                     if (gameOverContainer) gameOverContainer.classList.add('hidden');
+					updateUndoRedoUI();
                 }
                 e.preventDefault();
             } else if (e.key === 'y' || e.key === 'Y') {
@@ -1037,6 +1153,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         const gameOverContainer = document.getElementById('game-over-container');
                         if (gameOverContainer) gameOverContainer.classList.remove('hidden');
                     }
+					updateUndoRedoUI();
                 }
                 e.preventDefault();
             }
@@ -1332,6 +1449,25 @@ function canMove(direction) {
 						i++;
 						// Restore value after check to not affect other directions
 						setTimeout(() => tileA.value = originalTileAValue, 0);
+					}
+				}
+			}
+			return { row, rowChanged };
+		}
+		if (GAME_MODE === 'power-of-three') {
+			for (let i = 0; i < GRID_SIZE - 2; i++) {
+				const a = row[i], b = row[i + 1], c = row[i + 2];
+				if (a && b && c) {
+					const tileA = testTiles.find(t => t.id === a);
+					const tileB = testTiles.find(t => t.id === b);
+					const tileC = testTiles.find(t => t.id === c);
+					if (tileA && tileB && tileC && tileA.value === tileB.value && tileA.value === tileC.value) {
+						row[i] = a;
+						row[i + 1] = null;
+						row[i + 2] = null;
+						tileA.value *= 3;
+						rowChanged = true;
+						i += 2;
 					}
 				}
 			}

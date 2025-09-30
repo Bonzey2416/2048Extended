@@ -1,5 +1,11 @@
 # 2048Extended
 ## Changelog
+### Version 0.11
+Date of update: 2025-09-30
+* Powers of 3 mode: You can now use the Powers of 3 mode. Three of the same adjacent tiles can be merged into one!
+* Buttons are redesigned.
+* Added a counter to the undo and redo buttons to show how many undos/redos are available.
+* You can now undo moves up to 256 times, instead of 100.
 ### Version 0.10.4
 Date of update: 2025-09-30
 * AI settings are now saved and can be restored on reload.

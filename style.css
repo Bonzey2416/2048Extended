@@ -126,9 +126,9 @@ p {
 
 .grid-container {
     position: relative;
-    width: calc(80vh - 1vw);
-    height: calc(80vh - 1vw);
-    font-size: calc(80vh - 1vw);
+    width: calc(80vh - 2vw);
+    height: calc(80vh - 2vw);
+    font-size: calc(80vh - 2vw);
 }
 
 .grid-container-inner {
@@ -205,48 +205,60 @@ p {
 .tile.tile-4       { background: #ede0c8; color: #776e65; }
 .tile.tile-5       { background: #eddfc0; color: #776e65; }
 .tile.tile-8       { background: #f2b179; color: #f9f6f2; }
+.tile.tile-9       { background: #f2ae76; color: #f9f6f2; }
 .tile.tile-13      { background: #f4a16a; color: #f9f6f2; }
 .tile.tile-16      { background: #f59563; color: #f9f6f2; }
 .tile.tile-21      { background: #f58d62; color: #f9f6f2; }
+.tile.tile-27      { background: #f68460; color: #f9f6f2; }
 .tile.tile-32      { background: #f67c5f; color: #f9f6f2; }
 .tile.tile-34      { background: #f67b5e; color: #f9f6f2; }
 .tile.tile-55      { background: #f66947; color: #f9f6f2; }
 .tile.tile-64      { background: #f65e3b; color: #f9f6f2; }
+.tile.tile-81      { background: #f65330; color: #f9f6f2; }
 .tile.tile-89      { background: #f64e2b; color: #f9f6f2; }
 .tile.tile-128     { background: #edcf72; color: #f9f6f2; font-size: calc(40% / var(--grid-size)); }
 .tile.tile-144     { background: #edce6f; color: #f9f6f2; font-size: calc(40% / var(--grid-size)); }
 .tile.tile-233     { background: #edcc63; color: #f9f6f2; font-size: calc(40% / var(--grid-size)); }
+.tile.tile-243     { background: #edcc62; color: #f9f6f2; font-size: calc(40% / var(--grid-size)); }
 .tile.tile-256     { background: #edcc61; color: #f9f6f2; font-size: calc(40% / var(--grid-size)); }
 .tile.tile-377     { background: #edca57; color: #f9f6f2; font-size: calc(40% / var(--grid-size)); }
 .tile.tile-512     { background: #edc850; color: #f9f6f2; font-size: calc(40% / var(--grid-size)); }
 .tile.tile-610     { background: #edc74c; color: #f9f6f2; font-size: calc(40% / var(--grid-size)); }
+.tile.tile-729     { background: #edc649; color: #f9f6f2; font-size: calc(40% / var(--grid-size)); }
 .tile.tile-987     { background: #edc540; color: #f9f6f2; font-size: calc(40% / var(--grid-size)); }
 .tile.tile-1024    { background: #edc53f; color: #f9f6f2; font-size: calc(32% / var(--grid-size)); }
 .tile.tile-1597    { background: #edc334; color: #f9f6f2; font-size: calc(32% / var(--grid-size)); }
 .tile.tile-2048    { background: #edc22e; color: #f9f6f2; font-size: calc(32% / var(--grid-size)); }
+.tile.tile-2187    { background: #edc22c; color: #f9f6f2; font-size: calc(32% / var(--grid-size)); }
 .tile.tile-2584    { background: #edc128; color: #f9f6f2; font-size: calc(32% / var(--grid-size)); }
 .tile.tile-4096    { background: #b687b1; color: #f9f6f2; font-size: calc(32% / var(--grid-size)); }
 .tile.tile-4181    { background: #b586b0; color: #f9f6f2; font-size: calc(32% / var(--grid-size)); }
+.tile.tile-6561    { background: #af73ab; color: #f9f6f2; font-size: calc(32% / var(--grid-size)); }
 .tile.tile-6765    { background: #ae72ab; color: #f9f6f2; font-size: calc(32% / var(--grid-size)); }
 .tile.tile-8192    { background: #a862a8; color: #f9f6f2; font-size: calc(32% / var(--grid-size)); }
 .tile.tile-10946   { background: #a659a5; color: #f9f6f2; font-size: calc(26% / var(--grid-size)); }
 .tile.tile-16384   { background: #a248a1; color: #f9f6f2; font-size: calc(26% / var(--grid-size)); }
 .tile.tile-17711   { background: #9f419e; color: #f9f6f2; font-size: calc(26% / var(--grid-size)); }
+.tile.tile-19683   { background: #9b389a; color: #f9f6f2; font-size: calc(26% / var(--grid-size)); }
 .tile.tile-28657   { background: #850980; color: #f9f6f2; font-size: calc(26% / var(--grid-size)); }
 .tile.tile-32768   { background: #80007b; color: #f9f6f2; font-size: calc(26% / var(--grid-size)); }
 .tile.tile-46368   { background: #720162; color: #f9f6f2; font-size: calc(26% / var(--grid-size)); }
+.tile.tile-59049   { background: #67024f; color: #f9f6f2; font-size: calc(26% / var(--grid-size)); }
 .tile.tile-65536   { background: #610245; color: #f9f6f2; font-size: calc(26% / var(--grid-size)); }
 .tile.tile-75025   { background: #5b033d; color: #f9f6f2; font-size: calc(26% / var(--grid-size)); }
 .tile.tile-121393  { background: #8c8bdc; color: #f9f6f2; font-size: calc(22% / var(--grid-size)); }
 .tile.tile-131072  { background: #8986dd; color: #f9f6f2; font-size: calc(22% / var(--grid-size)); }
+.tile.tile-177141  { background: #837bde; color: #f9f6f2; font-size: calc(22% / var(--grid-size)); }
 .tile.tile-196418  { background: #8076df; color: #f9f6f2; font-size: calc(22% / var(--grid-size)); }
 .tile.tile-262144  { background: #7666e2; color: #f9f6f2; font-size: calc(22% / var(--grid-size)); }
 .tile.tile-317811  { background: #7362e3; color: #f9f6f2; font-size: calc(22% / var(--grid-size)); }
 .tile.tile-514229  { background: #6756e6; color: #f9f6f2; font-size: calc(22% / var(--grid-size)); }
 .tile.tile-524288  { background: #6652e6; color: #f9f6f2; font-size: calc(22% / var(--grid-size)); }
+.tile.tile-531441  { background: #6551e6; color: #f9f6f2; font-size: calc(22% / var(--grid-size)); }
 .tile.tile-832040  { background: #5845e7; color: #f9f6f2; font-size: calc(22% / var(--grid-size)); }
 .tile.tile-1048576 { background: #4f3de7; color: #f9f6f2; font-size: calc(19% / var(--grid-size)); }
 .tile.tile-1346269 { background: #4134ea; color: #f9f6f2; font-size: calc(19% / var(--grid-size)); }
+.tile.tile-1594323 { background: #372cec; color: #f9f6f2; font-size: calc(19% / var(--grid-size)); }
 .tile.tile-2097152 { background: #261cf0; color: #f9f6f2; font-size: calc(19% / var(--grid-size)); }
 .tile.tile-2178309 { background: #231af1; color: #f9f6f2; font-size: calc(19% / var(--grid-size)); }
 
@@ -361,28 +373,62 @@ p {
 .button-container {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     margin-top: calc(-1vw - 1vh);
 }
 
 .button-container button {
     background: #8f7a66;
     color: #f9f6f2;
-    flex: 1;
     font-family: inherit;
     font-weight: 500;
+    position: relative;
     border: none;
-    border-radius: calc(0.5vw + 0.5vh);
-    padding: calc(0.5vw + 0.5vh) calc(1vw + 1vh);
-    margin: calc(0.5vw + 0.5vh);
+    border-radius: 50%;
+    width: calc(1.4vw + 4vh);
+    height: calc(1.4vw + 4vh);
+    line-height: 0;
+    margin: calc(0.5vw + 0.5vh) calc(0.25vw + 0.25vh);
     font-size: calc(0.7vw + 2vh);
-    cursor: pointer;
     display: flex;
+    justify-content: center;
     align-items: center;
+    cursor: pointer;
     transition: background 0.3s ease;
 }
 
-.button-container button i {
-    margin-right: calc(0.5vw + 0.5vh);
+.button-container button .counter {
+    position: absolute;
+    top: -20%;
+    right: -20%;
+    background: #faf8ef;
+    color: #776e65;
+    -webkit-backdrop-filter: blur(calc(0.1vw + 0.2vh)) saturate(150%);
+    backdrop-filter: blur(calc(0.1vw + 0.2vh)) saturate(150%);
+    box-shadow: 0 calc(0.05vw + 0.1vh) calc(0.1vw + 0.2vh) #0003;
+    font-size: calc(0.4vw + 1.2vh);
+    font-weight: 700;
+    min-width: calc(0.4vw + 1.2vh);
+    padding: 0 calc(0.2vw + 0.6vh);
+    height: calc(0.8vw + 2.4vh);
+    line-height: calc(0.8vw + 2.4vh);
+    border-radius: calc(0.8vw + 2.4vh);
+    transition: all 0.3s;
+}
+
+.button-container button:disabled {
+    cursor: default;
+    background-color: #8f7a6655 !important;
+}
+
+.button-container button:disabled .counter {
+    transform: scale(0.7);
+    background-color: transparent;
+    color: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: none;
+    pointer-events: none;
 }
 
 .button-container button:hover {
@@ -645,7 +691,14 @@ p {
     opacity: 0.85;
 }
 
-@media screen and (orientation: portrait) {
+@media screen and (max-width: 125vh) {
+    .grid-container {
+        width: calc(70vw - 5vh);
+        height: calc(70vw - 5vh);
+        font-size: calc(70vw - 5vh);
+    }
+}
+@media screen and (max-width: 100vh) {
     .game-container {
         grid-template-rows: auto auto auto;
         grid-template-columns: 100%;
@@ -657,12 +710,9 @@ p {
 
     .grid-container {
         width: calc(50vh - 1vw);
-        max-width: 90vw;
         height: calc(50vh - 1vw);
-        max-height: 90vw;
         margin: auto;
         font-size: calc(50vh - 1vw);
-        font-size: min(calc(50vh - 1vw), 90vw);
     }
 
     .overlay-menu {
@@ -683,6 +733,15 @@ p {
     }
 }
 
+@media screen and (max-width: 60vh) {
+    .grid-container {
+        width: 90vw;
+        height: 90vw;
+        font-size: 90vw;
+    }
+    
+}
+
 @supports (-webkit-backdrop-filter: none) or (backdrop-filter: none) {
     .game-over-container {
         background-color: rgba(238, 228, 218, 0.5);
@@ -690,7 +749,7 @@ p {
     .game-won-container {
         background-color: rgba(237, 194, 46, 0.5);
     }
-    .overlay-menu {
+    .overlay-menu, .button-container button .counter {
         background-color: #faf8efbb;
     }
 }
