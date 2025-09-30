@@ -6,6 +6,7 @@
         <title>2048 Extended</title>
         <link rel="stylesheet" href="style.css">
         <script src="script.js" defer></script>
+        <script src="statistics.js" defer></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/aquawolf04/font-awesome-pro@5cd1511/css/all.css"  crossorigin="anonymous" referrerpolicy="no-referrer" />
     </head>
     <body>
@@ -51,6 +52,7 @@
                     <button id="redo-button" title="Redo (Ctrl+Y)" disabled><i class="fas fa-redo"></i><div id="redo-counter" class="counter">0</div></button>
                     <button id="restart-button" title="Restart Game"><i class="fas fa-sync-alt"></i></button>
                     <button id="mode-button" title="Change Mode"><i class="fas fa-adjust"></i></button>
+                    <button id="statistics-button" title="View Statistics"><i class="fas fa-chart-bar"></i></button>
                     <button id="about-button" title="About 2048 Extended"><i class="fas fa-info-circle"></i></button>
                 </div>
                 <div class="ai-container">
@@ -126,10 +128,19 @@
                 <input type="number" id="ai-move-duration-input" min="0" value="100">
             </div>
         </div>
+        <div class="overlay-menu hidden" id="statistics-menu">
+            <i class="fas fa-times close-button" id="close-statistics-menu"></i>
+            <h2>Statistics</h2>
+            <h3>General statistics</h3>
+            <p>Games played: <span id="games-played">0</span></p>
+            <p>Total score: <span id="total-score">0</span></p>
+            <h3>Statistics by game</h3>
+            <div id="game-statistics"></div>
+        </div>
         <div class="overlay-menu hidden" id="about-menu">
             <i class="fas fa-times close-button" id="close-about-menu"></i>
             <h2>About 2048 Extended</h2>
-            <p style="font-style: italic;">Version 0.11. Last updated 2025-09-30.</p>
+            <p style="font-style: italic;">Version 0.12. Last updated 2025-09-30.</p>
             <p>2048 Extended is an enhanced version of the classic 2048 game, featuring multiple game modes, grid sizes, and an AI mode.</p>
             <h3>How to play</h3>
             <p>
@@ -170,6 +181,12 @@
                 Based on 2048 created by Gabriele Cirulli, which was in turn based on 1024 by Veewo Studio and conceptually similar to Threes by Asher Vollmer.
             </p>
             <h3>Changelog</h3>
+            <h4>Version 0.12</h4>
+            <p class="update-date">Date of update: 2025-09-30</p>
+            <ul>
+                <li>Statistics: You can now view the statistics of each game.</li>
+                <li>Fixed undo/redo handling when restarting the game or selecting a different game mode/grid size.</li>
+            </ul>
             <h4>Version 0.11</h4>
             <p class="update-date">Date of update: 2025-09-30</p>
             <ul>

@@ -1,5 +1,9 @@
 # 2048Extended
 ## Changelog
+### Version 0.12
+Date of update: 2025-09-30
+* Statistics: You can now view the statistics of each game.
+* Fixed undo/redo handling when restarting the game or selecting a different game mode/grid size.
 ### Version 0.11
 Date of update: 2025-09-30
 * Powers of 3 mode: You can now use the Powers of 3 mode. Three of the same adjacent tiles can be merged into one!

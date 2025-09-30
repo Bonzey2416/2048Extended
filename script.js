@@ -2,6 +2,7 @@
 let GRID_SIZE = 4;
 let grid = [];
 let score = 0;
+let previousScore = 0;
 let tiles = [];
 let tileIdCounter = 1;
 let lastNewTileId = null;
@@ -109,6 +110,7 @@ function restoreGameState() {
         const gameState = JSON.parse(savedState);
         grid = gameState.grid;
         score = gameState.score;
+        previousScore = score;
         tiles = gameState.tiles;
 		tileIdCounter = gameState.tileIdCounter;
 		hasShownGameWon = gameState.hasShownGameWon;
@@ -155,10 +157,12 @@ function initGrid() {
 		tiles = [];
 		tileIdCounter = 1;
 		score = 0;
+		previousScore = 0;
 		hasShownGameWon = false;
 		addRandomTile();
 		addRandomTile();
 		updateUI();
+        incrementGamesPlayed(GAME_MODE, practiceMode, GRID_SIZE);
 		// Save the initial state so undo works after the first move
 		saveState();
 	}
@@ -180,6 +184,7 @@ function initGrid() {
 		const gameOverContainer = document.getElementById('game-over-container');
 		if (gameOverContainer) gameOverContainer.classList.remove('hidden');
 	}
+	clearUndoRedoStacks(); // Clear undo/redo history on grid initialization
 }
 
 function addRandomTile() {
@@ -262,9 +267,10 @@ function combine(row) {
 					to: { row: tileA.row, col: tileA.col },
 					mergedValue: tileA.value + tileB.value
 				});
+                score += tileA.value + tileB.value; // Increment score by the value of the new tile
                 tileA.value = tileA.value + tileB.value;
                 tileA.merged = true;
-                score += tileA.value;
+                // ...existing code...
                 const tileBEl = document.getElementById('tile-' + tileB.id);
                 // mark DOMs as merging so they persist for animation
 				// Remove the non-alias (removed) tile DOM immediately so only the alias and merged tile remain
@@ -777,12 +783,35 @@ function updateUI() {
 	const highScoreKey = getHighScoreKey(GAME_MODE, practiceMode, GRID_SIZE);
     let highScore = parseInt(localStorage.getItem(highScoreKey) || '0');
     
+    const highestTileKey = getHighestTileKey(GAME_MODE, practiceMode, GRID_SIZE);
+    let highestTile = parseInt(localStorage.getItem(highestTileKey) || '0');
+
+    for (const t of tiles) {
+        if (t.value > highestTile) {
+            highestTile = t.value;
+        }
+    }
 
     if (score > highScore) {
         highScore = score;
         localStorage.setItem(highScoreKey, highScore);
     }
+    localStorage.setItem(highestTileKey, highestTile);
     document.getElementById('high-score').textContent = highScore;
+
+    // Update total score
+    const totalScoreKey = 'totalScore';
+    let totalScore = parseInt(localStorage.getItem(totalScoreKey) || '0');
+    const scoreDelta = score - previousScore;
+    if (scoreDelta > 0) {
+        totalScore += scoreDelta;
+        localStorage.setItem(totalScoreKey, totalScore);
+    }
+    previousScore = score;
+}
+
+function getHighestTileKey(gameMode, practiceMode, gridSize) {
+    return `highestTile-${gameMode}-${practiceMode ? 'practice' : 'normal'}-${gridSize}`;
 }
 
 function saveState() {
@@ -812,6 +841,7 @@ function restoreState(state) {
 	grid = state.grid.map(row => [...row]);
 	tiles = state.tiles.map(t => ({ ...t }));
 	score = state.score;
+	previousScore = score;
 	tileIdCounter = state.tileIdCounter;
 	lastNewTileId = state.lastNewTileId;
 	hasShownGameWon = state.hasShownGameWon;
@@ -1033,6 +1063,9 @@ document.addEventListener('DOMContentLoaded', function () {
 	const aiOptionButton = document.getElementById('ai-option-button');
 	const aiOptionsMenu = document.getElementById('ai-options-menu');
 	const closeAiOptions = document.getElementById('close-ai-options-menu');
+	const statisticsButton = document.getElementById('statistics-button');
+	const statisticsMenu = document.getElementById('statistics-menu');
+	const closeStatistics = document.getElementById('close-statistics-menu');
 	const aboutButton = document.getElementById('about-button');
 	const aboutMenu = document.getElementById('about-menu');
 	const closeAbout = document.getElementById('close-about-menu');
@@ -1070,6 +1103,22 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	}
 
+	function showStatisticsMenu() {
+		if (statisticsMenu && overlayBackdrop) {
+			statisticsMenu.classList.remove('hidden');
+			overlayBackdrop.classList.remove('hidden');
+			gameContainer.classList.add('covered');
+		}
+	}
+
+	function hideStatisticsMenu() {
+		if (statisticsMenu && overlayBackdrop) {
+			statisticsMenu.classList.add('hidden');
+			overlayBackdrop.classList.add('hidden');
+			gameContainer.classList.remove('covered');
+		}
+	}
+
 	function showAboutMenu() {
 		if (aboutMenu && overlayBackdrop) {
 			aboutMenu.classList.remove('hidden');
@@ -1086,27 +1135,31 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	}
 
-    if (modeButton) modeButton.addEventListener('click', showModesMenu);
+    if (closeModes) closeModes.addEventListener('click', hideModesMenu);
+    if (overlayBackdrop) {
+        overlayBackdrop.addEventListener('click', function () {
+            hideModesMenu();
+			hideAiOptionsMenu();
+            hideStatisticsMenu();
+            hideAboutMenu();
+        });
+        overlayBackdrop.addEventListener('touchstart', function (event) {
+            event.preventDefault();
+            hideModesMenu();
+			hideAiOptionsMenu();
+			hideStatisticsMenu();
+            hideAboutMenu();
+        });
+    }
+
     if (modeButton) {
+		modeButton.addEventListener('click', showModesMenu);
         modeButton.addEventListener('touchstart', function (event) {
             event.preventDefault();
             showModesMenu();
         });
     }
-    if (closeModes) closeModes.addEventListener('click', hideModesMenu);
-    if (overlayBackdrop) {
-        overlayBackdrop.addEventListener('click', function () {
-            hideModesMenu();
-			hideAiOptionsMenu(); // Add this line to hide AI options menu as well
-            hideAboutMenu(); // Add this line to hide about menu as well
-        });
-        overlayBackdrop.addEventListener('touchstart', function (event) {
-            event.preventDefault();
-            hideModesMenu();
-			hideAiOptionsMenu(); // Add this line to hide AI options menu as well
-            hideAboutMenu(); // Add this line to hide about menu as well
-        });
-    }
+
 	if (aiOptionButton) {
 		aiOptionButton.addEventListener('click', showAiOptionsMenu);
 		aiOptionButton.addEventListener('touchstart', function (event) {
@@ -1114,16 +1167,27 @@ document.addEventListener('DOMContentLoaded', function () {
 			showAiOptionsMenu();
 		});
 	}
-	if (closeAiOptions) closeAiOptions.addEventListener('click', hideAiOptionsMenu);
-	if (closeAbout) closeAbout.addEventListener('click', hideAboutMenu);
-	if (overlayBackdrop) overlayBackdrop.addEventListener('click', hideAiOptionsMenu);
-	if (aboutButton) aboutButton.addEventListener('click', showAboutMenu);
+
+	if (statisticsButton) {
+        statisticsButton.addEventListener('click', showStatisticsMenu);
+        statisticsButton.addEventListener('touchstart', function (event) {
+            event.preventDefault();
+            showStatisticsMenu();
+        });
+    }
+
 	if (aboutButton) {
+		aboutButton.addEventListener('click', showAboutMenu);
         aboutButton.addEventListener('touchstart', function (event) {
             event.preventDefault();
             showAboutMenu();
         });
     }
+
+	if (closeAiOptions) closeAiOptions.addEventListener('click', hideAiOptionsMenu);
+	if (closeAbout) closeAbout.addEventListener('click', hideAboutMenu);
+	if (overlayBackdrop) overlayBackdrop.addEventListener('click', hideAiOptionsMenu);
+	if (aboutButton) aboutButton.addEventListener('click', showAboutMenu);
 
     // Close with ESC
     document.addEventListener('keydown', function (e) {
