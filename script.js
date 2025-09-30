@@ -1196,6 +1196,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 	if (closeAiOptions) closeAiOptions.addEventListener('click', hideAiOptionsMenu);
+	if (closeStatistics) closeStatistics.addEventListener('click', hideStatisticsMenu);
 	if (closeAbout) closeAbout.addEventListener('click', hideAboutMenu);
 	if (overlayBackdrop) overlayBackdrop.addEventListener('click', hideAiOptionsMenu);
 	if (aboutButton) aboutButton.addEventListener('click', showAboutMenu);
@@ -1205,7 +1206,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (e.key === 'Escape') {
             hideModesMenu();
 			hideAiOptionsMenu();
-			hideStatisticsMenu
+			hideStatisticsMenu();
 			hideAboutMenu();
         }
 
