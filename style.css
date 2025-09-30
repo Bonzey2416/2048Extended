@@ -714,6 +714,17 @@ p {
     opacity: 0.85;
 }
 
+kbd {
+    background: #eee4da;
+    border-radius: 0.2em;
+    padding: 0 0.3em;
+    font-size: 0.9em;
+    font-weight: 500;
+    font-family: inherit;
+    vertical-align: 0.1em;
+    box-shadow: 0 0.1em 0.3em #0006, inset 0 0.1em 0.1em #fff6, inset 0 -0.1em 0.1em #0009;
+}
+
 @media screen and (max-width: 125vh) {
     .grid-container {
         width: calc(70vw - 5vh);

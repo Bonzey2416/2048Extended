@@ -1,5 +1,8 @@
 # 2048Extended
 ## Changelog
+### Version 0.12.2
+Date of update: 2025-09-30
+* Fixed a bug when <kbd>Esc</kbd> button is pressed, the statistics menu doesn't hide properly.
 ### Version 0.12.1
 Date of update: 2025-09-30
 * Fixed a bug when restarting or selecting another game mode/size it registers 2 game plays instead of 1.
