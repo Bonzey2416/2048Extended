@@ -2,6 +2,7 @@
 ## Changelog
 ### Version 0.12.1
 Date of update: 2025-09-30
+* Fixed a bug when restarting or selecting another game mode/size it registers 2 game plays instead of 1.
 * Fixed a bug when the game is restarted, the game won container doesn't hide.
 * Fixed a bug where some tiles appear above game won container not below.
 ### Version 0.12
