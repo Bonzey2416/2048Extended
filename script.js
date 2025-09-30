@@ -167,9 +167,12 @@ function initGrid() {
 		saveState();
 	}
 
-	// Hide game over container initially, it will be shown if isGameOver() is true
+	// Hide game over and game won containers initially
 	const gameOverContainer = document.getElementById('game-over-container');
 	if (gameOverContainer) gameOverContainer.classList.add('hidden');
+
+	const gameWonContainer = document.getElementById('game-won-container');
+	if (gameWonContainer) gameWonContainer.classList.add('hidden');
 
 	const highScoreKey = getHighScoreKey(GAME_MODE, practiceMode, GRID_SIZE);
     const savedHighScore = localStorage.getItem(highScoreKey);
@@ -689,7 +692,7 @@ function updateUI() {
 		alias1.style.top = ((100 - 10 / GRID_SIZE) / GRID_SIZE * anim.from.row + 10 / GRID_SIZE) + '%';
 		alias1.style.left = ((100 - 10 / GRID_SIZE) / GRID_SIZE * anim.from.col + 10 / GRID_SIZE) + '%';
 		alias1.style.opacity = '1';
-		alias1.style.zIndex = '100';
+		alias1.style.zIndex = '5';
 		tileContainer.appendChild(alias1);
 		// Second merging alias at original pre-move position
 		const alias2 = document.createElement('div');
@@ -700,7 +703,7 @@ function updateUI() {
 		alias2.style.top = ((100 - 10 / GRID_SIZE) / GRID_SIZE * anim.from2.row + 10 / GRID_SIZE) + '%';
 		alias2.style.left = ((100 - 10 / GRID_SIZE) / GRID_SIZE * anim.from2.col + 10 / GRID_SIZE) + '%';
 		alias2.style.opacity = '1';
-		alias2.style.zIndex = '100';
+		alias2.style.zIndex = '5';
 		tileContainer.appendChild(alias2);
 		if (aiModeActive && aiMoveDelay < 50) {
 			// Instantly move and fade out aliases (no transition)
@@ -808,6 +811,14 @@ function updateUI() {
         localStorage.setItem(totalScoreKey, totalScore);
     }
     previousScore = score;
+
+    // Auto-update statistics if menu is visible
+    const statisticsMenu = document.getElementById('statistics-menu');
+    if (statisticsMenu && !statisticsMenu.classList.contains('hidden')) {
+        if (typeof updateStatistics === 'function') {
+            updateStatistics();
+        }
+    }
 }
 
 function getHighestTileKey(gameMode, practiceMode, gridSize) {
@@ -1703,21 +1714,6 @@ if (gameModeDropdown) {
     });
     GAME_MODE = gameModeDropdown.value;
 }
-
-// Listen for grid size changes
-document.getElementById('grid-size-select').addEventListener('change', (e) => {
-	GRID_SIZE = parseInt(e.target.value);
-	updateGoalDisplay();
-	// clearHistory(); // Removed: initGrid will handle state restoration
-	initGrid();
-});
-
-// Listen for practice mode toggle
-document.getElementById('practice-mode-toggle').addEventListener('change', (e) => {
-	practiceMode = e.target.checked;
-	initGrid();
-	saveSettings(); // Save settings after changing practice mode
-});
 
 // Initialize grid and UI
 initGrid();

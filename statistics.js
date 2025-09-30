@@ -126,4 +126,6 @@ function updateStatistics() {
     }
 }
 
+window.updateStatistics = updateStatistics;
+
 document.addEventListener('DOMContentLoaded', initStatistics);
