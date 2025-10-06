@@ -11,7 +11,8 @@ export let config = {
     aiStrategy: 'random',
     animationSpeed: 'medium',
     invertColors: false,
-    grayscaleColors: false
+    grayscaleColors: false,
+    theme: 'light'
 };
 
 // Shared game state
@@ -84,6 +85,7 @@ export function loadSettings() {
         config.animationSpeed = settings.animationSpeed || 'medium';
         config.invertColors = settings.invertColors || false;
         config.grayscaleColors = settings.grayscaleColors || false;
+        config.theme = settings.theme || 'light';
     }
 }
 
@@ -96,7 +98,8 @@ export function saveSettings() {
         aiStrategy: config.aiStrategy,
         animationSpeed: config.animationSpeed,
         invertColors: config.invertColors,
-        grayscaleColors: config.grayscaleColors
+        grayscaleColors: config.grayscaleColors,
+        theme: config.theme
     };
     localStorage.setItem('gameSettings', JSON.stringify(settings));
 }

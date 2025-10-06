@@ -179,7 +179,7 @@
                         <div class="dropdown-container">
                             <label for="tile-moving-animation-speed-select">
                                 <p class="label-title">Tile moving animation speed</p>
-                                <p class="label-subtitle">Choose the mode for your game</p>
+                                <p class="label-subtitle">Adjust the speed of tile moving animation</p>
                             </label>
                             <select id="tile-moving-animation-speed-select">
                                 <option value="slow">Slow</option>
@@ -191,7 +191,35 @@
                     </div>
                     <div class="settings-menu-content-inner" id="settings-appearance">
                         <h2>Appearance</h2>
-                        <p>Coming soon!</p>
+                        <div>
+                            <p class="label-title">Theme</p>
+                            <ul class="radio-image-group">
+                                <li class="radio-image-group-item">
+                                    <img src="images/2048 Extended Light.png">
+                                    <label class="radio">
+                                        <input type="radio" value="light" checked="checked" name="theme">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <p>Light</p>
+                                </li>
+                                <li class="radio-image-group-item">
+                                    <img src="images/2048 Extended Dark.png">
+                                    <label class="radio">
+                                        <input type="radio" value="dark" name="theme">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <p>Dark</p>
+                                </li>
+                                <li class="radio-image-group-item">
+                                    <img src="images/2048 Extended Auto.png">
+                                    <label class="radio">
+                                        <input type="radio" value="auto" name="theme">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <p>Auto</p>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                     <div class="settings-menu-content-inner" id="settings-accessibility">
                         <h2>Accessibility</h2>
@@ -218,7 +246,7 @@
                     </div>
                     <div class="settings-menu-content-inner" id="settings-about">
                         <h2>About 2048 Extended</h2>
-                        <p style="font-style: italic;">Version 0.13. Last updated 2025-10-06.</p>
+                        <p style="font-style: italic;">Version 0.14. Last updated 2025-10-06.</p>
                         <p>2048 Extended is an enhanced version of the classic 2048 game, featuring multiple game modes, grid sizes, and an AI mode.</p>
                         <h3>How to play</h3>
                         <p>
@@ -259,6 +287,13 @@
                             Based on 2048 created by Gabriele Cirulli, which was in turn based on 1024 by Veewo Studio and conceptually similar to Threes by Asher Vollmer.
                         </p>
                         <h3>Changelog</h3>
+                        <h4>Version 0.14</h4>
+                        <p class="update-date">Date of update: 2025-10-06</p>
+                        <ul>
+                            <li>Added dark mode support. You can now toggle dark mode or automate system dark mode.</li>
+                            <li>Fix undo/redo handling when not in practice mode.</li>
+                            <li>Fixed subtitle in tile moving animation speed option.</li>
+                        </ul>
                         <h4>Version 0.13</h4>
                         <p class="update-date">Date of update: 2025-10-06</p>
                         <ul>

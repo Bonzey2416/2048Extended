@@ -144,7 +144,7 @@ function setupEventListeners() {
             case 'ArrowLeft': case 'a': move(0); break;
             case 'ArrowRight': case 'd': move(2); break;
         }
-        if (e.ctrlKey || e.metaKey) {
+        if ((e.ctrlKey || e.metaKey)  && config.practiceMode) {
             if (e.key === 'z') undo();
             if (e.key === 'y') redo();
         }
@@ -337,6 +337,21 @@ function setupEventListeners() {
         document.getElementById('grayscale-colors').classList.toggle('hidden', !e.target.checked);
         saveSettings();
     });
+
+    document.querySelectorAll('input[name="theme"]').forEach(radio => {
+        radio.addEventListener('change', e => {
+            const theme = e.target.value;
+            config.theme = theme;
+            const html = document.documentElement;
+            html.classList.remove('dark-mode', 'auto-mode');
+            if (theme === 'dark') {
+                html.classList.add('dark-mode');
+            } else if (theme === 'auto') {
+                html.classList.add('auto-mode');
+            }
+            saveSettings();
+        });
+    });
 }
 
 function syncSettingsUI() {
@@ -358,6 +373,12 @@ function syncSettingsUI() {
     const grayscaleColorsToggle = document.getElementById('grayscale-colors-toggle');
     grayscaleColorsToggle.checked = config.grayscaleColors;
     document.getElementById('grayscale-colors').classList.toggle('hidden', !config.grayscaleColors);
+
+    const themeRadio = document.querySelector(`input[name="theme"][value="${config.theme}"]`);
+    if (themeRadio) {
+        themeRadio.checked = true;
+        themeRadio.dispatchEvent(new Event('change'));
+    }
 
     const speedSelect = document.getElementById('tile-moving-animation-speed-select');
     if (speedSelect) {

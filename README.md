@@ -1,5 +1,10 @@
 # 2048Extended
 ## Changelog
+### Version 0.14
+Date of update: 2025-10-06
+* Added dark mode support. You can now toggle dark mode or automate system dark mode.
+* Fix undo/redo handling when not in practice mode.
+* Fixed subtitle in tile moving animation speed option.
 ### Version 0.13
 Date of update: 2025-10-06
 * Reworked the JavaScript code by spliting into multiple files.
