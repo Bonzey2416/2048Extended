@@ -1,5 +1,12 @@
 # 2048Extended
 ## Changelog
+### Version 0.13
+Date of update: 2025-10-06
+* Reworked the JavaScript code by spliting into multiple files.
+* New Settings menu: Here you can adjust the settings.
+* New tile move animation speeds and accessibility options.
+* About menu moved into Settings menu.
+* Fixed undo/redo handling.
 ### Version 0.12.2
 Date of update: 2025-09-30
 * Fixed a bug when <kbd>Esc</kbd> button is pressed, the statistics menu doesn't hide properly.

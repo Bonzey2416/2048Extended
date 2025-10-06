@@ -1,0 +1,298 @@
+import { gameState, config } from './main.js';
+
+// Track merges for animation
+export let mergeAnimations = [];
+
+export function getTileById(id) {
+    return gameState.tiles.find(t => t.id === id);
+}
+
+export function addRandomTile() {
+    const emptyCells = [];
+    for (let r = 0; r < config.GRID_SIZE; r++) {
+        for (let c = 0; c < config.GRID_SIZE; c++) {
+            if (gameState.grid[r][c] === null) emptyCells.push([r, c]);
+        }
+    }
+    if (emptyCells.length === 0) return;
+    const [r, c] = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    let value;
+    if (config.GAME_MODE === 'fibonacci') {
+        value = Math.random() < 0.9 ? 1 : 2;
+    } else if (config.GAME_MODE === 'power-of-three') {
+        value = 1;
+    } else {
+        value = Math.random() < 0.9 ? 2 : 4;
+    }
+    const tile = { id: gameState.tileIdCounter++, value, row: r, col: c, merged: false };
+    gameState.tiles.push(tile);
+    gameState.grid[r][c] = tile.id;
+    gameState.lastNewTileId = tile.id;
+}
+
+function slide(row) {
+    const newRow = Array(config.GRID_SIZE).fill(null);
+    let insert = 0;
+    for (let i = 0; i < config.GRID_SIZE; i++) {
+        if (row[i] !== null) {
+            newRow[insert] = row[i];
+            insert++;
+        }
+    }
+    return newRow;
+}
+
+function getFibonacciSequence(maxValue) {
+    const fib = [1, 1];
+    while (fib[fib.length - 1] < maxValue) {
+        fib.push(fib[fib.length - 1] + fib[fib.length - 2]);
+    }
+    return fib;
+}
+
+function areFibonacciMergeable(a, b, fibSeq) {
+    for (let i = 0; i < fibSeq.length - 1; i++) {
+        if ((a === 1 && b === 1) ||
+            (fibSeq[i] === a && fibSeq[i + 1] === b) ||
+            (fibSeq[i] === b && fibSeq[i + 1] === a)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function combine(row) {
+    let rowChanged = false;
+    // Classic Mode
+    if (config.GAME_MODE === 'classic') {
+        for (let i = 0; i < config.GRID_SIZE - 1; i++) {
+            const tileA = row[i] ? getTileById(row[i]) : null;
+            const tileB = row[i + 1] ? getTileById(row[i + 1]) : null;
+            if (tileA && tileB && tileA.value === tileB.value && !tileA.merged && !tileB.merged) {
+                const fromA = gameState.beforeMovePositions[tileA.id] || { row: tileA.row, col: tileA.col };
+                const fromB = gameState.beforeMovePositions[tileB.id] || { row: tileB.row, col: tileB.col };
+                mergeAnimations.push({ from: { ...fromA, id: tileA.id, value: tileA.value }, from2: { ...fromB, id: tileB.id, value: tileB.value }, mergedId: tileA.id, to: { row: tileA.row, col: tileA.col }, mergedValue: tileA.value * 2 });
+                tileA.value *= 2;
+                tileA.merged = true;
+                gameState.score += tileA.value;
+                gameState.tiles = gameState.tiles.filter(t => t.id !== tileB.id);
+                row[i + 1] = null;
+                rowChanged = true;
+                i++;
+            }
+        }
+    }
+    // Fibonacci Mode
+    if (config.GAME_MODE === 'fibonacci') {
+        const fibSeq = getFibonacciSequence(Math.pow(2, 20));
+        for (let i = 0; i < config.GRID_SIZE - 1; i++) {
+            const tileA = row[i] ? getTileById(row[i]) : null;
+            const tileB = row[i + 1] ? getTileById(row[i + 1]) : null;
+            if (tileA && tileB && areFibonacciMergeable(tileA.value, tileB.value, fibSeq) && !tileA.merged && !tileB.merged) {
+                const fromA = gameState.beforeMovePositions[tileA.id] || { row: tileA.row, col: tileA.col };
+                const fromB = gameState.beforeMovePositions[tileB.id] || { row: tileB.row, col: tileB.col };
+                mergeAnimations.push({ from: { ...fromA, id: tileA.id, value: tileA.value }, from2: { ...fromB, id: tileB.id, value: tileB.value }, mergedId: tileA.id, to: { row: tileA.row, col: tileA.col }, mergedValue: tileA.value + tileB.value });
+                gameState.score += tileA.value + tileB.value;
+                tileA.value += tileB.value;
+                tileA.merged = true;
+                gameState.tiles = gameState.tiles.filter(t => t.id !== tileB.id);
+                row[i + 1] = null;
+                rowChanged = true;
+                i++;
+            }
+        }
+    }
+    // Power of Three Mode
+    if (config.GAME_MODE === 'power-of-three') {
+        for (let i = 0; i < config.GRID_SIZE - 2; i++) {
+            const tileA = row[i] ? getTileById(row[i]) : null;
+            const tileB = row[i + 1] ? getTileById(row[i + 1]) : null;
+            const tileC = row[i + 2] ? getTileById(row[i + 2]) : null;
+            if (tileA && tileB && tileC && tileA.value === tileB.value && tileA.value === tileC.value && !tileA.merged && !tileB.merged && !tileC.merged) {
+                const fromA = gameState.beforeMovePositions[tileA.id] || { row: tileA.row, col: tileA.col };
+                const fromB = gameState.beforeMovePositions[tileB.id] || { row: tileB.row, col: tileB.col };
+                const fromC = gameState.beforeMovePositions[tileC.id] || { row: tileC.row, col: tileC.col };
+                mergeAnimations.push({ from: { ...fromA, id: tileA.id, value: tileA.value }, from2: { ...fromB, id: tileB.id, value: tileB.value }, from3: { ...fromC, id: tileC.id, value: tileC.value }, mergedId: tileA.id, to: { row: tileA.row, col: tileA.col }, mergedValue: tileA.value * 3 });
+                tileA.value *= 3;
+                tileA.merged = true;
+                gameState.score += tileA.value;
+                gameState.tiles = gameState.tiles.filter(t => t.id !== tileB.id && t.id !== tileC.id);
+                row[i + 1] = null;
+                row[i + 2] = null;
+                rowChanged = true;
+                i += 2;
+            }
+        }
+    }
+    return { row, rowChanged };
+}
+
+function operate(row) {
+    let rowChanged = false;
+    const afterFirstSlide = slide(row);
+    if (JSON.stringify(afterFirstSlide) !== JSON.stringify(row)) rowChanged = true;
+    row = afterFirstSlide;
+
+    const beforeCombineCount = mergeAnimations.length;
+    const combineResult = combine(row);
+    row = combineResult.row;
+    if (combineResult.rowChanged) rowChanged = true;
+
+    const afterSecondSlide = slide(row);
+    if (JSON.stringify(afterSecondSlide) !== JSON.stringify(row)) rowChanged = true;
+    row = afterSecondSlide;
+
+    return { row, rowChanged };
+}
+
+export function rotateGrid(grid) {
+    let newGrid = Array(config.GRID_SIZE).fill().map(() => Array(config.GRID_SIZE).fill(null));
+    for (let r = 0; r < config.GRID_SIZE; r++) {
+        for (let c = 0; c < config.GRID_SIZE; c++) {
+            newGrid[c][config.GRID_SIZE - 1 - r] = grid[r][c];
+        }
+    }
+    return newGrid;
+}
+
+export function moveGrid(direction) {
+    let currentGrid = gameState.grid.map(row => [...row]);
+    for (let i = 0; i < direction; i++) {
+        currentGrid = rotateGrid(currentGrid);
+    }
+
+    let anyTileMoved = false;
+    for (let r = 0; r < config.GRID_SIZE; r++) {
+        const operateResult = operate(currentGrid[r]);
+        currentGrid[r] = operateResult.row;
+        if (operateResult.rowChanged) {
+            anyTileMoved = true;
+        }
+    }
+
+    for (let i = 0; i < (4 - direction) % 4; i++) {
+        currentGrid = rotateGrid(currentGrid);
+    }
+
+    if (anyTileMoved) {
+        gameState.grid = currentGrid;
+        for (let r = 0; r < config.GRID_SIZE; r++) {
+            for (let c = 0; c < config.GRID_SIZE; c++) {
+                const id = gameState.grid[r][c];
+                if (id) {
+                    const tile = getTileById(id);
+                    if (tile) {
+                        tile.row = r;
+                        tile.col = c;
+                    }
+                }
+            }
+        }
+    }
+    return anyTileMoved;
+}
+
+export function resetMergedState() {
+    gameState.tiles.forEach(tile => {
+        tile.merged = false;
+    });
+    mergeAnimations.length = 0;
+}
+
+export function isGameOver() {
+    for (let r = 0; r < config.GRID_SIZE; r++) {
+        for (let c = 0; c < config.GRID_SIZE; c++) {
+            if (gameState.grid[r][c] === null) return false;
+        }
+    }
+    // Check for possible merges
+    if (config.GAME_MODE === 'power-of-three') {
+        // Check for 3 consecutive identical tiles horizontally
+        for (let r = 0; r < config.GRID_SIZE; r++) {
+            for (let c = 0; c < config.GRID_SIZE - 2; c++) {
+                const tileA = getTileById(gameState.grid[r][c]);
+                const tileB = getTileById(gameState.grid[r][c + 1]);
+                const tileC = getTileById(gameState.grid[r][c + 2]);
+                if (tileA && tileB && tileC && tileA.value === tileB.value && tileA.value === tileC.value) {
+                    return false;
+                }
+            }
+        }
+        // Check for 3 consecutive identical tiles vertically
+        for (let c = 0; c < config.GRID_SIZE; c++) {
+            for (let r = 0; r < config.GRID_SIZE - 2; r++) {
+                const tileA = getTileById(gameState.grid[r][c]);
+                const tileB = getTileById(gameState.grid[r + 1][c]);
+                const tileC = getTileById(gameState.grid[r + 2][c]);
+                if (tileA && tileB && tileC && tileA.value === tileB.value && tileA.value === tileC.value) {
+                    return false;
+                }
+            }
+        }
+    } else {
+        for (let r = 0; r < config.GRID_SIZE; r++) {
+            for (let c = 0; c < config.GRID_SIZE; c++) {
+                const tile = getTileById(gameState.grid[r][c]);
+                if (c < config.GRID_SIZE - 1) {
+                    const rightTile = getTileById(gameState.grid[r][c + 1]);
+                    if (canMerge(tile, rightTile)) return false;
+                }
+                if (r < config.GRID_SIZE - 1) {
+                    const downTile = getTileById(gameState.grid[r + 1][c]);
+                    if (canMerge(tile, downTile)) return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+function canMerge(tileA, tileB) {
+    if (!tileA || !tileB) return false;
+    if (config.GAME_MODE === 'classic') return tileA.value === tileB.value;
+    if (config.GAME_MODE === 'fibonacci') {
+        const fibSeq = getFibonacciSequence(tileA.value + tileB.value + 1);
+        return areFibonacciMergeable(tileA.value, tileB.value, fibSeq);
+    }
+    // Power of three requires 3 tiles, so we check that in a different way
+    if (config.GAME_MODE === 'power-of-three') return false; // isGameOver handles this differently
+    return false;
+}
+
+export function getGoalValue() {
+    const size = config.GRID_SIZE;
+    if (config.GAME_MODE === 'fibonacci') {
+        const n = Math.pow(size, 2);
+        const idx = Math.round(n * 0.77 + 5);
+        const fib = [1, 1];
+        while (fib.length <= idx) {
+            fib.push(fib[fib.length - 1] + fib[fib.length - 2]);
+        }
+        return fib[idx];
+    } else if (config.GAME_MODE === 'power-of-three') {
+        return Math.pow(3, Math.round(Math.pow(size, 2) * 0.2));
+    } else {
+        return Math.pow(2, Math.round(Math.pow(size, 2) * 0.53 + 3));
+    }
+}
+
+export function isGameWon() {
+    const goal = getGoalValue();
+    return gameState.tiles.some(t => t.value === goal);
+}
+
+export function canMove(direction) {
+    let testGrid = gameState.grid.map(row => [...row]);
+    for (let i = 0; i < direction; i++) testGrid = rotateGrid(testGrid);
+    for (let r = 0; r < config.GRID_SIZE; r++) {
+        const originalRow = JSON.stringify(testGrid[r]);
+        const newRow = slide(testGrid[r]);
+        if (JSON.stringify(newRow) !== originalRow) return true; // Can slide
+        for (let c = 0; c < config.GRID_SIZE - 1; c++) {
+            const tileA = getTileById(newRow[c]);
+            const tileB = getTileById(newRow[c + 1]);
+            if (canMerge(tileA, tileB)) return true; // Can merge
+        }
+    }
+    return false;
+}
