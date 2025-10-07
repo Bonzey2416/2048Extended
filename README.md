@@ -1,4 +1,15 @@
 # 2048Extended
+## Browser support
+* Chrome 67+
+* Firefox 68+
+* Edge 79+
+* Safari 12+
+* Opera 54+
+* iOS 12+
+* Android 4.1+ (Chrome/Firefox)
+* OS X 10.9+ (Chrome/Firefox)
+* macOS 10.12+ (Safari)
+* Windows 7+ (Chrome/Firefox/Edge)
 ## Changelog
 ### Version 0.15
 Date of update: 2025-10-07
