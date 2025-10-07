@@ -244,6 +244,7 @@ p {
     }
 }
 
+.tile.tile-0       { background: #878481; color: var(--ui-inverse-fixed); }
 .tile.tile-1       { background: #f0eee8; color: var(--ui-text-fixed); }
 .tile.tile-2       { background: #eee4da; color: var(--ui-text-fixed); }
 .tile.tile-3       { background: #ede2d1; color: var(--ui-text-fixed); }
@@ -306,6 +307,19 @@ p {
 .tile.tile-1594323 { background: #372cec; color: var(--ui-inverse-fixed); font-size: calc(19% / var(--grid-size)); }
 .tile.tile-2097152 { background: #261cf0; color: var(--ui-inverse-fixed); font-size: calc(19% / var(--grid-size)); }
 .tile.tile-2178309 { background: #231af1; color: var(--ui-inverse-fixed); font-size: calc(19% / var(--grid-size)); }
+
+.tile.tile--2      { background: #dae4ee; color: var(--ui-text-fixed); }
+.tile.tile--4      { background: #c8e0ed; color: var(--ui-text-fixed); }
+.tile.tile--8      { background: #79b1f2; color: var(--ui-inverse-fixed); }
+.tile.tile--16     { background: #6395f5; color: var(--ui-inverse-fixed); }
+.tile.tile--32     { background: #5f7cf6; color: var(--ui-inverse-fixed); }
+.tile.tile--64     { background: #3b5ef6; color: var(--ui-inverse-fixed); }
+.tile.tile--128    { background: #72cfed; color: var(--ui-inverse-fixed); font-size: calc(35% / var(--grid-size)); }
+.tile.tile--256    { background: #61cced; color: var(--ui-inverse-fixed); font-size: calc(35% / var(--grid-size)); }
+.tile.tile--512    { background: #50c8ed; color: var(--ui-inverse-fixed); font-size: calc(35% / var(--grid-size)); }
+.tile.tile--1024   { background: #3fc5ed; color: var(--ui-inverse-fixed); font-size: calc(28% / var(--grid-size)); }
+.tile.tile--2048   { background: #2ec2ed; color: var(--ui-inverse-fixed); font-size: calc(28% / var(--grid-size)); }
+
 
 .tile-individual {
     width: calc(2vw + 4vh);
@@ -383,18 +397,22 @@ p {
     color: var(--ui-inverse-fixed);
 }
 
-.game-over-container .game-over-message button, .game-won-container .game-won-message button {
-    margin-top: 2.5%;
-    padding: 2.5% 5%;
-    font-size: 5%;
+.btn {
+    margin: 0.2em;
+    padding: 0.2em 0.4em;
     font-family: inherit;
+    font-size: 100%;
     font-weight: 500;
     color: var(--ui-inverse-fixed);
     background: #8f7a66;
     border: none;
-    border-radius: calc(0.5vw + 0.5vh);
+    border-radius: 0.2em;
     cursor: pointer;
     transition: background 0.3s ease;
+}
+
+.game-over-container btn, .game-won-container btn {
+    font-size: 5%;
 }
 
 .score-container {
@@ -621,14 +639,14 @@ a {
     color: inherit;
 }
 
-.dropdown-container, .input-container, .toggle-container {
+.dropdown-container, .input-container, .toggle-container, .menu-button-container {
     margin: calc(1vw + 1vh) 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.dropdown-container .label-title, .input-container .label-title, .toggle-container .label-title {
+.label-title {
     font-size: calc(0.7vw + 1.5vh);
     font-weight: 500;
 }
@@ -1144,6 +1162,7 @@ kbd {
     --ui-inverse: #181614;
 }
 
+.dark-mode .sync-tiles-dark-mode .tile.tile-0       { background: #454443; color: var(--ui-text); }
 .dark-mode .sync-tiles-dark-mode .tile.tile-1       { background: #353433; color: var(--ui-text); }
 .dark-mode .sync-tiles-dark-mode .tile.tile-2       { background: #503a35; color: var(--ui-text); }
 .dark-mode .sync-tiles-dark-mode .tile.tile-3       { background: #5c4635; color: var(--ui-text); }
@@ -1207,6 +1226,18 @@ kbd {
 .dark-mode .sync-tiles-dark-mode .tile.tile-2097152 { background: #8986dd; color: var(--ui-text); }
 .dark-mode .sync-tiles-dark-mode .tile.tile-2178309 { background: #8b88dc; color: var(--ui-text); }
 
+.dark-mode .sync-tiles-dark-mode .tile.tile--2      { background: #353a50; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile--4      { background: #355168; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile--8      { background: #044fa4; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile--16     { background: #0849c2; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile--32     { background: #143ad1; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile--64     { background: #092bc2; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile--128    { background: #2e8aa9; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile--256    { background: #2e98ba; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile--512    { background: #2ea6cb; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile--1024   { background: #2eb4dc; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile--2048   { background: #2ec2ed; color: var(--ui-text); }
+
 @media (prefers-color-scheme: dark) {
     .auto-mode {
         --ui-background: #403b37;
@@ -1223,6 +1254,7 @@ kbd {
         --ui-inverse: #181614;
     }
 
+    .auto-mode .sync-tiles-dark-mode .tile.tile-0       { background: #454443; color: var(--ui-text); }
     .auto-mode .sync-tiles-dark-mode .tile.tile-1       { background: #353433; color: var(--ui-text); }
     .auto-mode .sync-tiles-dark-mode .tile.tile-2       { background: #503a35; color: var(--ui-text); }
     .auto-mode .sync-tiles-dark-mode .tile.tile-3       { background: #5c4635; color: var(--ui-text); }
@@ -1286,4 +1318,15 @@ kbd {
     .auto-mode .sync-tiles-dark-mode .tile.tile-2097152 { background: #8986dd; color: var(--ui-text); }
     .auto-mode .sync-tiles-dark-mode .tile.tile-2178309 { background: #8b88dc; color: var(--ui-text); }
 
+    .auto-mode .sync-tiles-dark-mode .tile.tile--2      { background: #353a50; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile--4      { background: #355168; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile--8      { background: #044fa4; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile--16     { background: #0849c2; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile--32     { background: #143ad1; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile--64     { background: #092bc2; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile--128    { background: #2e8aa9; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile--256    { background: #2e98ba; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile--512    { background: #2ea6cb; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile--1024   { background: #2eb4dc; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile--2048   { background: #2ec2ed; color: var(--ui-text); }
 }

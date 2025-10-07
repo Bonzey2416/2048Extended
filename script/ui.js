@@ -88,24 +88,51 @@ function updateHighScore() {
     const highestTileKey = getHighestTileKey(config.GAME_MODE, config.practiceMode, config.GRID_SIZE);
     const currentHighestTile = gameState.tiles.reduce((max, t) => Math.max(max, t.value), 0);
     const storedHighestTile = parseInt(localStorage.getItem(highestTileKey) || '0');
-    if (currentHighestTile > storedHighestTile) {
+        if (currentHighestTile > storedHighestTile) {
         localStorage.setItem(highestTileKey, currentHighestTile);
     }
 }
 
 export function updateGoalDisplay() {
     const goal = getGoalValue();
-    document.querySelectorAll('.goal-number').forEach(el => el.textContent = goal);
+    const goalDescription = document.getElementById('goal-description');
+    const goalNumbers = document.querySelectorAll('.goal-number');
+
+    if (config.GAME_MODE === 'negative') {
+        if (goalDescription) {
+            goalDescription.textContent = `Join the numbers and get to both the ${goal} and -${goal} tiles!`;
+        }
+        goalNumbers.forEach(el => {
+            el.textContent = `${goal} and -${goal}`;
+        });
+    } else {
+        if (goalDescription) {
+            goalDescription.textContent = `Join the numbers and get to the ${goal} tile!`;
+        }
+        goalNumbers.forEach(el => {
+            el.textContent = goal;
+        });
+    }
 }
 
 export function showGameOver() {
     document.getElementById('game-over-container')?.classList.remove('hidden');
+    // When the game ends, the AI is stopped. We need to sync the UI
+    // so that updateAnimationState() can correctly remove .no-animations.
+    const icon = document.getElementById('ai-toggle-button-icon');
+    if (icon) icon.className = 'fas fa-play';
+    updateAnimationState();
 }
 export function hideGameOver() {
     document.getElementById('game-over-container')?.classList.add('hidden');
 }
 export function showGameWon() {
     document.getElementById('game-won-container')?.classList.remove('hidden');
+    // When the game ends, the AI is stopped. We need to sync the UI
+    // so that updateAnimationState() can correctly remove .no-animations.
+    const icon = document.getElementById('ai-toggle-button-icon');
+    if (icon) icon.className = 'fas fa-play';
+    updateAnimationState();
 }
 export function hideGameWon() {
     document.getElementById('game-won-container')?.classList.add('hidden');
@@ -455,6 +482,12 @@ function applyProportionalSpacing() {
                 }
             }
         });
+    });
+
+    document.getElementById('factory-reset')?.addEventListener('click', () => {
+        stopAIMode();
+        localStorage.clear();
+        location.reload();
     });
 }
 

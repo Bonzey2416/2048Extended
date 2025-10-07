@@ -434,11 +434,13 @@ export function updateStatistics() {
     gameStatisticsContainer.innerHTML = '';
 
     const gridSizes = [3, 4, 5, 6, 7, 8];
-    const gameModes = ['classic', 'fibonacci', 'power-of-three'];
+    const gameModes = ['classic', 'fibonacci', 'power-of-three', 'zero', 'negative'];
     const gameModesDisplay = {
         'classic': 'Classic',
         'fibonacci': 'Fibonacci',
-        'power-of-three': 'Powers of 3'
+        'power-of-three': 'Powers of 3',
+        'zero': 'Zero',
+        'negative': 'Negative'
     };
     const practiceModes = [false, true];
     let totalGamesPlayed = 0;

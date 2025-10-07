@@ -12,7 +12,7 @@
         <main class="game-container" id="game-container">
             <section class="header">
                 <h1 class="title">2048 Extended <span class="beta">Beta</span></h1>
-                <p>Join the numbers and get to the <span class="goal-number">2048</span> tile!</p>
+                <p id="goal-description">Join the numbers and get to the <span class="goal-number">2048</span> tile!</p>
             </section>
             <section class="game-board">
                 <div class="grid-container" id="grid-container">
@@ -22,14 +22,14 @@
                         <div class="game-over-container hidden" id="game-over-container">
                             <div class="game-over-message">
                                 <p>Game Over!</p>
-                                <button id="game-over-restart">Restart</button>
+                                <button class="btn" id="game-over-restart">Restart</button>
                             </div>
                         </div>
                         <div class="game-won-container hidden" id="game-won-container">
                             <div class="game-won-message">
                                 <p>You Won!</p>
-                                <button id="game-won-keep-going">Keep Going</button>
-                                <button id="game-won-restart">Restart</button>
+                                <button class="btn" id="game-won-keep-going">Keep Going</button>
+                                <button class="btn" id="game-won-restart">Restart</button>
                             </div>
                         </div>
                     </div>
@@ -87,6 +87,8 @@
                     <option value="classic" selected>Classic</option>
                     <option value="fibonacci">Fibonacci</option>
                     <option value="power-of-three">Powers of 3</option>
+                    <option value="zero">Zero</option>
+                    <option value="negative">Negative</option>
                 </select>
             </div>
             <div class="dropdown-container">
@@ -188,6 +190,13 @@
                                 <option value="instantaneous">Instantaneous</option>
                             </select>
                         </div>
+                        <div class="menu-button-container">
+                            <label>
+                                <p class="label-title">Factory reset</p>
+                                <p class="label-subtitle">Reset the game, all the scores and settings. This reset is irreversible.</p>
+                            </label>
+                            <button class="btn" id="factory-reset">Reset</button>
+                        </div>
                     </div>
                     <div class="settings-menu-content-inner" id="settings-appearance">
                         <h2>Appearance</h2>
@@ -256,7 +265,7 @@
                     </div>
                     <div class="settings-menu-content-inner text-dense" id="settings-about">
                         <h2>About 2048 Extended</h2>
-                        <p style="font-style: italic;">Version 0.15. Last updated 2025-10-07.</p>
+                        <p style="font-style: italic;">Version 0.16. Last updated 2025-10-07.</p>
                         <p>2048 Extended is an enhanced version of the classic 2048 game, featuring multiple game modes, grid sizes, and an AI mode.</p>
                         <h3>How to play</h3>
                         <p>
@@ -297,6 +306,13 @@
                             Based on 2048 created by Gabriele Cirulli, which was in turn based on 1024 by Veewo Studio and conceptually similar to Threes by Asher Vollmer.
                         </p>
                         <h3>Changelog</h3>
+                        <h4>Version 0.16</h4>
+                        <p class="update-date">Date of update: 2025-10-07</p>
+                        <ul>
+                            <li>Fixed animation when game over/won screen appears when using AI mode.</li>
+                            <li>Added two game modes: Zero and Negative. Zero mode sometimes spawns 0 in addition to 2 and 4, and Negative mode spawns negative numbers in addition to positive numbers.</li>
+                            <li>Allows users to factory reset.</li>
+                        </ul>
                         <h4>Version 0.15</h4>
                         <p class="update-date">Date of update: 2025-10-07</p>
                         <ul>

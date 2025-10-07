@@ -11,6 +11,11 @@
 * macOS 10.12+ (Safari)
 * Windows 7+ (Chrome/Firefox/Edge)
 ## Changelog
+### Version 0.16
+Date of update: 2025-10-07
+* Fixed animation when game over/won screen appears when using AI mode.
+* Added two game modes: Zero and Negative. Zero mode sometimes spawns 0 in addition to 2 and 4, and Negative mode spawns negative numbers in addition to positive numbers.
+* Allows users to factory reset.
 ### Version 0.15
 Date of update: 2025-10-07
 * Improved clarity in About menu.

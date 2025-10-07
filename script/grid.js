@@ -21,6 +21,17 @@ export function addRandomTile() {
         value = Math.random() < 0.9 ? 1 : 2;
     } else if (config.GAME_MODE === 'power-of-three') {
         value = 1;
+    } else if (config.GAME_MODE === 'zero') {
+        const rand = Math.random();
+        if (rand < 0.2) value = 0;
+        else if (rand < 0.9) value = 2;
+        else value = 4;
+    } else if (config.GAME_MODE === 'negative') {
+        const rand = Math.random();
+        if (rand < 0.45) value = 2;
+        else if (rand < 0.90) value = -2;
+        else if (rand < 0.95) value = 4;
+        else value = -4;
     } else {
         value = Math.random() < 0.9 ? 2 : 4;
     }
@@ -64,7 +75,7 @@ function areFibonacciMergeable(a, b, fibSeq) {
 function combine(row) {
     let rowChanged = false;
     // Classic Mode
-    if (config.GAME_MODE === 'classic') {
+    if (config.GAME_MODE === 'classic' || config.GAME_MODE === 'zero') {
         for (let i = 0; i < config.GRID_SIZE - 1; i++) {
             const tileA = row[i] ? getTileById(row[i]) : null;
             const tileB = row[i + 1] ? getTileById(row[i + 1]) : null;
@@ -73,6 +84,26 @@ function combine(row) {
                 const fromB = gameState.beforeMovePositions[tileB.id] || { row: tileB.row, col: tileB.col };
                 mergeAnimations.push({ from: { ...fromA, id: tileA.id, value: tileA.value }, from2: { ...fromB, id: tileB.id, value: tileB.value }, mergedId: tileA.id, to: { row: tileA.row, col: tileA.col }, mergedValue: tileA.value * 2 });
                 tileA.value *= 2;
+                tileA.merged = true;
+                gameState.score += tileA.value;
+                gameState.tiles = gameState.tiles.filter(t => t.id !== tileB.id);
+                row[i + 1] = null;
+                rowChanged = true;
+                i++;
+            }
+        }
+    }
+    // Negative Mode
+    if (config.GAME_MODE === 'negative') {
+        for (let i = 0; i < config.GRID_SIZE - 1; i++) {
+            const tileA = row[i] ? getTileById(row[i]) : null;
+            const tileB = row[i + 1] ? getTileById(row[i + 1]) : null;
+            if (tileA && tileB && (tileA.value === tileB.value || tileA.value === -tileB.value) && !tileA.merged && !tileB.merged) {
+                const fromA = gameState.beforeMovePositions[tileA.id] || { row: tileA.row, col: tileA.col };
+                const fromB = gameState.beforeMovePositions[tileB.id] || { row: tileB.row, col: tileB.col };
+                const newValue = tileA.value + tileB.value;
+                mergeAnimations.push({ from: { ...fromA, id: tileA.id, value: tileA.value }, from2: { ...fromB, id: tileB.id, value: tileB.value }, mergedId: tileA.id, to: { row: tileA.row, col: tileA.col }, mergedValue: newValue });
+                tileA.value = newValue;
                 tileA.merged = true;
                 gameState.score += tileA.value;
                 gameState.tiles = gameState.tiles.filter(t => t.id !== tileB.id);
@@ -249,7 +280,8 @@ export function isGameOver() {
 
 function canMerge(tileA, tileB) {
     if (!tileA || !tileB) return false;
-    if (config.GAME_MODE === 'classic') return tileA.value === tileB.value;
+    if (config.GAME_MODE === 'classic' || config.GAME_MODE === 'zero') return tileA.value === tileB.value;
+    if (config.GAME_MODE === 'negative') return tileA.value === tileB.value || tileA.value === -tileB.value;
     if (config.GAME_MODE === 'fibonacci') {
         const fibSeq = getFibonacciSequence(tileA.value + tileB.value + 1);
         return areFibonacciMergeable(tileA.value, tileB.value, fibSeq);
@@ -271,12 +303,21 @@ export function getGoalValue() {
         return fib[idx];
     } else if (config.GAME_MODE === 'power-of-three') {
         return Math.pow(3, Math.round(Math.pow(size, 2) * 0.2));
+    } else if (config.GAME_MODE === 'negative') {
+        const n = Math.pow(size, 2);
+        return Math.pow(2, Math.round(n * 0.27 + 2));
     } else {
         return Math.pow(2, Math.round(Math.pow(size, 2) * 0.53 + 3));
     }
 }
 
 export function isGameWon() {
+    if (config.GAME_MODE === 'negative') {
+        const goal = getGoalValue();
+        const hasPositive = gameState.tiles.some(t => t.value === goal);
+        const hasNegative = gameState.tiles.some(t => t.value === -goal);
+        return hasPositive && hasNegative;
+    }
     const goal = getGoalValue();
     return gameState.tiles.some(t => t.value === goal);
 }
