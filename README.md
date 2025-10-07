@@ -1,5 +1,9 @@
 # 2048Extended
 ## Changelog
+### Version 0.14.1
+Date of update: 2025-10-07
+* Fixed AI mode move handling.
+* Made headings consistent with the menus.
 ### Version 0.14
 Date of update: 2025-10-06
 * Added dark mode support. You can now toggle dark mode or automate system dark mode.

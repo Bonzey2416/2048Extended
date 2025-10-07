@@ -268,7 +268,49 @@ export function clearHistory() {
 
 // --- AI LOGIC ---
 
-import { canMove } from './grid.js';
+import { canMove as originalCanMove } from './grid.js';
+
+function aiCanMove(direction) {
+    // Use the original check first.
+    if (originalCanMove(direction)) {
+        return true;
+    }
+
+    // If the original check fails, and we're in "power-of-three" mode,
+    // perform a specific check for three-tile merges.
+    if (config.GAME_MODE !== 'power-of-three') {
+        return false;
+    }
+
+    const vector = { 0: { r: 0, c: -1 }, 1: { r: 1, c: 0 }, 2: { r: 0, c: 1 }, 3: { r: -1, c: 0 } }[direction];
+
+    const getTile = (row, col) => {
+        const tileId = gameState.grid[row]?.[col];
+        return tileId ? gameState.tiles.find(t => t.id === tileId) : null;
+    };
+
+    const isWithinBounds = (row, col) => row >= 0 && row < config.GRID_SIZE && col >= 0 && col < config.GRID_SIZE;
+
+    for (let r = 0; r < config.GRID_SIZE; r++) {
+        for (let c = 0; c < config.GRID_SIZE; c++) {
+            const tile1 = getTile(r, c);
+            if (!tile1) continue;
+
+            const r2 = r + vector.r, c2 = c + vector.c;
+            const r3 = r + 2 * vector.r, c3 = c + 2 * vector.c;
+
+            if (isWithinBounds(r3, c3)) {
+                const tile2 = getTile(r2, c2);
+                const tile3 = getTile(r3, c3);
+                if (tile2 && tile3 && tile1.value === tile2.value && tile1.value === tile3.value) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
 
 export const AI_STRATEGIES = {
     'random': { /* ...omitted for brevity... */ },
@@ -282,7 +324,7 @@ Object.assign(AI_STRATEGIES, {
         name: 'Random',
         getMove: function() {
             const dirs = [0, 1, 2, 3];
-            const valid = dirs.filter(canMove);
+            const valid = dirs.filter(aiCanMove);
             if (valid.length === 0) return 0;
             return valid[Math.floor(Math.random() * valid.length)];
         }
@@ -292,7 +334,7 @@ Object.assign(AI_STRATEGIES, {
         getMove: (function() {
             let state = 'primary'; let lastPrimary = 'up'; let lastRecovery = 'up';
             return function() {
-                const canLeft = canMove(0), canUp = canMove(3), canRight = canMove(2), canDown = canMove(1);
+                const canLeft = aiCanMove(0), canUp = aiCanMove(3), canRight = aiCanMove(2), canDown = aiCanMove(1);
                 if (state === 'primary' && !canLeft && !canUp) state = 'recovery';
                 else if (state === 'recovery' && !canRight && !canUp) state = 'primary';
                 if (state === 'primary') {
@@ -317,7 +359,7 @@ Object.assign(AI_STRATEGIES, {
             return function() {
                 for (let i = 0; i < 4; i++) {
                     const dir = order[(idx + i) % 4];
-                    if (canMove(dir)) { idx = (idx + 1) % 4; return dir; }
+                    if (aiCanMove(dir)) { idx = (idx + 1) % 4; return dir; }
                 }
                 return 0;
             };
@@ -328,7 +370,7 @@ Object.assign(AI_STRATEGIES, {
         getMove: (function() {
             let state = 'primary'; let lastPrimary = 'down'; let lastRecovery = 'right';
             return function() {
-                const canUp = canMove(3), canDown = canMove(1), canLeft = canMove(0), canRight = canMove(2);
+                const canUp = aiCanMove(3), canDown = aiCanMove(1), canLeft = aiCanMove(0), canRight = aiCanMove(2);
                 if (state === 'recovery' && !canLeft && !canRight) state = 'primary';
                 if (state === 'primary' && !canUp && !canDown) state = 'recovery';
                 if (state === 'primary') {
