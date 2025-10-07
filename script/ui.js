@@ -326,6 +326,12 @@ function setupEventListeners() {
         }
     });
 
+    document.getElementById('sync-tiles-dark-mode-toggle').addEventListener('change', e => {
+        config.syncTilesDarkMode = e.target.checked;
+        document.getElementById('tile-container').classList.toggle('sync-tiles-dark-mode', e.target.checked);
+        saveSettings();
+    });
+
     document.getElementById('invert-colors-toggle').addEventListener('change', e => {
         config.invertColors = e.target.checked;
         document.getElementById('invert-colors').classList.toggle('hidden', !e.target.checked);
@@ -366,6 +372,10 @@ function syncSettingsUI() {
     document.getElementById('ai-strategy-select').value = config.aiStrategy;
     document.getElementById('ai-move-duration-input').value = config.aiMoveDelay;
 
+    const syncTilesDarkModeToggle = document.getElementById('sync-tiles-dark-mode-toggle');
+    syncTilesDarkModeToggle.checked = config.syncTilesDarkMode;
+    document.getElementById('tile-container').classList.toggle('sync-tiles-dark-mode', config.syncTilesDarkMode);
+    
     const invertColorsToggle = document.getElementById('invert-colors-toggle');
     invertColorsToggle.checked = config.invertColors;
     document.getElementById('invert-colors').classList.toggle('hidden', !config.invertColors);
@@ -388,7 +398,68 @@ function syncSettingsUI() {
     }
 }
 
+function applyProportionalSpacing() {
+    const denseElements = document.querySelectorAll('.text-dense');
+
+    denseElements.forEach(el => {
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+        const nodesToProcess = [];
+        let node;
+        while ((node = walker.nextNode())) {
+            nodesToProcess.push(node);
+        }
+
+        nodesToProcess.forEach(node => {
+            const text = node.nodeValue;
+            if (!text.includes('1')) {
+                return;
+            }
+
+            let resultHTML = '';
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                const nextChar = (i + 1 < text.length) ? text[i + 1] : null;
+                let spacing = null;
+
+                // -0.2em on a '1' that is followed by another '1'
+                if (char === '1' && nextChar === '1') {
+                    spacing = '-0.2em';
+                }
+                // -0.1em on any character that is followed by a '1'
+                else if (nextChar === '1') {
+                    spacing = '-0.1em';
+                }
+                // -0.1em on a '1' that is not followed by another '1'
+                else if (char === '1') {
+                    spacing = '-0.1em';
+                }
+
+                if (spacing) {
+                    // Using HTML entities to be safe
+                    const safeChar = char.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;');
+                    resultHTML += `<span style="letter-spacing: ${spacing};">${safeChar}</span>`;
+                } else {
+                    resultHTML += char;
+                }
+            }
+
+            if (resultHTML !== text) {
+                const fragment = document.createDocumentFragment();
+                const temp = document.createElement('span');
+                temp.innerHTML = resultHTML;
+                while (temp.firstChild) {
+                    fragment.appendChild(temp.firstChild);
+                }
+                if (node.parentNode) {
+                    node.parentNode.replaceChild(fragment, node);
+                }
+            }
+        });
+    });
+}
+
 export function initializeUI() {
     setupEventListeners();
     syncSettingsUI();
+    applyProportionalSpacing();
 }

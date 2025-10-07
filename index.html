@@ -18,7 +18,7 @@
                 <div class="grid-container" id="grid-container">
                     <div class="grid-container-inner" id="grid-container-inner">
                     </div>
-                    <div class="tile-container" id="tile-container">
+                    <div class="tile-container sync-tiles-dark-mode" id="tile-container">
                         <div class="game-over-container hidden" id="game-over-container">
                             <div class="game-over-message">
                                 <p>Game Over!</p>
@@ -220,6 +220,16 @@
                                 </li>
                             </ul>
                         </div>
+                        <div class="toggle-container">
+                            <div>
+                                <p class="label-title">Sync tiles to dark mode</p>
+                                <p class="label-subtitle">Sync the tile colors to match dark mode settings</p>
+                            </div>
+                            <label class="switch" for="sync-tiles-dark-mode-toggle">
+                                <input type="checkbox" id="sync-tiles-dark-mode-toggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
                     </div>
                     <div class="settings-menu-content-inner" id="settings-accessibility">
                         <h2>Accessibility</h2>
@@ -244,9 +254,9 @@
                             </label>
                         </div>
                     </div>
-                    <div class="settings-menu-content-inner" id="settings-about">
+                    <div class="settings-menu-content-inner text-dense" id="settings-about">
                         <h2>About 2048 Extended</h2>
-                        <p style="font-style: italic;">Version 0.14.1. Last updated 2025-10-07.</p>
+                        <p style="font-style: italic;">Version 0.15. Last updated 2025-10-07.</p>
                         <p>2048 Extended is an enhanced version of the classic 2048 game, featuring multiple game modes, grid sizes, and an AI mode.</p>
                         <h3>How to play</h3>
                         <p>
@@ -287,6 +297,13 @@
                             Based on 2048 created by Gabriele Cirulli, which was in turn based on 1024 by Veewo Studio and conceptually similar to Threes by Asher Vollmer.
                         </p>
                         <h3>Changelog</h3>
+                        <h4>Version 0.15</h4>
+                        <p class="update-date">Date of update: 2025-10-07</p>
+                        <ul>
+                            <li>Improved clarity in About menu.</li>
+                            <li>Tile can now be synced with dark mode.</li>
+                            <li>Improved dark mode support.</li>
+                        </ul>
                         <h4>Version 0.14.1</h4>
                         <p class="update-date">Date of update: 2025-10-07</p>
                         <ul>

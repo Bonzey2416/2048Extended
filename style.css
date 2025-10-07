@@ -763,7 +763,7 @@ a {
 }
 
 kbd {
-    background: #eee4da;
+    background: var(--ui-surface);
     border-radius: 0.2em;
     padding: 0 0.3em;
     font-size: 0.9em;
@@ -1129,6 +1129,7 @@ kbd {
 
 /* Dark mode */
 .dark-mode {
+    color-scheme: dark;
     --ui-background: #403b37;
     --ui-background-opacity80: #403b37cc;
     --ui-background-opacity60: #403b3799;
@@ -1142,6 +1143,69 @@ kbd {
     --ui-text: #eee4da;
     --ui-inverse: #181614;
 }
+
+.dark-mode .sync-tiles-dark-mode .tile.tile-1       { background: #353433; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-2       { background: #503a35; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-3       { background: #5c4635; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-4       { background: #685135; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-5       { background: #785f35; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-8       { background: #a44f04; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-9       { background: #a84e04; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-13      { background: #b74b06; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-16      { background: #c24908; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-21      { background: #c7440c; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-27      { background: #cc3f10; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-32      { background: #d13a14; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-34      { background: #d03914; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-55      { background: #c62f0c; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-64      { background: #c22b09; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-81      { background: #be2706; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-89      { background: #bc2505; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-128     { background: #a98a2e; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-144     { background: #ab8c2e; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-233     { background: #b7952e; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-243     { background: #b8962e; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-256     { background: #ba982e; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-377     { background: #c29f2e; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-512     { background: #cba62e; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-610     { background: #cea82e; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-729     { background: #d2ac2e; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-987     { background: #dbb32e; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-1024    { background: #dcb42e; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-1597    { background: #e7ba2e; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-2048    { background: #edc22e; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-2187    { background: #efc32e; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-2584    { background: #f2c62e; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-4096    { background: #610245; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-4181    { background: #620246; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-6561    { background: #740166; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-6765    { background: #760169; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-8192    { background: #80007b; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-10946   { background: #8b1a89; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-16384   { background: #a248a1; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-17711   { background: #a34aa2; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-19683   { background: #a34da3; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-28657   { background: #a75ca7; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-32768   { background: #a862a8; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-46368   { background: #ae73ac; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-59049   { background: #b380af; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-65536   { background: #b687b1; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-75025   { background: #ba90b4; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-121393  { background: #2219f1; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-131072  { background: #261cf0; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-177141  { background: #3327ec; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-196418  { background: #3a2ceb; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-262144  { background: #4f3de7; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-317811  { background: #5441e7; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-514229  { background: #6550e6; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-524288  { background: #6652e6; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-531441  { background: #6555e6; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-832040  { background: #6f60e4; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-1048576 { background: #7666e2; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-1346269 { background: #7b70e0; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-1594323 { background: #8077df; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-2097152 { background: #8986dd; color: var(--ui-text); }
+.dark-mode .sync-tiles-dark-mode .tile.tile-2178309 { background: #8b88dc; color: var(--ui-text); }
 
 @media (prefers-color-scheme: dark) {
     .auto-mode {
@@ -1158,4 +1222,68 @@ kbd {
         --ui-text: #eee4da;
         --ui-inverse: #181614;
     }
+
+    .auto-mode .sync-tiles-dark-mode .tile.tile-1       { background: #353433; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-2       { background: #503a35; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-3       { background: #5c4635; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-4       { background: #685135; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-5       { background: #785f35; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-8       { background: #a44f04; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-9       { background: #a84e04; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-13      { background: #b74b06; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-16      { background: #c24908; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-21      { background: #c7440c; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-27      { background: #cc3f10; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-32      { background: #d13a14; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-34      { background: #d03914; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-55      { background: #c62f0c; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-64      { background: #c22b09; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-81      { background: #be2706; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-89      { background: #bc2505; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-128     { background: #a98a2e; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-144     { background: #ab8c2e; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-233     { background: #b7952e; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-243     { background: #b8962e; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-256     { background: #ba982e; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-377     { background: #c29f2e; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-512     { background: #cba62e; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-610     { background: #cea82e; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-729     { background: #d2ac2e; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-987     { background: #dbb32e; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-1024    { background: #dcb42e; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-1597    { background: #e7ba2e; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-2048    { background: #edc22e; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-2187    { background: #efc32e; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-2584    { background: #f2c62e; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-4096    { background: #610245; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-4181    { background: #620246; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-6561    { background: #740166; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-6765    { background: #760169; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-8192    { background: #80007b; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-10946   { background: #8b1a89; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-16384   { background: #a248a1; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-17711   { background: #a34aa2; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-19683   { background: #a34da3; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-28657   { background: #a75ca7; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-32768   { background: #a862a8; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-46368   { background: #ae73ac; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-59049   { background: #b380af; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-65536   { background: #b687b1; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-75025   { background: #ba90b4; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-121393  { background: #2219f1; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-131072  { background: #261cf0; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-177141  { background: #3327ec; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-196418  { background: #3a2ceb; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-262144  { background: #4f3de7; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-317811  { background: #5441e7; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-514229  { background: #6550e6; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-524288  { background: #6652e6; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-531441  { background: #6555e6; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-832040  { background: #6f60e4; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-1048576 { background: #7666e2; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-1346269 { background: #7b70e0; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-1594323 { background: #8077df; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-2097152 { background: #8986dd; color: var(--ui-text); }
+    .auto-mode .sync-tiles-dark-mode .tile.tile-2178309 { background: #8b88dc; color: var(--ui-text); }
+
 }

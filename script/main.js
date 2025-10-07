@@ -12,7 +12,8 @@ export let config = {
     animationSpeed: 'medium',
     invertColors: false,
     grayscaleColors: false,
-    theme: 'light'
+    theme: 'light',
+    syncTilesDarkMode: true
 };
 
 // Shared game state
@@ -86,6 +87,7 @@ export function loadSettings() {
         config.invertColors = settings.invertColors || false;
         config.grayscaleColors = settings.grayscaleColors || false;
         config.theme = settings.theme || 'light';
+        config.syncTilesDarkMode = settings.syncTilesDarkMode ?? true;
     }
 }
 
@@ -99,7 +101,8 @@ export function saveSettings() {
         animationSpeed: config.animationSpeed,
         invertColors: config.invertColors,
         grayscaleColors: config.grayscaleColors,
-        theme: config.theme
+        theme: config.theme,
+        syncTilesDarkMode: config.syncTilesDarkMode
     };
     localStorage.setItem('gameSettings', JSON.stringify(settings));
 }

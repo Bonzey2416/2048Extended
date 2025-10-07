@@ -1,5 +1,10 @@
 # 2048Extended
 ## Changelog
+### Version 0.15
+Date of update: 2025-10-07
+* Improved clarity in About menu.
+* Tile can now be synced with dark mode.
+* Improved dark mode support.
 ### Version 0.14.1
 Date of update: 2025-10-07
 * Fixed AI mode move handling.
