@@ -411,7 +411,7 @@ p {
     transition: background 0.3s ease;
 }
 
-.game-over-container btn, .game-won-container btn {
+.game-over-container .btn, .game-won-container .btn {
     font-size: 5%;
 }
 

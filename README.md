@@ -11,6 +11,9 @@
 * macOS 10.12+ (Safari)
 * Windows 7+ (Chrome/Firefox/Edge)
 ## Changelog
+### Version 0.16.1
+Date of update: 2025-10-07
+* Fixed a bug where the buttons in game over/won containers are too big.
 ### Version 0.16
 Date of update: 2025-10-07
 * Fixed animation when game over/won screen appears when using AI mode.
