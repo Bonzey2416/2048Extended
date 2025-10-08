@@ -13,7 +13,8 @@ export let config = {
     invertColors: false,
     grayscaleColors: false,
     theme: 'light',
-    syncTilesDarkMode: true
+    syncTilesDarkMode: true,
+    maxUndoMemory: 256
 };
 
 // Shared game state
@@ -88,6 +89,7 @@ export function loadSettings() {
         config.grayscaleColors = settings.grayscaleColors || false;
         config.theme = settings.theme || 'light';
         config.syncTilesDarkMode = settings.syncTilesDarkMode ?? true;
+        config.maxUndoMemory = settings.maxUndoMemory || 256;
     }
 }
 
@@ -102,7 +104,8 @@ export function saveSettings() {
         invertColors: config.invertColors,
         grayscaleColors: config.grayscaleColors,
         theme: config.theme,
-        syncTilesDarkMode: config.syncTilesDarkMode
+        syncTilesDarkMode: config.syncTilesDarkMode,
+        maxUndoMemory: config.maxUndoMemory
     };
     localStorage.setItem('gameSettings', JSON.stringify(settings));
 }
@@ -197,7 +200,7 @@ function saveState() {
         hasShownGameWon: gameState.hasShownGameWon,
     };
     undoStack.push(newState);
-    if (undoStack.length > 256) undoStack.shift();
+    if (undoStack.length > config.maxUndoMemory) undoStack.shift();
     redoStack = [];
     updateUndoRedoUI(undoStack.length, redoStack.length);
 }
@@ -434,11 +437,12 @@ export function updateStatistics() {
     gameStatisticsContainer.innerHTML = '';
 
     const gridSizes = [3, 4, 5, 6, 7, 8];
-    const gameModes = ['classic', 'fibonacci', 'power-of-three', 'zero', 'negative'];
+    const gameModes = ['classic', 'fibonacci', 'power-of-three', 'supermerging', 'zero', 'negative'];
     const gameModesDisplay = {
         'classic': 'Classic',
         'fibonacci': 'Fibonacci',
         'power-of-three': 'Powers of 3',
+        'supermerging': 'Supermerging',
         'zero': 'Zero',
         'negative': 'Negative'
     };

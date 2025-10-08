@@ -19,7 +19,7 @@ export function addRandomTile() {
     let value;
     if (config.GAME_MODE === 'fibonacci') {
         value = Math.random() < 0.9 ? 1 : 2;
-    } else if (config.GAME_MODE === 'power-of-three') {
+    } else if (config.GAME_MODE === 'power-of-three' || config.GAME_MODE === 'supermerging') {
         value = 1;
     } else if (config.GAME_MODE === 'zero') {
         const rand = Math.random();
@@ -109,6 +109,59 @@ function combine(row) {
                 gameState.tiles = gameState.tiles.filter(t => t.id !== tileB.id);
                 row[i + 1] = null;
                 rowChanged = true;
+                i++;
+            }
+        }
+    }
+    // Supermerging Mode
+    if (config.GAME_MODE === 'supermerging') {
+        let i = 0;
+        while (i < config.GRID_SIZE) {
+            const tileA_id = row[i];
+            const tileA = tileA_id ? getTileById(tileA_id) : null;
+            if (!tileA || tileA.merged) {
+                i++;
+                continue;
+            }
+            // Find contiguous block of identical tiles
+            let block_ids = [tileA_id];
+            let lookahead = i + 1;
+            while (lookahead < config.GRID_SIZE) {
+                const tileB_id = row[lookahead];
+                const tileB = tileB_id ? getTileById(tileB_id) : null;
+                if (tileB && tileB.value === tileA.value && !tileB.merged) {
+                    block_ids.push(tileB_id);
+                    lookahead++;
+                } else {
+                    break;
+                }
+            }
+
+            if (block_ids.length > 1) {
+                rowChanged = true;
+                const newValue = tileA.value * block_ids.length;
+                const block_tiles = block_ids.map(id => getTileById(id));
+                const sources = block_tiles.map(t => ({
+                    ...(gameState.beforeMovePositions[t.id] || { row: t.row, col: t.col }),
+                    id: t.id,
+                    value: t.value
+                }));
+                mergeAnimations.push({
+                    sources: sources,
+                    to: { row: tileA.row, col: tileA.col },
+                    mergedValue: newValue
+                });
+                tileA.value = newValue;
+                tileA.merged = true;
+                gameState.score += tileA.value;
+                // Remove other tiles in the block
+                for (let k = 1; k < block_tiles.length; k++) {
+                    const tileToRemove = block_tiles[k];
+                    gameState.tiles = gameState.tiles.filter(t => t.id !== tileToRemove.id);
+                    row[i + k] = null;
+                }
+                i += block_ids.length;
+            } else {
                 i++;
             }
         }
@@ -280,7 +333,7 @@ export function isGameOver() {
 
 function canMerge(tileA, tileB) {
     if (!tileA || !tileB) return false;
-    if (config.GAME_MODE === 'classic' || config.GAME_MODE === 'zero') return tileA.value === tileB.value;
+    if (config.GAME_MODE === 'classic' || config.GAME_MODE === 'zero' || config.GAME_MODE === 'supermerging') return tileA.value === tileB.value;
     if (config.GAME_MODE === 'negative') return tileA.value === tileB.value || tileA.value === -tileB.value;
     if (config.GAME_MODE === 'fibonacci') {
         const fibSeq = getFibonacciSequence(tileA.value + tileB.value + 1);
@@ -306,6 +359,16 @@ export function getGoalValue() {
     } else if (config.GAME_MODE === 'negative') {
         const n = Math.pow(size, 2);
         return Math.pow(2, Math.round(n * 0.27 + 2));
+    } else if (config.GAME_MODE === 'supermerging') {
+        switch (size) {
+            case 3: return 12;
+            case 4: return 36;
+            case 5: return 144;
+            case 6: return 720;
+            case 7: return 8640;
+            case 8: return 181440;
+            default: return 36;
+        }
     } else {
         return Math.pow(2, Math.round(Math.pow(size, 2) * 0.53 + 3));
     }

@@ -2,6 +2,74 @@ import { config, gameState, move, undo, redo, handlePracticeModeChange, startAIM
 import { mergeAnimations, getGoalValue } from './grid.js';
 import { getHighScoreKey, getHighestTileKey, getGameStateKey } from './utils.js';
 
+
+// --- Supermerging Style Helpers ---
+
+const largePrimeGradients = {
+    7: 'linear-gradient(135deg, #0005, transparent, #fff5, transparent, #0005)',
+    11: 'radial-gradient(#fff5, transparent, #0005, transparent, #fff5, transparent, #0005)'
+}
+
+function getPrimeFactorization(num) {
+    const n = Math.abs(num);
+    if (n <= 1) return {};
+    const factors = {};
+    let tempN = n;
+
+    while (tempN % 2 === 0) {
+        factors[2] = (factors[2] || 0) + 1;
+        tempN /= 2;
+    }
+
+    for (let i = 3; i * i <= tempN; i += 2) {
+        while (tempN % i === 0) {
+            factors[i] = (factors[i] || 0) + 1;
+            tempN /= i;
+        }
+    }
+
+    if (tempN > 2) {
+        factors[tempN] = (factors[tempN] || 0) + 1;
+    }
+
+    return factors;
+}
+
+function applySupermergingStyle(tileEl, value) {
+    if (value === 0) {
+        tileEl.className = 'tile tile-0';
+        tileEl.style.backgroundImage = 'none';
+        return;
+    }
+
+    const factors = getPrimeFactorization(value);
+    const primes = Object.keys(factors).map(Number);
+    
+    tileEl.style.backgroundImage = 'none'; // Reset style
+
+    let baseValue = value;
+    const backgroundImages = [];
+    const sortedPrimes = primes.sort((a, b) => a - b);
+
+    for (const prime of sortedPrimes) {
+        if (prime > 5) {
+            const power = factors[prime];
+            baseValue /= Math.pow(prime, power);
+            if (largePrimeGradients[prime]) {
+                for (let i = 0; i < power; i++) {
+                    backgroundImages.push(largePrimeGradients[prime]);
+                }
+            }
+        }
+    }
+    
+    tileEl.className = `tile tile-base-${baseValue}`;
+    
+    if (backgroundImages.length > 0) {
+        tileEl.style.backgroundImage = backgroundImages.join(', ');
+    }
+}
+
 export function generateGridCells() {
     const gridContainerInner = document.getElementById('grid-container-inner');
     if (!gridContainerInner) return;
@@ -31,7 +99,12 @@ export function updateUI() {
             tileEl.id = 'tile-' + t.id;
             tileContainer.appendChild(tileEl);
         }
-        tileEl.className = `tile tile-${t.value}`;
+        if (config.GAME_MODE === 'supermerging') {
+            applySupermergingStyle(tileEl, t.value);
+        } else {
+            tileEl.className = `tile tile-${t.value}`;
+            tileEl.style.backgroundImage = 'none'; // Ensure style is cleared when switching modes
+        }
         if (t.id === gameState.lastNewTileId) tileEl.classList.add('new');
         if (t.merged) tileEl.classList.add('merged');
         tileEl.textContent = t.value;
@@ -53,11 +126,18 @@ function animateMerges() {
         const finalTop = `${((100 - 10 / config.GRID_SIZE) / config.GRID_SIZE * anim.to.row + 10 / config.GRID_SIZE)}%`;
         const finalLeft = `${((100 - 10 / config.GRID_SIZE) / config.GRID_SIZE * anim.to.col + 10 / config.GRID_SIZE)}%`;
 
-        const sources = ['from', 'from2', 'from3'].map(key => anim[key]).filter(Boolean);
+        const sources = anim.sources || ['from', 'from2', 'from3'].map(key => anim[key]).filter(Boolean);
 
         sources.forEach(source => {
             const alias = document.createElement('div');
-            alias.className = `tile tile-${source.value} merging`;
+            
+            if (config.GAME_MODE === 'supermerging') {
+                applySupermergingStyle(alias, source.value);
+                alias.classList.add('merging');
+            } else {
+                alias.className = `tile tile-${source.value} merging`;
+            }
+
             alias.textContent = source.value;
             alias.style.top = `${((100 - 10 / config.GRID_SIZE) / config.GRID_SIZE * source.row + 10 / config.GRID_SIZE)}%`;
             alias.style.left = `${((100 - 10 / config.GRID_SIZE) / config.GRID_SIZE * source.col + 10 / config.GRID_SIZE)}%`;
@@ -289,6 +369,7 @@ function setupEventListeners() {
 
     document.getElementById('game-mode-select').addEventListener('change', e => {
         config.GAME_MODE = e.target.value;
+        document.getElementById('tile-container').classList.toggle('tile-factor', config.GAME_MODE === 'supermerging');
         initGrid();
         updateGoalDisplay();
         saveSettings();
@@ -299,6 +380,14 @@ function setupEventListeners() {
         handlePracticeModeChange(enabled);
         document.getElementById('undo-button').classList.toggle('hidden', !enabled);
         document.getElementById('redo-button').classList.toggle('hidden', !enabled);
+    });
+
+    document.getElementById('maximum-undo-memory')?.addEventListener('change', e => {
+        const value = parseInt(e.target.value, 10);
+        if (!isNaN(value) && value >= 2) {
+            config.maxUndoMemory = value;
+            saveSettings();
+        }
     });
 
     document.getElementById('tile-moving-animation-speed-select')?.addEventListener('change', e => {
@@ -355,7 +444,7 @@ function setupEventListeners() {
 
     document.getElementById('sync-tiles-dark-mode-toggle').addEventListener('change', e => {
         config.syncTilesDarkMode = e.target.checked;
-        document.getElementById('tile-container').classList.toggle('sync-tiles-dark-mode', e.target.checked);
+        document.documentElement.classList.toggle('sync-tiles-dark-mode', e.target.checked);
         saveSettings();
     });
 
@@ -388,20 +477,22 @@ function setupEventListeners() {
 }
 
 function syncSettingsUI() {
-    // Sync UI elements with loaded config
+       // Sync UI elements with loaded config
     document.getElementById('grid-size-select').value = config.GRID_SIZE;
     document.documentElement.style.setProperty('--grid-size', config.GRID_SIZE);
     document.getElementById('game-mode-select').value = config.GAME_MODE;
+    document.getElementById('tile-container').classList.toggle('tile-factor', config.GAME_MODE === 'supermerging');
     const practiceToggle = document.getElementById('practice-mode-toggle');
     practiceToggle.checked = config.practiceMode;
     document.getElementById('undo-button').classList.toggle('hidden', !config.practiceMode);
     document.getElementById('redo-button').classList.toggle('hidden', !config.practiceMode);
     document.getElementById('ai-strategy-select').value = config.aiStrategy;
     document.getElementById('ai-move-duration-input').value = config.aiMoveDelay;
+    document.getElementById('maximum-undo-memory').value = config.maxUndoMemory;
 
     const syncTilesDarkModeToggle = document.getElementById('sync-tiles-dark-mode-toggle');
     syncTilesDarkModeToggle.checked = config.syncTilesDarkMode;
-    document.getElementById('tile-container').classList.toggle('sync-tiles-dark-mode', config.syncTilesDarkMode);
+    document.documentElement.classList.toggle('sync-tiles-dark-mode', config.syncTilesDarkMode);
     
     const invertColorsToggle = document.getElementById('invert-colors-toggle');
     invertColorsToggle.checked = config.invertColors;

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="sync-tiles-dark-mode">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -18,7 +18,7 @@
                 <div class="grid-container" id="grid-container">
                     <div class="grid-container-inner" id="grid-container-inner">
                     </div>
-                    <div class="tile-container sync-tiles-dark-mode" id="tile-container">
+                    <div class="tile-container" id="tile-container">
                         <div class="game-over-container hidden" id="game-over-container">
                             <div class="game-over-message">
                                 <p>Game Over!</p>
@@ -87,6 +87,7 @@
                     <option value="classic" selected>Classic</option>
                     <option value="fibonacci">Fibonacci</option>
                     <option value="power-of-three">Powers of 3</option>
+                    <option value="supermerging">Supermerging</option>
                     <option value="zero">Zero</option>
                     <option value="negative">Negative</option>
                 </select>
@@ -190,10 +191,23 @@
                                 <option value="instantaneous">Instantaneous</option>
                             </select>
                         </div>
+                        <div class="input-container">
+                            <label for="maximum-undo-memory">
+                                <p class="label-title">Maximum undo memory</p>
+                                <p class="label-subtitle">
+                                    Adjust the maximum undos to be stored.<br>
+                                    <strong>WARNING: Setting too high (10,000+ undos) may cause performance issues!</strong>
+                                </p>
+                            </label>
+                            <input type="number" id="maximum-undo-memory" min="2" value="256">
+                        </div>
                         <div class="menu-button-container">
                             <label>
                                 <p class="label-title">Factory reset</p>
-                                <p class="label-subtitle">Reset the game, all the scores and settings. This reset is irreversible.</p>
+                                <p class="label-subtitle">
+                                    Reset the game, all the scores and settings.<br>
+                                    <strong>WARNING: This reset is irreversible!</strong>
+                                </p>
                             </label>
                             <button class="btn" id="factory-reset">Reset</button>
                         </div>
@@ -265,7 +279,7 @@
                     </div>
                     <div class="settings-menu-content-inner text-dense" id="settings-about">
                         <h2>About 2048 Extended</h2>
-                        <p style="font-style: italic;">Version 0.16.1. Last updated 2025-10-07.</p>
+                        <p style="font-style: italic;">Version 0.17. Last updated 2025-10-08.</p>
                         <p>2048 Extended is an enhanced version of the classic 2048 game, featuring multiple game modes, grid sizes, and an AI mode.</p>
                         <h3>How to play</h3>
                         <p>
@@ -306,11 +320,18 @@
                             Based on 2048 created by Gabriele Cirulli, which was in turn based on 1024 by Veewo Studio and conceptually similar to Threes by Asher Vollmer.
                         </p>
                         <h3>Changelog</h3>
+                        <h4>Version 0.17</h4>
+                        <p class="update-date">Date of update: 2025-10-08</p>
+                        <ul>
+                            <li>Supermerging mode: Merge tiles of any length.</li>
+                            <li>You can now adjust maximum undo memory.</li>
+                            <li>Clarified warning texts.</li>
+                        </ul>
                         <h4>Version 0.16.1</h4>
+                        <p class="update-date">Date of update: 2025-10-07</p>
                         <ul>
                             <li>Fixed a bug where the buttons in game over/won containers are too big.</li>
                         </ul>
-                        <p class="update-date">Date of update: 2025-10-07</p>
                         <h4>Version 0.16</h4>
                         <p class="update-date">Date of update: 2025-10-07</p>
                         <ul>
