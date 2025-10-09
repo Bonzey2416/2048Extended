@@ -1,6 +1,6 @@
-import { moveGrid as calculateMove, addRandomTile, isGameOver, isGameWon, getGoalValue, resetMergedState } from './grid.js';
-import { initializeUI, updateUI, updateGoalDisplay, generateGridCells, showGameOver, showGameWon, hideGameOver, hideGameWon, updateUndoRedoUI } from './ui.js';
-import { getGameStateKey, getHighScoreKey, getHighestTileKey, getGamesPlayedKey } from './utils.js';
+import { moveGrid as calculateMove, addRandomTile, isGameOver, isGameWon, getGoalValue, resetMergedState, mergeAnimations } from './grid.js';
+import { initializeUI, updateUI, updateGoalDisplay, generateGridCells, showGameOver, showGameWon, hideGameOver, hideGameWon, updateUndoRedoUI, updateDiveSeedsUI } from './ui.js';
+import { getGameStateKey, getHighScoreKey, getHighestTileKey, getGamesPlayedKey, getPrimeFactorization } from './utils.js';
 
 // Shared configuration
 export let config = {
@@ -26,7 +26,8 @@ export let gameState = {
     tileIdCounter: 1,
     lastNewTileId: null,
     hasShownGameWon: false,
-    beforeMovePositions: null
+    beforeMovePositions: null,
+    diveSeeds: []
 };
 
 // Undo/Redo support
@@ -48,7 +49,8 @@ function saveGameState() {
         hasShownGameWon: gameState.hasShownGameWon,
         GRID_SIZE: config.GRID_SIZE,
         GAME_MODE: config.GAME_MODE,
-        practiceMode: config.practiceMode
+        practiceMode: config.practiceMode,
+        diveSeeds: [...gameState.diveSeeds]
     };
     localStorage.setItem(getGameStateKey(config.GAME_MODE, config.practiceMode, config.GRID_SIZE), JSON.stringify(stateToSave));
 }
@@ -70,6 +72,7 @@ function restoreGameState() {
         config.GRID_SIZE = restored.GRID_SIZE || 4;
         config.GAME_MODE = restored.GAME_MODE || 'classic';
         config.practiceMode = restored.practiceMode || false;
+        gameState.diveSeeds = restored.diveSeeds || (restored.GAME_MODE === 'dive' ? [2] : []);
         return true;
     }
     return false;
@@ -123,6 +126,11 @@ export function initGrid() {
         gameState.score = 0;
         gameState.previousScore = 0;
         gameState.hasShownGameWon = false;
+        if (config.GAME_MODE === 'dive') {
+            gameState.diveSeeds = [2];
+        } else {
+            gameState.diveSeeds = [];
+        }
         addRandomTile();
         addRandomTile();
         incrementGamesPlayed(config.GAME_MODE, config.practiceMode, config.GRID_SIZE);
@@ -149,6 +157,32 @@ export function initGrid() {
 
 // --- CORE GAME LOGIC ---
 
+function updateDiveSeeds() {
+    if (config.GAME_MODE !== 'dive') return;
+
+    // Add new seeds from merged tiles
+    const newPrimes = new Set();
+    mergeAnimations.forEach(anim => {
+        const factors = getPrimeFactorization(anim.mergedValue);
+        Object.keys(factors).forEach(p => newPrimes.add(Number(p)));
+    });
+
+    newPrimes.forEach(p => {
+        if (!gameState.diveSeeds.includes(p)) {
+            gameState.diveSeeds.push(p);
+        }
+    });
+
+    // Remove seeds that are no longer factors of any tile on the board
+    const allFactorsOnBoard = new Set();
+    gameState.tiles.forEach(tile => {
+        const factors = getPrimeFactorization(tile.value);
+        Object.keys(factors).forEach(p => allFactorsOnBoard.add(Number(p)));
+    });
+
+    gameState.diveSeeds = gameState.diveSeeds.filter(seed => allFactorsOnBoard.has(seed));
+}
+
 export function move(direction) {
     resetMergedState();
     gameState.beforeMovePositions = {};
@@ -168,6 +202,9 @@ export function move(direction) {
             let totalScore = parseInt(localStorage.getItem('totalScore') || '0');
             totalScore += scoreGained;
             localStorage.setItem('totalScore', totalScore);
+        }
+        if (config.GAME_MODE === 'dive') {
+            updateDiveSeeds();
         }
         addRandomTile();
         updateUI();
@@ -215,6 +252,7 @@ function restoreState(state) {
     gameState.tileIdCounter = state.tileIdCounter;
     gameState.lastNewTileId = state.lastNewTileId;
     gameState.hasShownGameWon = state.hasShownGameWon;
+    gameState.diveSeeds = state.diveSeeds ? [...state.diveSeeds] : (config.GAME_MODE === 'dive' ? [2] : []);
 
     const scoreDifference = gameState.score - scoreBeforeRestore;
     if (scoreDifference !== 0) {
@@ -437,12 +475,13 @@ export function updateStatistics() {
     gameStatisticsContainer.innerHTML = '';
 
     const gridSizes = [3, 4, 5, 6, 7, 8];
-    const gameModes = ['classic', 'fibonacci', 'power-of-three', 'supermerging', 'zero', 'negative'];
+    const gameModes = ['classic', 'fibonacci', 'power-of-three', 'supermerging', 'dive', 'zero', 'negative'];
     const gameModesDisplay = {
         'classic': 'Classic',
         'fibonacci': 'Fibonacci',
         'power-of-three': 'Powers of 3',
         'supermerging': 'Supermerging',
+        'dive': 'DIVE',
         'zero': 'Zero',
         'negative': 'Negative'
     };

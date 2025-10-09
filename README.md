@@ -11,11 +11,14 @@
 * macOS 10.12+ (Safari)
 * Windows 7+ (Chrome/Firefox/Edge)
 ## Changelog
+### Version 0.18
+Date of update: 2025-10-09
+* DIVE mode: You can now use the DIVE mode. Start with a 2 tile and merge tiles to create new seeds. New tiles spawned will be one of the seeds you have created.
 ### Version 0.17
 Date of update: 2025-10-08
 * Supermerging mode: Merge tiles of any length.
 * You can now adjust maximum undo memory.
-* *Clarified warning texts.
+* Clarified warning texts.
 ### Version 0.16.1
 Date of update: 2025-10-07
 * Fixed a bug where the buttons in game over/won containers are too big.

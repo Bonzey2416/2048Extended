@@ -11,30 +11,48 @@ export function addRandomTile() {
     const emptyCells = [];
     for (let r = 0; r < config.GRID_SIZE; r++) {
         for (let c = 0; c < config.GRID_SIZE; c++) {
-            if (gameState.grid[r][c] === null) emptyCells.push([r, c]);
+            if (gameState.grid[r][c] === null) {
+                emptyCells.push([r, c]);
+            }
         }
     }
     if (emptyCells.length === 0) return;
     const [r, c] = emptyCells[Math.floor(Math.random() * emptyCells.length)];
     let value;
-    if (config.GAME_MODE === 'fibonacci') {
-        value = Math.random() < 0.9 ? 1 : 2;
-    } else if (config.GAME_MODE === 'power-of-three' || config.GAME_MODE === 'supermerging') {
-        value = 1;
-    } else if (config.GAME_MODE === 'zero') {
-        const rand = Math.random();
-        if (rand < 0.2) value = 0;
-        else if (rand < 0.9) value = 2;
-        else value = 4;
-    } else if (config.GAME_MODE === 'negative') {
-        const rand = Math.random();
-        if (rand < 0.45) value = 2;
-        else if (rand < 0.90) value = -2;
-        else if (rand < 0.95) value = 4;
-        else value = -4;
-    } else {
-        value = Math.random() < 0.9 ? 2 : 4;
+
+    switch (config.GAME_MODE) {
+        case 'dive':
+            if (!gameState.diveSeeds || gameState.diveSeeds.length === 0) return; // No seeds, no spawn
+            value = gameState.diveSeeds[Math.floor(Math.random() * gameState.diveSeeds.length)];
+            break;
+        case 'fibonacci':
+            value = Math.random() < 0.9 ? 1 : 2;
+            break;
+        case 'power-of-three':
+            value = 1;
+            break;
+        case 'zero': {
+            const rand = Math.random();
+            if (rand < 0.2) value = 0;
+            else if (rand < 0.9) value = 2;
+            else value = 4;
+            break;
+        }
+        case 'negative': {
+            const rand = Math.random();
+            if (rand < 0.45) value = 2;
+            else if (rand < 0.90) value = -2;
+            else if (rand < 0.95) value = 4;
+            else value = -4;
+            break;
+        }
+        case 'classic':
+        case 'supermerging':
+        default:
+            value = Math.random() < 0.9 ? 2 : 4;
+            break;
     }
+
     const tile = { id: gameState.tileIdCounter++, value, row: r, col: c, merged: false };
     gameState.tiles.push(tile);
     gameState.grid[r][c] = tile.id;
@@ -86,6 +104,26 @@ function combine(row) {
                 tileA.value *= 2;
                 tileA.merged = true;
                 gameState.score += tileA.value;
+                gameState.tiles = gameState.tiles.filter(t => t.id !== tileB.id);
+                row[i + 1] = null;
+                rowChanged = true;
+                i++;
+            }
+        }
+    }
+    // DIVE Mode
+    if (config.GAME_MODE === 'dive') {
+        for (let i = 0; i < config.GRID_SIZE - 1; i++) {
+            const tileA = row[i] ? getTileById(row[i]) : null;
+            const tileB = row[i + 1] ? getTileById(row[i + 1]) : null;
+            if (tileA && tileB && !tileA.merged && !tileB.merged && tileA.value !== 0 && tileB.value !== 0 && (tileA.value % tileB.value === 0 || tileB.value % tileA.value === 0)) {
+                const fromA = gameState.beforeMovePositions[tileA.id] || { row: tileA.row, col: tileA.col };
+                const fromB = gameState.beforeMovePositions[tileB.id] || { row: tileB.row, col: tileB.col };
+                const newValue = tileA.value + tileB.value;
+                mergeAnimations.push({ from: { ...fromA, id: tileA.id, value: tileA.value }, from2: { ...fromB, id: tileB.id, value: tileB.value }, mergedId: tileA.id, to: { row: tileA.row, col: tileA.col }, mergedValue: newValue });
+                tileA.value = newValue;
+                tileA.merged = true;
+                gameState.score += newValue;
                 gameState.tiles = gameState.tiles.filter(t => t.id !== tileB.id);
                 row[i + 1] = null;
                 rowChanged = true;
@@ -334,6 +372,7 @@ export function isGameOver() {
 function canMerge(tileA, tileB) {
     if (!tileA || !tileB) return false;
     if (config.GAME_MODE === 'classic' || config.GAME_MODE === 'zero' || config.GAME_MODE === 'supermerging') return tileA.value === tileB.value;
+    if (config.GAME_MODE === 'dive') return tileA.value !== 0 && tileB.value !== 0 && (tileA.value % tileB.value === 0 || tileB.value % tileA.value === 0);
     if (config.GAME_MODE === 'negative') return tileA.value === tileB.value || tileA.value === -tileB.value;
     if (config.GAME_MODE === 'fibonacci') {
         const fibSeq = getFibonacciSequence(tileA.value + tileB.value + 1);

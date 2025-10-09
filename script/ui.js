@@ -1,38 +1,17 @@
 import { config, gameState, move, undo, redo, handlePracticeModeChange, startAIMode, stopAIMode, saveSettings, initGrid, clearHistory, updateStatistics } from './main.js';
 import { mergeAnimations, getGoalValue } from './grid.js';
-import { getHighScoreKey, getHighestTileKey, getGameStateKey } from './utils.js';
+import { getHighScoreKey, getHighestTileKey, getGameStateKey, getPrimeFactorization } from './utils.js';
 
 
 // --- Supermerging Style Helpers ---
 
 const largePrimeGradients = {
     7: 'linear-gradient(135deg, #0005, transparent, #fff5, transparent, #0005)',
-    11: 'radial-gradient(#fff5, transparent, #0005, transparent, #fff5, transparent, #0005)'
-}
-
-function getPrimeFactorization(num) {
-    const n = Math.abs(num);
-    if (n <= 1) return {};
-    const factors = {};
-    let tempN = n;
-
-    while (tempN % 2 === 0) {
-        factors[2] = (factors[2] || 0) + 1;
-        tempN /= 2;
-    }
-
-    for (let i = 3; i * i <= tempN; i += 2) {
-        while (tempN % i === 0) {
-            factors[i] = (factors[i] || 0) + 1;
-            tempN /= i;
-        }
-    }
-
-    if (tempN > 2) {
-        factors[tempN] = (factors[tempN] || 0) + 1;
-    }
-
-    return factors;
+    11: 'radial-gradient(#fff5, transparent, #0005, transparent, #fff5, transparent, #0005)',
+    13: 'linear-gradient(180deg, #0005, transparent, #fff5, transparent, #0005, transparent, #fff5, transparent, #0005)',
+    17: 'repeating-linear-gradient(195deg, transparent 0%, transparent 19%, #0906 20%, #0906 26%, transparent 27%)',
+    19: 'repeating-linear-gradient(135deg, #90f6 0%, #90f6 3%, transparent 4%, transparent 21%, #90f6 22%, #90f6 25%)',
+    23: 'repeating-linear-gradient(135deg, #f906 0%, #f906 3%, transparent 4%, transparent 21%, #f906 22%, #f906 25%)'
 }
 
 function applySupermergingStyle(tileEl, value) {
@@ -99,7 +78,7 @@ export function updateUI() {
             tileEl.id = 'tile-' + t.id;
             tileContainer.appendChild(tileEl);
         }
-        if (config.GAME_MODE === 'supermerging') {
+        if (config.GAME_MODE === 'supermerging' || config.GAME_MODE === 'dive') {
             applySupermergingStyle(tileEl, t.value);
         } else {
             tileEl.className = `tile tile-${t.value}`;
@@ -113,6 +92,9 @@ export function updateUI() {
     });
 
     animateMerges();
+    if (config.GAME_MODE === 'dive') {
+        updateDiveSeedsUI();
+    }
 
     document.getElementById('score').textContent = gameState.score;
     updateHighScore();
@@ -131,7 +113,7 @@ function animateMerges() {
         sources.forEach(source => {
             const alias = document.createElement('div');
             
-            if (config.GAME_MODE === 'supermerging') {
+            if (config.GAME_MODE === 'supermerging' || config.GAME_MODE === 'dive') {
                 applySupermergingStyle(alias, source.value);
                 alias.classList.add('merging');
             } else {
@@ -170,6 +152,21 @@ function updateHighScore() {
     const storedHighestTile = parseInt(localStorage.getItem(highestTileKey) || '0');
         if (currentHighestTile > storedHighestTile) {
         localStorage.setItem(highestTileKey, currentHighestTile);
+    }
+}
+
+export function updateDiveSeedsUI() {
+    const container = document.getElementById('dive-seed-group');
+    if (!container) return;
+    container.innerHTML = ''; // Clear old seeds
+    if (gameState.diveSeeds) {
+        gameState.diveSeeds.sort((a, b) => a - b).forEach(seed => {
+            const seedEl = document.createElement('div');
+            seedEl.id = `tile-seed-${seed}`;
+            applySupermergingStyle(seedEl, seed);
+            seedEl.textContent = seed;
+            container.appendChild(seedEl);
+        });
     }
 }
 
@@ -369,7 +366,7 @@ function setupEventListeners() {
 
     document.getElementById('game-mode-select').addEventListener('change', e => {
         config.GAME_MODE = e.target.value;
-        document.getElementById('tile-container').classList.toggle('tile-factor', config.GAME_MODE === 'supermerging');
+        document.getElementById('dive-seed-container').classList.toggle('hidden', config.GAME_MODE !== 'dive');
         initGrid();
         updateGoalDisplay();
         saveSettings();
@@ -481,7 +478,7 @@ function syncSettingsUI() {
     document.getElementById('grid-size-select').value = config.GRID_SIZE;
     document.documentElement.style.setProperty('--grid-size', config.GRID_SIZE);
     document.getElementById('game-mode-select').value = config.GAME_MODE;
-    document.getElementById('tile-container').classList.toggle('tile-factor', config.GAME_MODE === 'supermerging');
+    document.getElementById('dive-seed-container').classList.toggle('hidden', config.GAME_MODE !== 'dive');
     const practiceToggle = document.getElementById('practice-mode-toggle');
     practiceToggle.checked = config.practiceMode;
     document.getElementById('undo-button').classList.toggle('hidden', !config.practiceMode);
