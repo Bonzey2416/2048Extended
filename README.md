@@ -11,6 +11,9 @@
 * macOS 10.12+ (Safari)
 * Windows 7+ (Chrome/Firefox/Edge)
 ## Changelog
+### Version 0.18.2
+Date of update: 2025-10-11
+* Updated the sizings of the user interface elements.
 ### Version 0.18.1
 Date of update: 2025-10-11
 * Fixed seed list when undoing/redoing.
