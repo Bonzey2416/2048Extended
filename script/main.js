@@ -1,5 +1,5 @@
 import { moveGrid as calculateMove, addRandomTile, isGameOver, isGameWon, getGoalValue, resetMergedState, mergeAnimations } from './grid.js';
-import { initializeUI, updateUI, updateGoalDisplay, generateGridCells, showGameOver, showGameWon, hideGameOver, hideGameWon, updateUndoRedoUI, updateDiveSeedsUI } from './ui.js';
+import { initializeUI, updateUI, updateGoalDisplay, generateGridCells, showGameOver, showGameWon, hideGameOver, hideGameWon, updateUndoRedoUI, updateDiveSeedsUI, applySupermergingStyle } from './ui.js';
 import { getGameStateKey, getHighScoreKey, getHighestTileKey, getGamesPlayedKey, getPrimeFactorization } from './utils.js';
 
 // Shared configuration
@@ -235,6 +235,7 @@ function saveState() {
         tileIdCounter: gameState.tileIdCounter,
         lastNewTileId: gameState.lastNewTileId,
         hasShownGameWon: gameState.hasShownGameWon,
+        diveSeeds: gameState.diveSeeds ? [...gameState.diveSeeds] : []
     };
     undoStack.push(newState);
     if (undoStack.length > config.maxUndoMemory) undoStack.shift();
@@ -534,7 +535,11 @@ export function updateStatistics() {
                 individualTileDiv.classList.add('tile-individual');
 
                 const tileDiv = document.createElement('div');
-                tileDiv.classList.add('tile', `tile-${highestTile}`);
+                if (mode === 'supermerging' || mode === 'dive') {
+                    applySupermergingStyle(tileDiv, highestTile);
+                } else {
+                    tileDiv.classList.add('tile', `tile-${highestTile}`);
+                };
                 tileDiv.textContent = highestTile;
                 individualTileDiv.appendChild(tileDiv);
                 highestTileContainer.appendChild(individualTileDiv);

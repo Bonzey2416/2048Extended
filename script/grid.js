@@ -28,6 +28,9 @@ export function addRandomTile() {
         case 'fibonacci':
             value = Math.random() < 0.9 ? 1 : 2;
             break;
+        case 'supermerging':
+            value = 1;
+            break;
         case 'power-of-three':
             value = 1;
             break;
@@ -47,7 +50,6 @@ export function addRandomTile() {
             break;
         }
         case 'classic':
-        case 'supermerging':
         default:
             value = Math.random() < 0.9 ? 2 : 4;
             break;

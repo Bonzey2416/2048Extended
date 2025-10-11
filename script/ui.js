@@ -11,10 +11,18 @@ const largePrimeGradients = {
     13: 'linear-gradient(180deg, #0005, transparent, #fff5, transparent, #0005, transparent, #fff5, transparent, #0005)',
     17: 'repeating-linear-gradient(195deg, transparent 0%, transparent 19%, #0906 20%, #0906 26%, transparent 27%)',
     19: 'repeating-linear-gradient(135deg, #90f6 0%, #90f6 3%, transparent 4%, transparent 21%, #90f6 22%, #90f6 25%)',
-    23: 'repeating-linear-gradient(135deg, #f906 0%, #f906 3%, transparent 4%, transparent 21%, #f906 22%, #f906 25%)'
+    23: 'repeating-linear-gradient(60deg, #f906 0%, #f906 3%, transparent 4%, transparent 21%, #f906 22%, #f906 25%)',
+    29: 'repeating-linear-gradient(170deg, #09f6 0%, #09f6 3%, transparent 4%, transparent 21%, #09f6 22%, #09f6 25%)',
+    31: 'repeating-linear-gradient(105deg, transparent 0%, transparent 2%, #f006 3%, #f006 8%, transparent 9%, transparent 22.25%)',
+    37: 'repeating-linear-gradient(35deg, transparent 0%, transparent 6%, #9996 7%, #90f6 13%, transparent 14%, transparent 20%)',
+    41: 'repeating-linear-gradient(150deg, #0f06 0%, #fff6 2%, transparent 3%, transparent 13.67%, #0006 14.67%, #0f06 16.67%)',
+    43: 'repeating-linear-gradient(80deg, transparent 0%, transparent 6.5%, #f996 7.5%, #ff06 12.5%, transparent 13.5%, transparent 20%)',
+    47: 'repeating-linear-gradient(10deg, transparent 0%, transparent 6.5%, #f906 7.5%, #f906 12.5%, transparent 13.5%, transparent 20%)',
+    53: 'repeating-linear-gradient(120deg, transparent 0%, transparent 4.643%, #0f06 5.143%, #0f06 9.143%, transparent 9.643%, transparent 14.286%)',
+    59: 'repeating-linear-gradient(50deg, transparent 0%, transparent 4.643%, #99f6 5.143%, #99f6 9.143%, transparent 9.643%, transparent 14.286%)',
 }
 
-function applySupermergingStyle(tileEl, value) {
+export function applySupermergingStyle(tileEl, value) {
     if (value === 0) {
         tileEl.className = 'tile tile-0';
         tileEl.style.backgroundImage = 'none';
@@ -46,6 +54,18 @@ function applySupermergingStyle(tileEl, value) {
     
     if (backgroundImages.length > 0) {
         tileEl.style.backgroundImage = backgroundImages.join(', ');
+    }
+
+    if (value >= 100 && value < 1000) {
+        tileEl.style.fontSize = 'calc(40% / var(--grid-size))';
+    } else if (value >= 1000 && value < 10000) {
+        tileEl.style.fontSize = 'calc(32% / var(--grid-size))';
+    } else if (value >= 10000 && value < 100000) {
+        tileEl.style.fontSize = 'calc(26% / var(--grid-size))';
+    } else if (value >= 100000 && value < 1000000) {
+        tileEl.style.fontSize = 'calc(22% / var(--grid-size))';
+    } else if (value >= 1000000) {
+        tileEl.style.fontSize = 'calc(19% / var(--grid-size))';
     }
 }
 
