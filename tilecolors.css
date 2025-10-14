@@ -249,6 +249,11 @@
 .tile-base-162000 { background-color: #330000; }
 .tile-base-324000 { background-color: #000000; }
 
+.tile-plus        { color: #09f; }
+.tile-minus       { color: #f60; }
+.tile-multiply    { color: #0c0; }
+.tile-divide      { color: #f0f; }
+
 .dark-mode.sync-tiles-dark-mode .tile.tile-0       { background: #454443; color: var(--ui-text); }
 .dark-mode.sync-tiles-dark-mode .tile.tile-1       { background: #353433; color: var(--ui-text); }
 .dark-mode.sync-tiles-dark-mode .tile.tile-2       { background: #503a35; color: var(--ui-text); }

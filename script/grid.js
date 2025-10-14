@@ -25,6 +25,16 @@ export function addRandomTile() {
             if (!gameState.diveSeeds || gameState.diveSeeds.length === 0) return; // No seeds, no spawn
             value = gameState.diveSeeds[Math.floor(Math.random() * gameState.diveSeeds.length)];
             break;
+        case 'math': {
+            const rand = Math.random();
+            if (rand < 0.70) value = 2;
+            else if (rand < 0.80) value = 4;
+            else if (rand < 0.85) value = '+';
+            else if (rand < 0.90) value = '-';
+            else if (rand < 0.95) value = '*';
+            else value = '/';
+            break;
+        }
         case 'fibonacci':
             value = Math.random() < 0.9 ? 1 : 2;
             break;
@@ -110,6 +120,83 @@ function combine(row) {
                 row[i + 1] = null;
                 rowChanged = true;
                 i++;
+            }
+        }
+    }
+    // Math Mode
+    if (config.GAME_MODE === 'math') {
+        for (let i = 0; i < config.GRID_SIZE - 1; i++) {
+            const tileA = row[i] ? getTileById(row[i]) : null;
+            const tileB = row[i + 1] ? getTileById(row[i + 1]) : null;
+            const tileC = (i + 2 < config.GRID_SIZE) ? getTileById(row[i + 2]) : null;
+
+            if (!tileA || tileA.merged) continue;
+
+            // Pattern 1: [Number, Operator, Number]
+            if (tileB && tileC && !isNaN(tileA.value) && isNaN(tileB.value) && !isNaN(tileC.value) && !tileB.merged && !tileC.merged) {
+                const valA = Number(tileA.value);
+                const valC = Number(tileC.value);
+                const op = tileB.value;
+
+                // Check for invalid operations (division by zero)
+                if (op === '/' && valC === 0) {
+                    // Invalid merge, do nothing
+                } else {
+                    let result;
+                    switch (op) {
+                        case '+': result = valA + valC; break;
+                        case '-': result = valA - valC; break;
+                        case '*': result = valA * valC; break;
+                        case '/': result = valA / valC; break;
+                    }
+
+                    const fromA = gameState.beforeMovePositions[tileA.id] || { row: tileA.row, col: tileA.col };
+                    const fromB = gameState.beforeMovePositions[tileB.id] || { row: tileB.row, col: tileB.col };
+                    const fromC = gameState.beforeMovePositions[tileC.id] || { row: tileC.row, col: tileC.col };
+                    mergeAnimations.push({
+                        sources: [
+                            { ...fromA, id: tileA.id, value: tileA.value },
+                            { ...fromB, id: tileB.id, value: tileB.value },
+                            { ...fromC, id: tileC.id, value: tileC.value }
+                        ],
+                        to: { row: tileA.row, col: tileA.col },
+                        mergedValue: result
+                    });
+
+                    tileA.value = result;
+                    tileA.merged = true;
+                    gameState.score += Math.abs(valA) + Math.abs(valC);
+                    gameState.tiles = gameState.tiles.filter(t => t.id !== tileB.id && t.id !== tileC.id);
+                    row[i + 1] = null;
+                    row[i + 2] = null;
+                    rowChanged = true;
+                    i++; // Additional increment to skip over the consumed space
+                    continue;
+                }
+            }
+
+            // Pattern 2: [Number, Number] or [Operator, Operator]
+            if (tileB && tileA.value === tileB.value && !tileB.merged) {
+                const newValue = !isNaN(tileA.value) ? tileA.value * 2 : tileA.value;
+                const fromA = gameState.beforeMovePositions[tileA.id] || { row: tileA.row, col: tileA.col };
+                const fromB = gameState.beforeMovePositions[tileB.id] || { row: tileB.row, col: tileB.col };
+                mergeAnimations.push({
+                    sources: [
+                        { ...fromA, id: tileA.id, value: tileA.value },
+                        { ...fromB, id: tileB.id, value: tileB.value }
+                    ],
+                    to: { row: tileA.row, col: tileA.col },
+                    mergedValue: newValue
+                });
+
+                if (!isNaN(tileA.value)) { // Number merge
+                    tileA.value = newValue;
+                    gameState.score += newValue;
+                } // else Operator merge, value stays the same, no score
+                tileA.merged = true;
+                gameState.tiles = gameState.tiles.filter(t => t.id !== tileB.id);
+                row[i + 1] = null;
+                rowChanged = true;
             }
         }
     }
@@ -324,50 +411,60 @@ export function resetMergedState() {
 }
 
 export function isGameOver() {
-    for (let r = 0; r < config.GRID_SIZE; r++) {
-        for (let c = 0; c < config.GRID_SIZE; c++) {
-            if (gameState.grid[r][c] === null) return false;
+    // If there are empty cells, the game is not over.
+    if (gameState.tiles.length < config.GRID_SIZE * config.GRID_SIZE) {
+        return false;
+    }
+
+    // Check for possible moves in all 4 directions
+    for (let direction = 0; direction < 4; direction++) {
+        let testGrid = gameState.grid.map(row => [...row]);
+        for (let i = 0; i < direction; i++) {
+            testGrid = rotateGrid(testGrid);
+        }
+
+        for (let r = 0; r < config.GRID_SIZE; r++) {
+            const row = testGrid[r];
+            const slidedRow = slide(row);
+
+            // 1. A move is possible if tiles can slide into an empty space.
+            if (JSON.stringify(row) !== JSON.stringify(slidedRow)) return false;
+
+            // 2. A move is possible if any tiles can merge after sliding.
+            for (let c = 0; c < config.GRID_SIZE - 1; c++) {
+                const tileA = slidedRow[c] ? getTileById(slidedRow[c]) : null;
+                if (!tileA) continue;
+
+                const tileB = slidedRow[c + 1] ? getTileById(slidedRow[c + 1]) : null;
+
+                // Generic 2-tile merge check
+                if (tileB && canMerge(tileA, tileB)) return false;
+
+                // Special checks for modes not fully handled by canMerge()
+                if (config.GAME_MODE === 'math') {
+                    if (tileB && tileA.value === tileB.value) return false; // [N,N] or [Op,Op]
+                    if (c < config.GRID_SIZE - 2) {
+                        const tileC = slidedRow[c + 2] ? getTileById(slidedRow[c + 2]) : null;
+                        if (tileB && tileC && !isNaN(tileA.value) && isNaN(tileB.value) && !isNaN(tileC.value)) {
+                            // Check for valid [N,Op,N] merge
+                            if (!(tileB.value === '/' && (tileC.value === 0 || tileA.value % tileC.value !== 0))) {
+                                return false;
+                            }
+                        }
+                    }
+                } else if (config.GAME_MODE === 'power-of-three') {
+                    if (c < config.GRID_SIZE - 2) {
+                        const tileC = slidedRow[c + 2] ? getTileById(slidedRow[c + 2]) : null;
+                        if (tileB && tileC && tileA.value === tileB.value && tileA.value === tileC.value) {
+                            return false; // [N,N,N] is possible
+                        }
+                    }
+                }
+            }
         }
     }
-    // Check for possible merges
-    if (config.GAME_MODE === 'power-of-three') {
-        // Check for 3 consecutive identical tiles horizontally
-        for (let r = 0; r < config.GRID_SIZE; r++) {
-            for (let c = 0; c < config.GRID_SIZE - 2; c++) {
-                const tileA = getTileById(gameState.grid[r][c]);
-                const tileB = getTileById(gameState.grid[r][c + 1]);
-                const tileC = getTileById(gameState.grid[r][c + 2]);
-                if (tileA && tileB && tileC && tileA.value === tileB.value && tileA.value === tileC.value) {
-                    return false;
-                }
-            }
-        }
-        // Check for 3 consecutive identical tiles vertically
-        for (let c = 0; c < config.GRID_SIZE; c++) {
-            for (let r = 0; r < config.GRID_SIZE - 2; r++) {
-                const tileA = getTileById(gameState.grid[r][c]);
-                const tileB = getTileById(gameState.grid[r + 1][c]);
-                const tileC = getTileById(gameState.grid[r + 2][c]);
-                if (tileA && tileB && tileC && tileA.value === tileB.value && tileA.value === tileC.value) {
-                    return false;
-                }
-            }
-        }
-    } else {
-        for (let r = 0; r < config.GRID_SIZE; r++) {
-            for (let c = 0; c < config.GRID_SIZE; c++) {
-                const tile = getTileById(gameState.grid[r][c]);
-                if (c < config.GRID_SIZE - 1) {
-                    const rightTile = getTileById(gameState.grid[r][c + 1]);
-                    if (canMerge(tile, rightTile)) return false;
-                }
-                if (r < config.GRID_SIZE - 1) {
-                    const downTile = getTileById(gameState.grid[r + 1][c]);
-                    if (canMerge(tile, downTile)) return false;
-                }
-            }
-        }
-    }
+
+    // If no moves are possible in any direction, the game is over.
     return true;
 }
 
@@ -425,19 +522,51 @@ export function isGameWon() {
     const goal = getGoalValue();
     return gameState.tiles.some(t => t.value === goal);
 }
-
 export function canMove(direction) {
     let testGrid = gameState.grid.map(row => [...row]);
-    for (let i = 0; i < direction; i++) testGrid = rotateGrid(testGrid);
+    // Rotate to the desired direction
+    for (let i = 0; i < direction; i++) {
+        testGrid = rotateGrid(testGrid);
+    }
+
     for (let r = 0; r < config.GRID_SIZE; r++) {
-        const originalRow = JSON.stringify(testGrid[r]);
-        const newRow = slide(testGrid[r]);
-        if (JSON.stringify(newRow) !== originalRow) return true; // Can slide
+        const row = testGrid[r];
+        const slidedRow = slide(row);
+
+        // 1. A move is possible if tiles can slide into an empty space.
+        if (JSON.stringify(row) !== JSON.stringify(slidedRow)) return true;
+
+        // 2. A move is possible if any tiles can merge after sliding.
         for (let c = 0; c < config.GRID_SIZE - 1; c++) {
-            const tileA = getTileById(newRow[c]);
-            const tileB = getTileById(newRow[c + 1]);
-            if (canMerge(tileA, tileB)) return true; // Can merge
+            const tileA = slidedRow[c] ? getTileById(slidedRow[c]) : null;
+            if (!tileA) continue;
+
+            const tileB = slidedRow[c + 1] ? getTileById(slidedRow[c + 1]) : null;
+
+            // Generic 2-tile merge check
+            if (tileB && canMerge(tileA, tileB)) return true;
+
+            // Special checks for modes not fully handled by canMerge()
+            if (config.GAME_MODE === 'math') {
+                if (tileB && tileA.value === tileB.value) return true; // [N,N] or [Op,Op]
+                if (c < config.GRID_SIZE - 2) {
+                    const tileC = slidedRow[c + 2] ? getTileById(slidedRow[c + 2]) : null;
+                    if (tileB && tileC && !isNaN(tileA.value) && isNaN(tileB.value) && !isNaN(tileC.value)) {
+                        if (!(tileB.value === '/' && tileC.value === 0)) {
+                            return true;
+                        }
+                    }
+                }
+            } else if (config.GAME_MODE === 'power-of-three') {
+                if (c < config.GRID_SIZE - 2) {
+                    const tileC = slidedRow[c + 2] ? getTileById(slidedRow[c + 2]) : null;
+                    if (tileB && tileC && tileA.value === tileB.value && tileA.value === tileC.value) {
+                        return true; // [N,N,N] is possible
+                    }
+                }
+            }
         }
     }
+    // If no moves are possible in this direction
     return false;
 }

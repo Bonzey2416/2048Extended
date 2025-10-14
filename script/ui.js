@@ -1,6 +1,6 @@
 import { config, gameState, move, undo, redo, handlePracticeModeChange, startAIMode, stopAIMode, saveSettings, initGrid, clearHistory, updateStatistics } from './main.js';
 import { mergeAnimations, getGoalValue } from './grid.js';
-import { getHighScoreKey, getHighestTileKey, getGameStateKey, getPrimeFactorization } from './utils.js';
+import { getHighScoreKey, getHighestTileKey, getGameStateKey, getPrimeFactorization, formatScore } from './utils.js';
 
 
 // --- Supermerging Style Helpers ---
@@ -20,6 +20,12 @@ const largePrimeGradients = {
     47: 'repeating-linear-gradient(10deg, transparent 0%, transparent 6.5%, #f906 7.5%, #f906 12.5%, transparent 13.5%, transparent 20%)',
     53: 'repeating-linear-gradient(120deg, transparent 0%, transparent 4.643%, #0f06 5.143%, #0f06 9.143%, transparent 9.643%, transparent 14.286%)',
     59: 'repeating-linear-gradient(50deg, transparent 0%, transparent 4.643%, #99f6 5.143%, #99f6 9.143%, transparent 9.643%, transparent 14.286%)',
+}
+
+function getFontSizeByChars(charCount) {
+    let percentage;
+    if (charCount >= 3) percentage = 140 / charCount + 1;
+    return percentage ? `calc(${percentage}% / var(--grid-size))` : '';
 }
 
 export function applySupermergingStyle(tileEl, value) {
@@ -55,18 +61,8 @@ export function applySupermergingStyle(tileEl, value) {
     if (backgroundImages.length > 0) {
         tileEl.style.backgroundImage = backgroundImages.join(', ');
     }
-
-    if (value >= 100 && value < 1000) {
-        tileEl.style.fontSize = 'calc(40% / var(--grid-size))';
-    } else if (value >= 1000 && value < 10000) {
-        tileEl.style.fontSize = 'calc(32% / var(--grid-size))';
-    } else if (value >= 10000 && value < 100000) {
-        tileEl.style.fontSize = 'calc(26% / var(--grid-size))';
-    } else if (value >= 100000 && value < 1000000) {
-        tileEl.style.fontSize = 'calc(22% / var(--grid-size))';
-    } else if (value >= 1000000) {
-        tileEl.style.fontSize = 'calc(19% / var(--grid-size))';
-    }
+    const charCount = String(value).length;
+    tileEl.style.fontSize = getFontSizeByChars(charCount);
 }
 
 export function generateGridCells() {
@@ -100,9 +96,22 @@ export function updateUI() {
         }
         if (config.GAME_MODE === 'supermerging' || config.GAME_MODE === 'dive') {
             applySupermergingStyle(tileEl, t.value);
+        } else if (config.GAME_MODE === 'math' && isNaN(t.value)) {
+            let opClass = '';
+            switch (t.value) {
+                case '+': opClass = 'plus'; break;
+                case '-': opClass = 'minus'; break;
+                case '*': opClass = 'multiply'; break;
+                case '/': opClass = 'divide'; break;
+            }
+            tileEl.className = `tile tile-operator tile-${opClass}`;
+            tileEl.style.backgroundImage = 'none';
+            tileEl.style.fontSize = '';
         } else {
             tileEl.className = `tile tile-${t.value}`;
             tileEl.style.backgroundImage = 'none'; // Ensure style is cleared when switching modes
+            const charCount = String(t.value).length;
+            tileEl.style.fontSize = getFontSizeByChars(charCount);
         }
         if (t.id === gameState.lastNewTileId) tileEl.classList.add('new');
         if (t.merged) tileEl.classList.add('merged');
@@ -116,7 +125,7 @@ export function updateUI() {
         updateDiveSeedsUI();
     }
 
-    document.getElementById('score').textContent = gameState.score;
+    document.getElementById('score').textContent = formatScore(gameState.score);
     updateHighScore();
 }
 
@@ -136,8 +145,20 @@ function animateMerges() {
             if (config.GAME_MODE === 'supermerging' || config.GAME_MODE === 'dive') {
                 applySupermergingStyle(alias, source.value);
                 alias.classList.add('merging');
+            } else if (config.GAME_MODE === 'math' && isNaN(source.value)) {
+                let opClass = '';
+                switch (source.value) {
+                    case '+': opClass = 'plus'; break;
+                    case '-': opClass = 'minus'; break;
+                    case '*': opClass = 'multiply'; break;
+                    case '/': opClass = 'divide'; break;
+                }
+                alias.className = `tile tile-operator tile-${opClass} merging`;
+                alias.style.fontSize = '';
             } else {
                 alias.className = `tile tile-${source.value} merging`;
+                const charCount = String(source.value).length;
+                alias.style.fontSize = getFontSizeByChars(charCount);
             }
 
             alias.textContent = source.value;
@@ -160,16 +181,16 @@ function animateMerges() {
 
 function updateHighScore() {
     const highScoreKey = getHighScoreKey(config.GAME_MODE, config.practiceMode, config.GRID_SIZE);
-    let highScore = parseInt(localStorage.getItem(highScoreKey) || '0');
+    let highScore = parseFloat(localStorage.getItem(highScoreKey) || '0');
     if (gameState.score > highScore) {
         highScore = gameState.score;
         localStorage.setItem(highScoreKey, highScore);
     }
-    document.getElementById('high-score').textContent = highScore;
+    document.getElementById('high-score').textContent = formatScore(highScore);
 
     const highestTileKey = getHighestTileKey(config.GAME_MODE, config.practiceMode, config.GRID_SIZE);
     const currentHighestTile = gameState.tiles.reduce((max, t) => Math.max(max, t.value), 0);
-    const storedHighestTile = parseInt(localStorage.getItem(highestTileKey) || '0');
+    const storedHighestTile = parseFloat(localStorage.getItem(highestTileKey) || '0');
         if (currentHighestTile > storedHighestTile) {
         localStorage.setItem(highestTileKey, currentHighestTile);
     }

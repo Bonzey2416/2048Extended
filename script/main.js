@@ -1,6 +1,6 @@
 import { moveGrid as calculateMove, addRandomTile, isGameOver, isGameWon, getGoalValue, resetMergedState, mergeAnimations } from './grid.js';
 import { initializeUI, updateUI, updateGoalDisplay, generateGridCells, showGameOver, showGameWon, hideGameOver, hideGameWon, updateUndoRedoUI, updateDiveSeedsUI, applySupermergingStyle } from './ui.js';
-import { getGameStateKey, getHighScoreKey, getHighestTileKey, getGamesPlayedKey, getPrimeFactorization } from './utils.js';
+import { getGameStateKey, getHighScoreKey, getHighestTileKey, getGamesPlayedKey, getPrimeFactorization, formatScore } from './utils.js';
 
 // Shared configuration
 export let config = {
@@ -199,7 +199,7 @@ export function move(direction) {
     if (anyTileMoved) {
         const scoreGained = gameState.score - scoreBeforeMove;
         if (scoreGained > 0) {
-            let totalScore = parseInt(localStorage.getItem('totalScore') || '0');
+            let totalScore = parseFloat(localStorage.getItem('totalScore') || '0');
             totalScore += scoreGained;
             localStorage.setItem('totalScore', totalScore);
         }
@@ -257,7 +257,7 @@ function restoreState(state) {
 
     const scoreDifference = gameState.score - scoreBeforeRestore;
     if (scoreDifference !== 0) {
-        let totalScore = parseInt(localStorage.getItem('totalScore') || '0');
+        let totalScore = parseFloat(localStorage.getItem('totalScore') || '0');
         totalScore += scoreDifference;
         localStorage.setItem('totalScore', totalScore);
     }
@@ -476,7 +476,7 @@ export function updateStatistics() {
     gameStatisticsContainer.innerHTML = '';
 
     const gridSizes = [3, 4, 5, 6, 7, 8];
-    const gameModes = ['classic', 'fibonacci', 'power-of-three', 'supermerging', 'dive', 'zero', 'negative'];
+    const gameModes = ['classic', 'fibonacci', 'power-of-three', 'supermerging', 'dive', 'zero', 'negative', 'math'];
     const gameModesDisplay = {
         'classic': 'Classic',
         'fibonacci': 'Fibonacci',
@@ -484,7 +484,8 @@ export function updateStatistics() {
         'supermerging': 'Supermerging',
         'dive': 'DIVE',
         'zero': 'Zero',
-        'negative': 'Negative'
+        'negative': 'Negative',
+        'math': 'Math'
     };
     const practiceModes = [false, true];
     let totalGamesPlayed = 0;
@@ -503,8 +504,8 @@ export function updateStatistics() {
                     continue;
                 }
 
-                let highScore = parseInt(localStorage.getItem(highScoreKey) || '0');
-                const highestTile = parseInt(localStorage.getItem(highestTileKey) || '0');
+                let highScore = parseFloat(localStorage.getItem(highScoreKey) || '0');
+                const highestTile = parseFloat(localStorage.getItem(highestTileKey) || '0');
 
                 // If the current game matches this statistics entry, consider its score for the total.
                 if (size === config.GRID_SIZE && mode === config.GAME_MODE && practice === config.practiceMode) {
@@ -549,7 +550,7 @@ export function updateStatistics() {
                 statsElement.appendChild(gamesPlayedElement);
 
                 const bestScore = document.createElement('p');
-                bestScore.textContent = `Best score: ${highScore}`;
+                bestScore.textContent = `Best score: ${formatScore(highScore)}`;
                 statsElement.appendChild(bestScore);
 
                 gameStatisticsContainer.appendChild(statsElement);
@@ -563,7 +564,8 @@ export function updateStatistics() {
 
     const totalScoreElement = document.getElementById('total-score');
     if (totalScoreElement) {
-        totalScoreElement.textContent = localStorage.getItem('totalScore') || '0';
+        const totalScore = parseFloat(localStorage.getItem('totalScore') || '0');
+        totalScoreElement.textContent = formatScore(totalScore);
     }
 }
 

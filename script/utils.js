@@ -38,3 +38,19 @@ export function getPrimeFactorization(num) {
 
     return factors;
 }
+
+const scoreFormatter = new Intl.NumberFormat('en-US', {
+    maximumSignificantDigits: 7,
+    useGrouping: false
+});
+
+export function formatScore(score) {
+    const numScore = Number(score);
+    if (isNaN(numScore)) return score;
+
+    if (numScore >= 1000000) {
+        return Math.round(numScore).toString();
+    } else {
+        return scoreFormatter.format(numScore);
+    }
+}
