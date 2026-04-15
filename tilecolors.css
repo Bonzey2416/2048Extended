@@ -16,51 +16,51 @@
 .tile.tile-64      { background: #f65e3b; color: var(--ui-inverse-fixed); }
 .tile.tile-81      { background: #f65330; color: var(--ui-inverse-fixed); }
 .tile.tile-89      { background: #f64e2b; color: var(--ui-inverse-fixed); }
-.tile.tile-128     { background: #edcf72; color: var(--ui-inverse-fixed); font-size: calc(40% / var(--grid-size)); }
-.tile.tile-144     { background: #edce6f; color: var(--ui-inverse-fixed); font-size: calc(40% / var(--grid-size)); }
-.tile.tile-233     { background: #edcc63; color: var(--ui-inverse-fixed); font-size: calc(40% / var(--grid-size)); }
-.tile.tile-243     { background: #edcc62; color: var(--ui-inverse-fixed); font-size: calc(40% / var(--grid-size)); }
-.tile.tile-256     { background: #edcc61; color: var(--ui-inverse-fixed); font-size: calc(40% / var(--grid-size)); }
-.tile.tile-377     { background: #edca57; color: var(--ui-inverse-fixed); font-size: calc(40% / var(--grid-size)); }
-.tile.tile-512     { background: #edc850; color: var(--ui-inverse-fixed); font-size: calc(40% / var(--grid-size)); }
-.tile.tile-610     { background: #edc74c; color: var(--ui-inverse-fixed); font-size: calc(40% / var(--grid-size)); }
-.tile.tile-729     { background: #edc649; color: var(--ui-inverse-fixed); font-size: calc(40% / var(--grid-size)); }
-.tile.tile-987     { background: #edc540; color: var(--ui-inverse-fixed); font-size: calc(40% / var(--grid-size)); }
-.tile.tile-1024    { background: #edc53f; color: var(--ui-inverse-fixed); font-size: calc(32% / var(--grid-size)); }
-.tile.tile-1597    { background: #edc334; color: var(--ui-inverse-fixed); font-size: calc(32% / var(--grid-size)); }
-.tile.tile-2048    { background: #edc22e; color: var(--ui-inverse-fixed); font-size: calc(32% / var(--grid-size)); }
-.tile.tile-2187    { background: #edc22c; color: var(--ui-inverse-fixed); font-size: calc(32% / var(--grid-size)); }
-.tile.tile-2584    { background: #edc128; color: var(--ui-inverse-fixed); font-size: calc(32% / var(--grid-size)); }
-.tile.tile-4096    { background: #b687b1; color: var(--ui-inverse-fixed); font-size: calc(32% / var(--grid-size)); }
-.tile.tile-4181    { background: #b586b0; color: var(--ui-inverse-fixed); font-size: calc(32% / var(--grid-size)); }
-.tile.tile-6561    { background: #af73ab; color: var(--ui-inverse-fixed); font-size: calc(32% / var(--grid-size)); }
-.tile.tile-6765    { background: #ae72ab; color: var(--ui-inverse-fixed); font-size: calc(32% / var(--grid-size)); }
-.tile.tile-8192    { background: #a862a8; color: var(--ui-inverse-fixed); font-size: calc(32% / var(--grid-size)); }
-.tile.tile-10946   { background: #a659a5; color: var(--ui-inverse-fixed); font-size: calc(26% / var(--grid-size)); }
-.tile.tile-16384   { background: #a248a1; color: var(--ui-inverse-fixed); font-size: calc(26% / var(--grid-size)); }
-.tile.tile-17711   { background: #9f419e; color: var(--ui-inverse-fixed); font-size: calc(26% / var(--grid-size)); }
-.tile.tile-19683   { background: #9b389a; color: var(--ui-inverse-fixed); font-size: calc(26% / var(--grid-size)); }
-.tile.tile-28657   { background: #850980; color: var(--ui-inverse-fixed); font-size: calc(26% / var(--grid-size)); }
-.tile.tile-32768   { background: #80007b; color: var(--ui-inverse-fixed); font-size: calc(26% / var(--grid-size)); }
-.tile.tile-46368   { background: #720162; color: var(--ui-inverse-fixed); font-size: calc(26% / var(--grid-size)); }
-.tile.tile-59049   { background: #67024f; color: var(--ui-inverse-fixed); font-size: calc(26% / var(--grid-size)); }
-.tile.tile-65536   { background: #610245; color: var(--ui-inverse-fixed); font-size: calc(26% / var(--grid-size)); }
-.tile.tile-75025   { background: #5b033d; color: var(--ui-inverse-fixed); font-size: calc(26% / var(--grid-size)); }
-.tile.tile-121393  { background: #8c8bdc; color: var(--ui-inverse-fixed); font-size: calc(22% / var(--grid-size)); }
-.tile.tile-131072  { background: #8986dd; color: var(--ui-inverse-fixed); font-size: calc(22% / var(--grid-size)); }
-.tile.tile-177141  { background: #837bde; color: var(--ui-inverse-fixed); font-size: calc(22% / var(--grid-size)); }
-.tile.tile-196418  { background: #8076df; color: var(--ui-inverse-fixed); font-size: calc(22% / var(--grid-size)); }
-.tile.tile-262144  { background: #7666e2; color: var(--ui-inverse-fixed); font-size: calc(22% / var(--grid-size)); }
-.tile.tile-317811  { background: #7362e3; color: var(--ui-inverse-fixed); font-size: calc(22% / var(--grid-size)); }
-.tile.tile-514229  { background: #6756e6; color: var(--ui-inverse-fixed); font-size: calc(22% / var(--grid-size)); }
-.tile.tile-524288  { background: #6652e6; color: var(--ui-inverse-fixed); font-size: calc(22% / var(--grid-size)); }
-.tile.tile-531441  { background: #6551e6; color: var(--ui-inverse-fixed); font-size: calc(22% / var(--grid-size)); }
-.tile.tile-832040  { background: #5845e7; color: var(--ui-inverse-fixed); font-size: calc(22% / var(--grid-size)); }
-.tile.tile-1048576 { background: #4f3de7; color: var(--ui-inverse-fixed); font-size: calc(19% / var(--grid-size)); }
-.tile.tile-1346269 { background: #4134ea; color: var(--ui-inverse-fixed); font-size: calc(19% / var(--grid-size)); }
-.tile.tile-1594323 { background: #372cec; color: var(--ui-inverse-fixed); font-size: calc(19% / var(--grid-size)); }
-.tile.tile-2097152 { background: #261cf0; color: var(--ui-inverse-fixed); font-size: calc(19% / var(--grid-size)); }
-.tile.tile-2178309 { background: #231af1; color: var(--ui-inverse-fixed); font-size: calc(19% / var(--grid-size)); }
+.tile.tile-128     { background: #edcf72; color: var(--ui-inverse-fixed); }
+.tile.tile-144     { background: #edce6f; color: var(--ui-inverse-fixed); }
+.tile.tile-233     { background: #edcc63; color: var(--ui-inverse-fixed); }
+.tile.tile-243     { background: #edcc62; color: var(--ui-inverse-fixed); }
+.tile.tile-256     { background: #edcc61; color: var(--ui-inverse-fixed); }
+.tile.tile-377     { background: #edca57; color: var(--ui-inverse-fixed); }
+.tile.tile-512     { background: #edc850; color: var(--ui-inverse-fixed); }
+.tile.tile-610     { background: #edc74c; color: var(--ui-inverse-fixed); }
+.tile.tile-729     { background: #edc649; color: var(--ui-inverse-fixed); }
+.tile.tile-987     { background: #edc540; color: var(--ui-inverse-fixed); }
+.tile.tile-1024    { background: #edc53f; color: var(--ui-inverse-fixed); }
+.tile.tile-1597    { background: #edc334; color: var(--ui-inverse-fixed); }
+.tile.tile-2048    { background: #edc22e; color: var(--ui-inverse-fixed); }
+.tile.tile-2187    { background: #edc22c; color: var(--ui-inverse-fixed); }
+.tile.tile-2584    { background: #edc128; color: var(--ui-inverse-fixed); }
+.tile.tile-4096    { background: #b687b1; color: var(--ui-inverse-fixed); }
+.tile.tile-4181    { background: #b586b0; color: var(--ui-inverse-fixed); }
+.tile.tile-6561    { background: #af73ab; color: var(--ui-inverse-fixed); }
+.tile.tile-6765    { background: #ae72ab; color: var(--ui-inverse-fixed); }
+.tile.tile-8192    { background: #a862a8; color: var(--ui-inverse-fixed); }
+.tile.tile-10946   { background: #a659a5; color: var(--ui-inverse-fixed); }
+.tile.tile-16384   { background: #a248a1; color: var(--ui-inverse-fixed); }
+.tile.tile-17711   { background: #9f419e; color: var(--ui-inverse-fixed); }
+.tile.tile-19683   { background: #9b389a; color: var(--ui-inverse-fixed); }
+.tile.tile-28657   { background: #850980; color: var(--ui-inverse-fixed); }
+.tile.tile-32768   { background: #80007b; color: var(--ui-inverse-fixed); }
+.tile.tile-46368   { background: #720162; color: var(--ui-inverse-fixed); }
+.tile.tile-59049   { background: #67024f; color: var(--ui-inverse-fixed); }
+.tile.tile-65536   { background: #610245; color: var(--ui-inverse-fixed); }
+.tile.tile-75025   { background: #5b033d; color: var(--ui-inverse-fixed); }
+.tile.tile-121393  { background: #8c8bdc; color: var(--ui-inverse-fixed); }
+.tile.tile-131072  { background: #8986dd; color: var(--ui-inverse-fixed); }
+.tile.tile-177141  { background: #837bde; color: var(--ui-inverse-fixed); }
+.tile.tile-196418  { background: #8076df; color: var(--ui-inverse-fixed); }
+.tile.tile-262144  { background: #7666e2; color: var(--ui-inverse-fixed); }
+.tile.tile-317811  { background: #7362e3; color: var(--ui-inverse-fixed); }
+.tile.tile-514229  { background: #6756e6; color: var(--ui-inverse-fixed); }
+.tile.tile-524288  { background: #6652e6; color: var(--ui-inverse-fixed); }
+.tile.tile-531441  { background: #6551e6; color: var(--ui-inverse-fixed); }
+.tile.tile-832040  { background: #5845e7; color: var(--ui-inverse-fixed); }
+.tile.tile-1048576 { background: #4f3de7; color: var(--ui-inverse-fixed); }
+.tile.tile-1346269 { background: #4134ea; color: var(--ui-inverse-fixed); }
+.tile.tile-1594323 { background: #372cec; color: var(--ui-inverse-fixed); }
+.tile.tile-2097152 { background: #261cf0; color: var(--ui-inverse-fixed); }
+.tile.tile-2178309 { background: #231af1; color: var(--ui-inverse-fixed); }
 
 .tile.tile--2      { background: #dae4ee; color: var(--ui-text-fixed); }
 .tile.tile--4      { background: #c8e0ed; color: var(--ui-text-fixed); }
@@ -68,11 +68,11 @@
 .tile.tile--16     { background: #6395f5; color: var(--ui-inverse-fixed); }
 .tile.tile--32     { background: #5f7cf6; color: var(--ui-inverse-fixed); }
 .tile.tile--64     { background: #3b5ef6; color: var(--ui-inverse-fixed); }
-.tile.tile--128    { background: #72cfed; color: var(--ui-inverse-fixed); font-size: calc(35% / var(--grid-size)); }
-.tile.tile--256    { background: #61cced; color: var(--ui-inverse-fixed); font-size: calc(35% / var(--grid-size)); }
-.tile.tile--512    { background: #50c8ed; color: var(--ui-inverse-fixed); font-size: calc(35% / var(--grid-size)); }
-.tile.tile--1024   { background: #3fc5ed; color: var(--ui-inverse-fixed); font-size: calc(28% / var(--grid-size)); }
-.tile.tile--2048   { background: #2ec2ed; color: var(--ui-inverse-fixed); font-size: calc(28% / var(--grid-size)); }
+.tile.tile--128    { background: #72cfed; color: var(--ui-inverse-fixed); }
+.tile.tile--256    { background: #61cced; color: var(--ui-inverse-fixed); }
+.tile.tile--512    { background: #50c8ed; color: var(--ui-inverse-fixed); }
+.tile.tile--1024   { background: #3fc5ed; color: var(--ui-inverse-fixed); }
+.tile.tile--2048   { background: #2ec2ed; color: var(--ui-inverse-fixed); }
 
 .tile-base-1      { background-color: #ffffff; }
 .tile-base-2      { background-color: #ccffff; }

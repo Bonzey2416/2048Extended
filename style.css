@@ -257,7 +257,11 @@ p {
 
 .tile-individual {
     width: 3rem;
+    min-width: 3rem;
+    max-width: 3rem;
     height: 3rem;
+    min-height: 3rem;
+    max-height: 3rem;
     font-size: calc(3rem * var(--grid-size));
 }
 
@@ -531,6 +535,14 @@ p {
     transition: all 0.3s ease;
 }
 
+.overlay-backdrop.overlay-backdrop2 {
+    z-index: 2000;
+}
+
+.overlay-backdrop.overlay-backdrop3 {
+    z-index: 3000;
+}
+
 .overlay-backdrop.hidden {
     pointer-events: none;
     background-color: transparent;
@@ -555,6 +567,14 @@ p {
     pointer-events: auto;
     transition: all 0.3s ease;
     box-shadow: 0 0 1rem #00000055;
+}
+
+.overlay-menu.overlay-menu2 {
+    z-index: 2050;
+}
+
+.overlay-menu.overlay-menu3 {
+    z-index: 3050;
 }
 
 .overlay-menu.hidden {
@@ -617,7 +637,7 @@ a {
     font-weight: 500;
 }
 
-.dropdown-container select, .input-container input {
+.dropdown-container select, input {
     font-size: 1.1rem;
     font-family: inherit;
     font-weight: 400;
@@ -631,8 +651,133 @@ a {
 }
 
 
-.input-container input {
-    width: 30%;
+input {
+    box-sizing: border-box;
+}
+
+.tile-editor-value, .tile-editor-name {
+    width: 6rem;
+    display: block;
+    margin: auto;
+}
+
+.color-picker-container {
+    --color-picker-size: 50vh;
+    display: grid;
+    grid-template-columns: auto auto auto;
+    gap: calc(1vw + 1vh);
+}
+
+.color-picker-square {
+    position: relative;
+    width: var(--color-picker-size);
+    height: var(--color-picker-size);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    background: linear-gradient(to top, black, transparent, white), linear-gradient(to right, red, yellow, lime, cyan, blue, magenta, red);
+}
+
+.color-picker-pointer {
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    border: 0.1rem solid var(--ui-accent);
+    background-color: var(--ui-surface-opacity35);
+    pointer-events: none;
+}
+
+.color-picker-slider-container {
+    width: 2rem;
+    height: var(--color-picker-size);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.color-picker-slider-container-inner {
+    min-width: var(--color-picker-size);
+    height: 2rem;
+    transform: rotate(270deg);
+}
+
+.color-picker-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: var(--color-picker-size);
+    height: 2rem;
+    border: none;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.color-picker-slider::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 2rem;
+    background: var(--color-picker-slider-bg, linear-gradient(to right, gray, red));
+    border-radius: 1rem;
+}
+
+.color-picker-slider::-moz-range-track {
+    width: 100%;
+    height: 2rem;
+    background: var(--color-picker-slider-bg, linear-gradient(to right, gray, red));
+    border-radius: 1rem;
+    border: none;
+}
+
+.color-picker-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0.3rem 0; /* (track height - thumb height) / 2 */
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    border: 0.1rem solid var(--ui-accent);
+    background-color: var(--ui-surface-opacity35);
+}
+ 
+.color-picker-slider::-moz-range-thumb {
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    border: 0.1rem solid var(--ui-accent);
+    background-color: var(--ui-surface-opacity35);
+    border: none;
+}
+
+.color-picker-input-container {
+    display: grid;
+    grid-template-columns: 1.2rem 0.8rem auto 1.2rem 0.8rem auto;
+    align-self: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.color-picker-input-container input {
+    width: 100%;
+    margin: 0;
+}
+
+/* Tile theme editor color picker swatches */
+.color-picker-inputs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.color-picker-inputs .color-swatch {
+    width: 1.8rem;
+    height: 1.8rem;
+    margin: 0 0.3rem;
+    border-radius: 50%;
+    border: 0.12rem solid var(--ui-accent);
+    box-shadow: 0 0.05rem 0.1rem #0003;
+    cursor: pointer;
+}
+.color-picker-inputs .color-swatch:hover {
+    transform: scale(1.05);
 }
 
 .toggle-container .switch {
@@ -688,6 +833,12 @@ a {
 
 .toggle-container .switch input:checked + .slider:before {
     left: 1.7rem;
+}
+
+.tile-theme-editor-table {
+    width: 100%;
+    border-spacing: 0;
+    
 }
 
 .highest-tile-container {
@@ -1006,6 +1157,10 @@ kbd {
         height: calc(70vw - 5vh);
         font-size: calc(70vw - 5vh);
     }
+
+    .color-picker-container {
+        --color-picker-size: 30vw;
+    }
 }
 @media screen and (max-width: 100vh) {
     .game-container {
@@ -1085,6 +1240,15 @@ kbd {
     .back-button {
         display: block !important;
     }
+
+    .color-picker-container {
+        grid-template-rows: auto auto;
+        --color-picker-size: 65vw;
+    }
+
+    .color-picker-input-container {
+        grid-area: 2 / 1 / 3 / 3;
+    }
 }
 
 @media screen and (max-width: 57vh) {
@@ -1094,6 +1258,9 @@ kbd {
         font-size: 90vw;
     }
     
+    .tile-editor-value, .tile-editor-name {
+        width: 4rem;
+    }
 }
 
 @supports (-webkit-backdrop-filter: none) or (backdrop-filter: none) {

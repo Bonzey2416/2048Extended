@@ -148,6 +148,113 @@
             <h3>Statistics by game</h3>
             <div id="game-statistics"></div>
         </div>
+        <div class="overlay-backdrop overlay-backdrop2 hidden" id="overlay-backdrop2"></div>
+        <div class="overlay-menu overlay-menu2 hidden" id="customize-theme-menu">
+            <i class="fas fa-times close-button" id="close-customize-theme-menu"></i>
+            <h2>Customize Theme</h2>
+            <div class="toggle-container">
+                <div>
+                    <p class="label-title">Apply fallback colors</p>
+                    <p class="label-subtitle">Applies a fallback color scheme where colors are not available.</p>
+                </div>
+                <label class="switch" for="fallback-colors-toggle">
+                    <input type="checkbox" id="fallback-colors-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="dropdown-container">
+                <label for="filter-tiles-select">
+                    <p class="label-title">Filter tiles</p>
+                    <p class="label-subtitle">Filter the tiles by game mode.</p>
+                </label>
+                <select id="filter-tiles-select">
+                    <option value="all" selected>All</option>
+                    <option value="classic">Classic</option>
+                    <option value="fibonacci">Fibonacci</option>
+                    <option value="negative">Negative</option>
+                    <option value="power-of-three">Powers of 3</option>
+                    <option value="operators">Operators</option>
+                </select>
+            </div>
+            <div class="menu-button-container">
+                <label>
+                    <p class="label-title">Reset theme</p>
+                    <p class="label-subtitle">
+                        Reset the theme to default, which will reset the colors and names of the tiles to default.
+                    </p>
+                </label>
+                <button class="btn" id="theme-reset">Reset</button>
+            </div>
+            <table class="tile-theme-editor-table">
+                <thead>
+                    <tr>
+                        <th>Tile</th>
+                        <th>Value</th>
+                        <th>Name</th>
+                        <th>Background</th>
+                        <th>Text color</th>
+                    </tr>
+                </thead>
+                <tbody id="tile-theme-editor-table-body">
+                </tbody>
+            </table>
+        </div>
+        <div class="overlay-backdrop overlay-backdrop3 hidden" id="overlay-backdrop3"></div>
+        <div class="overlay-menu overlay-menu3 hidden" id="color-picker-menu">
+            <i class="fas fa-times close-button" id="close-color-picker-menu"></i>
+            <h2>Edit color for: <span id="edit-color-element"></span></h2>
+            <div class="color-picker-container">
+                <div class="color-picker-square" id="color-picker-square">
+                    <div class="color-picker-pointer" id="color-picker-pointer"></div>
+                </div>
+                <div class="color-picker-slider-container">
+                    <div class="color-picker-slider-container-inner">
+                        <input type="range" class="color-picker-slider" id="color-picker-slider" value="0">
+                    </div>
+                </div>
+                <div class="color-picker-input-container">
+                    <label class="radio">
+                        <input type="radio" value="red" name="color-input-type">
+                        <span class="checkmark"></span>
+                    </label>
+                    <label>R</label>
+                    <input type="number" id="red-amount-input">
+                    <label class="radio">
+                        <input type="radio" value="hue" name="color-input-type">
+                        <span class="checkmark"></span>
+                    </label>
+                    <label>H</label>
+                    <input type="number" id="hue-amount-input">
+                    <label class="radio">
+                        <input type="radio" value="green" name="color-input-type">
+                        <span class="checkmark"></span>
+                    </label>
+                    <label>G</label>
+                    <input type="number" id="green-amount-input">
+                    <label class="radio">
+                        <input type="radio" value="saturation" name="color-input-type"  checked="checked">
+                        <span class="checkmark"></span>
+                    </label>
+                    <label>S</label>
+                    <input type="number" id="saturation-amount-input">
+                    <label class="radio">
+                        <input type="radio" value="blue" name="color-input-type">
+                        <span class="checkmark"></span>
+                    </label>
+                    <label>B</label>
+                    <input type="number" id="blue-amount-input">
+                    <label class="radio">
+                        <input type="radio" value="luminosity" name="color-input-type">
+                        <span class="checkmark"></span>
+                    </label>
+                    <label>L</label>
+                    <input type="number" id="luminosity-amount-input">
+                    <label style="grid-column: 1 / 3;">Hex</label>
+                    <input style="grid-column: 3 / 7;" id="hex-input">
+                </div>
+            </div>
+            <button class="btn" id="reset-color-button">Reset to Default</button> <button class="btn" id="apply-color-button">Apply Changes</button>
+        </div>
         <div class="settings-menu hidden" id="settings-menu">
             <div class="settings-menu-inner" id="settings-menu-inner">
                 <div class="settings-menu-list active" id="settings-menu-list">
@@ -262,6 +369,15 @@
                                 <span class="slider"></span>
                             </label>
                         </div>
+                        <div class="menu-button-container">
+                            <label>
+                                <p class="label-title">Customize themes</p>
+                                <p class="label-subtitle">
+                                    Customize the colors and names of the tiles.
+                                </p>
+                            </label>
+                            <button class="btn" id="customize-themes">Edit</button>
+                        </div>
                     </div>
                     <div class="settings-menu-content-inner" id="settings-accessibility">
                         <h2>Accessibility</h2>
@@ -288,7 +404,7 @@
                     </div>
                     <div class="settings-menu-content-inner text-dense" id="settings-about">
                         <h2>About 2048 Extended</h2>
-                        <p style="font-style: italic;">Version 0.19. Last updated 2025-10-14.</p>
+                        <p style="font-style: italic;">Version 0.20. Last updated 2026-04-15.</p>
                         <p>2048 Extended is an enhanced version of the classic 2048 game, featuring multiple game modes, grid sizes, and an AI mode.</p>
                         <h3>How to play</h3>
                         <p>
@@ -322,13 +438,18 @@
                         </ul>
                         <h3>Contributing</h3>
                         <p>
-                            If you'd like to contribute to 2048 Extended, feel free to <a href="https://github.com/Bonzey2416/2048Extended/compare" target="_blank">submit a pull request</a> or <a href="https://github.com/Bonzey2416/2048Extended/issues/new/choose" target="_blank">open an issue on GitHub</a>.
+                            If you'd like to contribute to 2048 Extended, please feel free to <a href="https://github.com/Bonzey2416/2048Extended/compare" target="_blank">submit a pull request</a> or <a href="https://github.com/Bonzey2416/2048Extended/issues/new/choose" target="_blank">open an issue on GitHub</a>.
                         </p>
                         <h3>Credits</h3>
                         <p>
                             Based on 2048 created by Gabriele Cirulli, which was in turn based on 1024 by Veewo Studio and conceptually similar to Threes by Asher Vollmer.
                         </p>
                         <h3>Changelog</h3>
+                        <h4>Version 0.20</h4>
+                        <p class="update-date">Date of update: 2026-04-15</p>
+                        <ul>
+                            <li>You can now customize the appearance of the game tiles.</li>
+                        </ul>
                         <h4>Version 0.19</h4>
                         <p class="update-date">Date of update: 2025-10-14</p>
                         <ul>
@@ -345,7 +466,7 @@
                             <li>Fixed seed list when undoing/redoing.</li>
                             <li>Restore spawn mechanism in supermerging mode.</li>
                             <li>Tiles in supermerging and DIVE modes scale the font size depending on tile value.</li>
-                            <li>Better support for prime numbers up to 57 in DIVE mode.</li>
+                            <li>Better support for prime numbers up to 59 in DIVE mode.</li>
                         </ul>
                         <h4>Version 0.18</h4>
                         <p class="update-date">Date of update: 2025-10-09</p>

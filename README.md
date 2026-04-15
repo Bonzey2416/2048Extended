@@ -1,4 +1,12 @@
 # 2048Extended
+Available at: https://bonzey2416.github.io/2048Extended/
+
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="images/readme/2048 Extended Screenshot Dark.png">
+<source media="(prefers-color-scheme: light)" srcset="images/readme/2048 Extended Screenshot Light.png">
+<img alt="Screenshot of 2048 Extended game" src="images/readme/2048 Extended Screenshot Light.png">
+</picture>
+
 ## Browser support
 * Chrome 67+
 * Firefox 68+
@@ -11,6 +19,9 @@
 * macOS 10.12+ (Safari)
 * Windows 7+ (Chrome/Firefox/Edge)
 ## Changelog
+### Version 0.20
+Date of update: 2026-04-15
+* You can now customize the appearance of the game tiles.
 ### Version 0.19
 Date of update: 2025-10-14
 * Math mode: Merge numeric tiles with operator tiles.
@@ -22,7 +33,7 @@ Date of update: 2025-10-11
 * Fixed seed list when undoing/redoing.
 * Restore spawn mechanism in supermerging mode.
 * Tiles in supermerging and DIVE modes scale the font size depending on tile value.
-* Better support for prime numbers up to 57 in DIVE mode.
+* Better support for prime numbers up to 59 in DIVE mode.
 ### Version 0.18
 Date of update: 2025-10-09
 * DIVE mode: You can now use the DIVE mode. Start with a 2 tile and merge tiles to create new seeds. New tiles spawned will be one of the seeds you have created.

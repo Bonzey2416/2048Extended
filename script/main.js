@@ -1,6 +1,7 @@
 import { moveGrid as calculateMove, addRandomTile, isGameOver, isGameWon, getGoalValue, resetMergedState, mergeAnimations } from './grid.js';
-import { initializeUI, updateUI, updateGoalDisplay, generateGridCells, showGameOver, showGameWon, hideGameOver, hideGameWon, updateUndoRedoUI, updateDiveSeedsUI, applySupermergingStyle } from './ui.js';
+import { initializeUI, updateUI, updateGoalDisplay, generateGridCells, showGameOver, showGameWon, hideGameOver, hideGameWon, updateUndoRedoUI, updateDiveSeedsUI, applySupermergingStyle, getFontSizeByChars } from './ui.js';
 import { getGameStateKey, getHighScoreKey, getHighestTileKey, getGamesPlayedKey, getPrimeFactorization, formatScore } from './utils.js';
+import { initializeColorPicker } from './color.js';
 
 // Shared configuration
 export let config = {
@@ -540,6 +541,10 @@ export function updateStatistics() {
                     applySupermergingStyle(tileDiv, highestTile);
                 } else {
                     tileDiv.classList.add('tile', `tile-${highestTile}`);
+                    // Apply consistent font sizing as used in the main grid
+                    const charCount = String(highestTile).length;
+                    const fs = getFontSizeByChars(charCount);
+                    if (fs) tileDiv.style.fontSize = fs;
                 };
                 tileDiv.textContent = highestTile;
                 individualTileDiv.appendChild(tileDiv);
@@ -574,6 +579,7 @@ export function updateStatistics() {
 window.onload = function() {
     loadSettings();
     initializeUI();
+    initializeColorPicker();
     initGrid();
     updateGoalDisplay();
 };

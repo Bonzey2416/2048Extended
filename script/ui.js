@@ -1,6 +1,109 @@
 import { config, gameState, move, undo, redo, handlePracticeModeChange, startAIMode, stopAIMode, saveSettings, initGrid, clearHistory, updateStatistics } from './main.js';
 import { mergeAnimations, getGoalValue } from './grid.js';
 import { getHighScoreKey, getHighestTileKey, getGameStateKey, getPrimeFactorization, formatScore } from './utils.js';
+import { openColorPicker } from './color.js';
+
+// Map of tile value -> display name supplied by the current theme/editor
+const tileDisplayNameMap = new Map();
+
+// Local storage key for a user-edited/custom tile theme
+const CUSTOM_THEME_KEY = 'customTileTheme';
+
+// The currently loaded theme tiles (full list). Filtering shows subsets of this array.
+let currentThemeTiles = [];
+
+// Helper: determine numeric value (or null)
+function toNumber(val) {
+    const n = Number(val);
+    return Number.isFinite(n) ? n : null;
+}
+
+function isIntegerNumber(val) {
+    const n = toNumber(val);
+    return n !== null && Number.isInteger(n);
+}
+
+function isPowerOf(n, base) {
+    if (!Number.isFinite(n) || n <= 1 || !Number.isInteger(n)) return false;
+    while (n % base === 0) n = n / base;
+    return n === 1;
+}
+
+function isPowerOfTwo(n) { return isPowerOf(n, 2); }
+function isPowerOfThree(n) { return isPowerOf(n, 3); }
+
+function isPerfectSquare(x) {
+    if (!Number.isFinite(x) || x < 0) return false;
+    const s = Math.floor(Math.sqrt(x));
+    return s * s === x;
+}
+
+function isFibonacci(n) {
+    if (!Number.isFinite(n) || n < 1 || !Number.isInteger(n)) return false;
+    return isPerfectSquare(5 * n * n + 4) || isPerfectSquare(5 * n * n - 4);
+}
+
+function isOperatorValue(val) {
+    const s = String(val);
+    return ['plus', 'minus', 'multiply', 'divide', '+', '-', '*', '/'].includes(s);
+}
+
+function filterTiles(tiles, filter) {
+    if (!Array.isArray(tiles)) return [];
+    switch ((filter || 'all').toString()) {
+        case 'classic':
+            return tiles.filter(t => {
+                const n = toNumber(t.tileValue);
+                return n !== null && isPowerOfTwo(n) && n > 1;
+            });
+        case 'fibonacci':
+            return tiles.filter(t => {
+                const n = toNumber(t.tileValue);
+                return n !== null && isFibonacci(n);
+            });
+        case 'negative':
+            return tiles.filter(t => {
+                const n = toNumber(t.tileValue);
+                if (n !== null) {
+                    if (n < 0) return true; // all negative numeric tiles
+                    return isPowerOfTwo(n) && n > 1; // powers of two > 1
+                }
+                return false;
+            });
+        case 'power-of-three':
+            return tiles.filter(t => {
+                const n = toNumber(t.tileValue);
+                return n !== null && isPowerOfThree(n);
+            });
+        case 'operators':
+            return tiles.filter(t => isOperatorValue(t.tileValue));
+        case 'all':
+        default:
+            return tiles.slice();
+    }
+}
+
+function saveCustomThemeToLocalStorage(tiles) {
+    try {
+        // store as an object for future extensibility
+        localStorage.setItem(CUSTOM_THEME_KEY, JSON.stringify({ tiles }));
+    } catch (e) {
+        console.error('Failed to save custom theme to localStorage', e);
+    }
+}
+
+function getCustomThemeFromLocalStorage() {
+    try {
+        const raw = localStorage.getItem(CUSTOM_THEME_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+        if (parsed && Array.isArray(parsed.tiles)) return parsed.tiles;
+    } catch (e) {
+        console.error('Failed to read custom theme from localStorage', e);
+    }
+    return null;
+}
 
 
 // --- Supermerging Style Helpers ---
@@ -22,9 +125,9 @@ const largePrimeGradients = {
     59: 'repeating-linear-gradient(50deg, transparent 0%, transparent 4.643%, #99f6 5.143%, #99f6 9.143%, transparent 9.643%, transparent 14.286%)',
 }
 
-function getFontSizeByChars(charCount) {
+export function getFontSizeByChars(charCount) {
     let percentage;
-    if (charCount >= 3) percentage = 140 / charCount + 1;
+    if (charCount >= 3) percentage = 130 / charCount + 1;
     return percentage ? `calc(${percentage}% / var(--grid-size))` : '';
 }
 
@@ -115,7 +218,9 @@ export function updateUI() {
         }
         if (t.id === gameState.lastNewTileId) tileEl.classList.add('new');
         if (t.merged) tileEl.classList.add('merged');
-        tileEl.textContent = t.value;
+        // Use theme/editor-provided display name when available, otherwise fall back to the tile's value
+        const displayName = tileDisplayNameMap.get(String(t.value)) || t.value;
+        tileEl.textContent = displayName;
         tileEl.style.top = `${((100 - 10 / config.GRID_SIZE) / config.GRID_SIZE * t.row + 10 / config.GRID_SIZE)}%`;
         tileEl.style.left = `${((100 - 10 / config.GRID_SIZE) / config.GRID_SIZE * t.col + 10 / config.GRID_SIZE)}%`;
     });
@@ -397,6 +502,42 @@ function setupEventListeners() {
         document.getElementById('game-container').classList.remove("covered");
     });
 
+    // Customize Theme Menu
+    document.getElementById('customize-themes')?.addEventListener('click', () => {
+        document.getElementById('customize-theme-menu')?.classList.remove('hidden');
+        document.getElementById('overlay-backdrop2')?.classList.remove('hidden');
+        document.getElementById('game-container')?.classList.add('covered');
+    });
+
+    document.getElementById('close-customize-theme-menu')?.addEventListener('click', () => {
+        document.getElementById('customize-theme-menu')?.classList.add('hidden');
+        document.getElementById('overlay-backdrop2')?.classList.add('hidden');
+        document.getElementById('game-container')?.classList.remove('covered');
+    });
+
+    document.getElementById('overlay-backdrop2')?.addEventListener('click', () => {
+        document.getElementById('customize-theme-menu')?.classList.add('hidden');
+        document.getElementById('overlay-backdrop2')?.classList.add('hidden');
+        document.getElementById('game-container')?.classList.remove('covered');
+    });
+
+    // Filter selector for theme editor
+    const filterSelect = document.getElementById('filter-tiles-select');
+    filterSelect?.addEventListener('change', e => {
+        const val = e.target.value;
+        const toShow = filterTiles(currentThemeTiles, val);
+        populateTileThemeEditor(toShow);
+    });
+
+    // Reset theme to defaults (clears saved custom theme and reloads defaults)
+    document.getElementById('theme-reset')?.addEventListener('click', () => {
+        try { localStorage.removeItem(CUSTOM_THEME_KEY); } catch (e) { /* ignore */ }
+        const styleEl = document.getElementById('custom-tile-theme-styles');
+        if (styleEl) styleEl.remove();
+        // Reload themes.json and repopulate editor with defaults
+        loadThemesAndPopulateEditor();
+    });
+
     document.getElementById('grid-size-select').addEventListener('change', e => {
         config.GRID_SIZE = parseInt(e.target.value, 10);
         document.documentElement.style.setProperty('--grid-size', config.GRID_SIZE);
@@ -624,4 +765,255 @@ export function initializeUI() {
     setupEventListeners();
     syncSettingsUI();
     applyProportionalSpacing();
+    // Populate the tile theme editor from themes.json
+    loadThemesAndPopulateEditor();
+}
+
+// Load themes.json and populate the tile theme editor table
+async function loadThemesAndPopulateEditor() {
+    try {
+        // If the user has a saved custom theme in localStorage, load that first
+        const custom = getCustomThemeFromLocalStorage();
+        if (custom && Array.isArray(custom) && custom.length > 0) {
+            currentThemeTiles = custom;
+            const filterEl = document.getElementById('filter-tiles-select');
+            const filter = filterEl ? filterEl.value : 'all';
+            const toShow = filterTiles(currentThemeTiles, filter);
+            populateTileThemeEditor(toShow);
+            applyTileThemeCSS(currentThemeTiles);
+            return;
+        }
+
+        const res = await fetch('themes.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error(`Failed to fetch themes.json: ${res.status}`);
+        const data = await res.json();
+        const themeObj = Array.isArray(data.theme) ? data.theme.find(t => t.name === 'Default') || data.theme[0] : null;
+        const tiles = (themeObj && Array.isArray(themeObj.tiles)) ? themeObj.tiles : [];
+        currentThemeTiles = tiles;
+        const filterEl = document.getElementById('filter-tiles-select');
+        const filter = filterEl ? filterEl.value : 'all';
+        const toShow = filterTiles(currentThemeTiles, filter);
+        populateTileThemeEditor(toShow);
+        // Apply loaded theme to game tiles immediately
+        applyTileThemeCSS(currentThemeTiles);
+    } catch (err) {
+        // If fetching fails, leave the editor empty but log error
+        console.error('Could not load themes.json for theme editor:', err);
+    }
+}
+
+// Generate and inject runtime CSS rules from a tile theme array so changes apply to game tiles immediately.
+function applyTileThemeCSS(tiles) {
+    if (!Array.isArray(tiles)) return;
+    let css = '';
+    try {
+        // rebuild name map
+        tileDisplayNameMap.clear();
+        tiles.forEach(tile => {
+            const val = String(tile.tileValue);
+            const cls = 'tile-' + val;
+            const esc = (typeof CSS !== 'undefined' && CSS.escape) ? CSS.escape(cls) : cls.replace(/([^a-zA-Z0-9_-])/g, "\\$1");
+            const selector = `.tile.${esc}`;
+            const lightBg = tile.tileBackgroundLightMode || 'initial';
+            const lightColor = tile.tileTextColorLightMode || 'inherit';
+            const darkBg = tile.tileBackgroundDarkMode || tile.tileBackgroundLightMode || 'initial';
+            const darkColor = tile.tileTextColorDarkMode || tile.tileTextColorLightMode || 'inherit';
+
+            css += `${selector} { background: ${lightBg} !important; color: ${lightColor} !important; }\n`;
+            css += `.dark-mode.sync-tiles-dark-mode ${selector} { background: ${darkBg} !important; color: ${darkColor} !important; }\n`;
+
+            // store display name (fallback to value)
+            tileDisplayNameMap.set(val, tile.tileName != null ? String(tile.tileName) : String(tile.tileValue));
+        });
+    } catch (e) {
+        console.error('Failed to build tile theme CSS', e);
+    }
+
+    let styleEl = document.getElementById('custom-tile-theme-styles');
+    if (!styleEl) {
+        styleEl = document.createElement('style');
+        styleEl.id = 'custom-tile-theme-styles';
+        document.head.appendChild(styleEl);
+    }
+    styleEl.textContent = css;
+}
+
+function createPreviewTile(tile) {
+    const preview = document.createElement('div');
+    preview.className = 'tile';
+
+    const value = String(tile.tileValue);
+    // mimic rendering used elsewhere: numeric values use tile-{value}, operators use operator classes
+    if (!isNaN(Number(value))) {
+        preview.classList.add(`tile-${value}`);
+    } else {
+        // operators (plus/minus/multiply/divide)
+        switch (value) {
+            case 'plus':
+                preview.classList.add('tile-operator', 'tile-plus');
+                break;
+            case 'minus':
+                preview.classList.add('tile-operator', 'tile-minus');
+                break;
+            case 'multiply':
+                preview.classList.add('tile-operator', 'tile-multiply');
+                break;
+            case 'divide':
+                preview.classList.add('tile-operator', 'tile-divide');
+                break;
+            default:
+                preview.classList.add(`tile-${value}`);
+        }
+    }
+
+    preview.textContent = tile.tileName || tile.tileValue;
+    // apply light mode colors to the preview by default
+    if (tile.tileBackgroundLightMode) preview.style.background = tile.tileBackgroundLightMode;
+    if (tile.tileTextColorLightMode) preview.style.color = tile.tileTextColorLightMode;
+
+    return preview;
+}
+
+function populateTileThemeEditor(tiles) {
+    const tbody = document.getElementById('tile-theme-editor-table-body');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    tiles.forEach((tile, idx) => {
+        const tr = document.createElement('tr');
+
+        // Col 1: preview
+        const tdPreview = document.createElement('td');
+        const tdPreviewInner = document.createElement('div');
+        tdPreviewInner.className = 'tile-individual';
+        tdPreview.appendChild(tdPreviewInner);
+        const preview = createPreviewTile(tile);
+        tdPreviewInner.appendChild(preview);
+        tr.appendChild(tdPreview);
+
+        // Col 2: input for tile value
+        const tdValue = document.createElement('td');
+        const inputValue = document.createElement('input');
+        inputValue.type = 'text';
+        inputValue.value = tile.tileValue;
+        inputValue.className = 'tile-editor-value';
+        inputValue.dataset.index = String(idx);
+        tdValue.appendChild(inputValue);
+        tr.appendChild(tdValue);
+
+        // Col 3: input for tile display name
+        const tdName = document.createElement('td');
+        const inputName = document.createElement('input');
+        inputName.type = 'text';
+        inputName.value = tile.tileName || '';
+        inputName.className = 'tile-editor-name';
+        inputName.dataset.index = String(idx);
+        tdName.appendChild(inputName);
+        tr.appendChild(tdName);
+
+        // Col 4: background color pickers (light + dark)
+        const tdBg = document.createElement('td');
+        const bgContainer = document.createElement('div');
+        bgContainer.className = 'color-picker-inputs';
+
+        const bgLightSwatch = document.createElement('div');
+        bgLightSwatch.className = 'color-swatch';
+        bgLightSwatch.style.backgroundColor = tile.tileBackgroundLightMode || '#ffffff';
+        bgLightSwatch.addEventListener('click', () => {
+            openColorPicker(tile.tileBackgroundLightMode || '#ffffff', `Tile ${tile.tileName || tile.tileValue} BG (Light)`, (newColor) => {
+                tile.tileBackgroundLightMode = newColor;
+                bgLightSwatch.style.backgroundColor = newColor;
+                refreshPreviewFromTile();
+            });
+        });
+
+        const bgDarkSwatch = document.createElement('div');
+        bgDarkSwatch.className = 'color-swatch';
+        bgDarkSwatch.style.backgroundColor = tile.tileBackgroundDarkMode || '#000000';
+        bgDarkSwatch.addEventListener('click', () => {
+        openColorPicker(tile.tileBackgroundDarkMode || '#000000', `Tile ${tile.tileName || tile.tileValue} BG (Dark)`, (newColor) => {
+            tile.tileBackgroundDarkMode = newColor;
+            bgDarkSwatch.style.backgroundColor = newColor;
+            // Update runtime CSS so dark-mode colors take effect when active
+            applyTileThemeCSS(currentThemeTiles);
+            try { saveCustomThemeToLocalStorage(currentThemeTiles); } catch (e) { /* swallow */ }
+        });
+        });
+
+        bgContainer.appendChild(bgLightSwatch);
+        bgContainer.appendChild(bgDarkSwatch);
+        tdBg.appendChild(bgContainer);
+        tr.appendChild(tdBg);
+
+        // Col 5: text color pickers (light + dark)
+        const tdText = document.createElement('td');
+        const textContainer = document.createElement('div');
+        textContainer.className = 'color-picker-inputs';
+
+        const txtLightSwatch = document.createElement('div');
+        txtLightSwatch.className = 'color-swatch';
+        txtLightSwatch.style.backgroundColor = tile.tileTextColorLightMode || '#000000';
+        txtLightSwatch.addEventListener('click', () => {
+            openColorPicker(tile.tileTextColorLightMode || '#000000', `Tile ${tile.tileName || tile.tileValue} Text (Light)`, (newColor) => {
+                tile.tileTextColorLightMode = newColor;
+                txtLightSwatch.style.backgroundColor = newColor;
+                refreshPreviewFromTile();
+            });
+        });
+
+        const txtDarkSwatch = document.createElement('div');
+        txtDarkSwatch.className = 'color-swatch';
+        txtDarkSwatch.style.backgroundColor = tile.tileTextColorDarkMode || '#ffffff';
+        txtDarkSwatch.addEventListener('click', () => {
+            openColorPicker(tile.tileTextColorDarkMode || '#ffffff', `Tile ${tile.tileName || tile.tileValue} Text (Dark)`, (newColor) => {
+                tile.tileTextColorDarkMode = newColor;
+                txtDarkSwatch.style.backgroundColor = newColor;
+                applyTileThemeCSS(currentThemeTiles);
+                try { saveCustomThemeToLocalStorage(currentThemeTiles); } catch (e) { /* swallow */ }
+            });
+        });
+
+        textContainer.appendChild(txtLightSwatch);
+        textContainer.appendChild(txtDarkSwatch);
+        tdText.appendChild(textContainer);
+        tr.appendChild(tdText);
+
+        // Wire up events to update preview and in-memory tile object
+        function refreshPreviewFromTile() {
+            // update preview appearance: class, text, colors (light)
+            preview.textContent = inputName.value || inputValue.value;
+            // update classes
+            preview.className = 'tile';
+            const newVal = inputValue.value;
+            if (!isNaN(Number(newVal))) {
+                preview.classList.add(`tile-${newVal}`);
+            } else {
+                switch (newVal) {
+                    case 'plus': preview.classList.add('tile-operator', 'tile-plus'); break;
+                    case 'minus': preview.classList.add('tile-operator', 'tile-minus'); break;
+                    case 'multiply': preview.classList.add('tile-operator', 'tile-multiply'); break;
+                    case 'divide': preview.classList.add('tile-operator', 'tile-divide'); break;
+                    default: preview.classList.add(`tile-${newVal}`);
+                }
+            }
+            // Use the tile's stored light-mode colors (falling back to the swatch visuals)
+            preview.style.background = tile.tileBackgroundLightMode || bgLightSwatch.style.backgroundColor || '#ffffff';
+            preview.style.color = tile.tileTextColorLightMode || txtLightSwatch.style.backgroundColor || '#000000';
+            // Rebuild runtime CSS so changes to value/name/colors immediately affect game tiles
+            applyTileThemeCSS(currentThemeTiles);
+            // Persist the updated theme so changes survive reloads
+            try { saveCustomThemeToLocalStorage(currentThemeTiles); } catch (e) { /* swallow */ }
+        }
+
+        inputValue.addEventListener('input', () => {
+            tiles[idx].tileValue = inputValue.value;
+            refreshPreviewFromTile();
+        });
+        inputName.addEventListener('input', () => {
+            tiles[idx].tileName = inputName.value;
+            refreshPreviewFromTile();
+        });
+
+        tbody.appendChild(tr);
+    });
 }
