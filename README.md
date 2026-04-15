@@ -19,6 +19,9 @@ Available at: https://bonzey2416.github.io/2048Extended/
 * macOS 10.12+ (Safari)
 * Windows 7+ (Chrome/Firefox/Edge)
 ## Changelog
+### Version 0.21.1
+Date of update: 2026-04-15
+* Minor bug fixes and improvements to the color picker.
 ### Version 0.21
 Date of update: 2026-04-15
 * Redesigned statistics: Improved layout and presentation of game statistics; you can now track the total playtime and moves made, as well as statistics for the current game.
