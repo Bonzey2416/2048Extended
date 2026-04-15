@@ -1,4 +1,4 @@
-import { config, gameState, move, undo, redo, handlePracticeModeChange, startAIMode, stopAIMode, saveSettings, initGrid, clearHistory, updateStatistics } from './main.js';
+import { config, gameState, move, undo, redo, handlePracticeModeChange, startAIMode, stopAIMode, saveSettings, initGrid, clearHistory, updateStatistics, updateStatisticsLive, finalizeCurrentGame } from './main.js';
 import { mergeAnimations, getGoalValue } from './grid.js';
 import { getHighScoreKey, getHighestTileKey, getGameStateKey, getPrimeFactorization, formatScore } from './utils.js';
 import { openColorPicker } from './color.js';
@@ -11,6 +11,21 @@ const CUSTOM_THEME_KEY = 'customTileTheme';
 
 // The currently loaded theme tiles (full list). Filtering shows subsets of this array.
 let currentThemeTiles = [];
+let statisticsIntervalId = null;
+
+function startStatisticsAutoUpdate() {
+    stopStatisticsAutoUpdate();
+    statisticsIntervalId = setInterval(() => {
+        try { updateStatisticsLive(); } catch (e) { /* ignore */ }
+    }, 1000);
+}
+
+function stopStatisticsAutoUpdate() {
+    if (statisticsIntervalId) {
+        clearInterval(statisticsIntervalId);
+        statisticsIntervalId = null;
+    }
+}
 
 // Helper: determine numeric value (or null)
 function toNumber(val) {
@@ -420,6 +435,8 @@ function setupEventListeners() {
     const restartGame = () => {
         stopAIMode();
         // Clear the saved game state for the current mode to ensure a fresh start.
+        // finalize current game's statistics before removing saved state
+        try { finalizeCurrentGame(); } catch (e) { /* ignore */ }
         const gameStateKey = getGameStateKey(config.GAME_MODE, config.practiceMode, config.GRID_SIZE);
         localStorage.removeItem(gameStateKey);
         initGrid();
@@ -486,8 +503,10 @@ function setupEventListeners() {
         document.getElementById('statistics-menu')?.classList.remove('hidden');
         document.getElementById('overlay-backdrop')?.classList.remove('hidden');
         document.getElementById('game-container').classList.add("covered");
+        startStatisticsAutoUpdate();
     });
     document.getElementById('close-statistics-menu')?.addEventListener('click', () => {
+        stopStatisticsAutoUpdate();
         document.getElementById('statistics-menu')?.classList.add('hidden');
         document.getElementById('overlay-backdrop')?.classList.add('hidden');
         document.getElementById('game-container').classList.remove("covered");
@@ -495,6 +514,7 @@ function setupEventListeners() {
     });
 
     document.getElementById('overlay-backdrop')?.addEventListener('click', () => {
+        stopStatisticsAutoUpdate();
         document.getElementById('modes-menu')?.classList.add('hidden');
         document.getElementById('ai-options-menu')?.classList.add('hidden');
         document.getElementById('statistics-menu')?.classList.add('hidden');

@@ -28,7 +28,11 @@ export let gameState = {
     lastNewTileId: null,
     hasShownGameWon: false,
     beforeMovePositions: null,
-    diveSeeds: []
+    diveSeeds: [],
+    moves: 0,
+    playtimeAccumulated: 0,
+    startedAt: null,
+    finalized: false
 };
 
 // Undo/Redo support
@@ -51,7 +55,9 @@ function saveGameState() {
         GRID_SIZE: config.GRID_SIZE,
         GAME_MODE: config.GAME_MODE,
         practiceMode: config.practiceMode,
-        diveSeeds: [...gameState.diveSeeds]
+        diveSeeds: [...gameState.diveSeeds],
+        moves: gameState.moves || 0,
+        playtime: (gameState.playtimeAccumulated || 0) + (gameState.startedAt ? (Date.now() - gameState.startedAt) : 0)
     };
     localStorage.setItem(getGameStateKey(config.GAME_MODE, config.practiceMode, config.GRID_SIZE), JSON.stringify(stateToSave));
 }
@@ -74,6 +80,10 @@ function restoreGameState() {
         config.GAME_MODE = restored.GAME_MODE || 'classic';
         config.practiceMode = restored.practiceMode || false;
         gameState.diveSeeds = restored.diveSeeds || (restored.GAME_MODE === 'dive' ? [2] : []);
+        gameState.moves = restored.moves || 0;
+        gameState.playtimeAccumulated = restored.playtime || 0;
+        gameState.startedAt = Date.now();
+        gameState.finalized = false;
         return true;
     }
     return false;
@@ -127,6 +137,10 @@ export function initGrid() {
         gameState.score = 0;
         gameState.previousScore = 0;
         gameState.hasShownGameWon = false;
+        gameState.moves = 0;
+        gameState.playtimeAccumulated = 0;
+        gameState.startedAt = Date.now();
+        gameState.finalized = false;
         if (config.GAME_MODE === 'dive') {
             gameState.diveSeeds = [2];
         } else {
@@ -198,6 +212,8 @@ export function move(direction) {
     const anyTileMoved = calculateMove(direction);
 
     if (anyTileMoved) {
+        // track moves for the current game
+        gameState.moves = (gameState.moves || 0) + 1;
         const scoreGained = gameState.score - scoreBeforeMove;
         if (scoreGained > 0) {
             let totalScore = parseFloat(localStorage.getItem('totalScore') || '0');
@@ -215,6 +231,7 @@ export function move(direction) {
         gameState.beforeMovePositions = null;
 
         if (isGameOver()) {
+            finalizeCurrentGame();
             stopAIMode();
             setTimeout(showGameOver, 100);
         }
@@ -236,7 +253,9 @@ function saveState() {
         tileIdCounter: gameState.tileIdCounter,
         lastNewTileId: gameState.lastNewTileId,
         hasShownGameWon: gameState.hasShownGameWon,
-        diveSeeds: gameState.diveSeeds ? [...gameState.diveSeeds] : []
+        diveSeeds: gameState.diveSeeds ? [...gameState.diveSeeds] : [],
+        moves: gameState.moves || 0,
+        playtime: (gameState.playtimeAccumulated || 0) + (gameState.startedAt ? (Date.now() - gameState.startedAt) : 0)
     };
     undoStack.push(newState);
     if (undoStack.length > config.maxUndoMemory) undoStack.shift();
@@ -255,6 +274,10 @@ function restoreState(state) {
     gameState.lastNewTileId = state.lastNewTileId;
     gameState.hasShownGameWon = state.hasShownGameWon;
     gameState.diveSeeds = state.diveSeeds ? [...state.diveSeeds] : (config.GAME_MODE === 'dive' ? [2] : []);
+    gameState.moves = state.moves || 0;
+    gameState.playtimeAccumulated = state.playtime || 0;
+    gameState.startedAt = Date.now();
+    gameState.finalized = false;
 
     const scoreDifference = gameState.score - scoreBeforeRestore;
     if (scoreDifference !== 0) {
@@ -460,8 +483,36 @@ export function stopAIMode() {
     if (aiToggleButtonIcon) aiToggleButtonIcon.className = 'fas fa-play';
 }
 
+export function finalizeCurrentGame() {
+    if (gameState.finalized) return;
+    gameState.finalized = true;
+    const playtimeMs = (gameState.playtimeAccumulated || 0) + (gameState.startedAt ? (Date.now() - gameState.startedAt) : 0);
+    const prevTotalPlaytime = parseInt(localStorage.getItem('totalPlaytime') || '0', 10) || 0;
+    localStorage.setItem('totalPlaytime', prevTotalPlaytime + playtimeMs);
+
+    const prevTotalMoves = parseInt(localStorage.getItem('totalMoves') || '0', 10) || 0;
+    localStorage.setItem('totalMoves', prevTotalMoves + (gameState.moves || 0));
+
+    // record final playtime in the game state and stop the timer
+    gameState.playtimeAccumulated = playtimeMs;
+    gameState.startedAt = null;
+
+    // Persist any final game state (optional)
+    saveGameState();
+}
+
 // --- HELPERS ---
 // --- STATISTICS ---
+
+function formatDuration(ms) {
+    const totalSec = Math.floor((ms || 0) / 1000);
+    if (totalSec < 60) return `${totalSec}s`;
+    const hours = Math.floor(totalSec / 3600);
+    const mins = Math.floor((totalSec % 3600) / 60);
+    const secs = totalSec % 60;
+    if (hours > 0) return `${hours}h ${mins}m ${secs}s`;
+    return `${mins}m ${secs}s`;
+}
 
 export function incrementGamesPlayed(gameMode, practiceMode, gridSize) {
     const key = getGamesPlayedKey(gameMode, practiceMode, gridSize);
@@ -550,13 +601,37 @@ export function updateStatistics() {
                 individualTileDiv.appendChild(tileDiv);
                 highestTileContainer.appendChild(individualTileDiv);
 
-                const gamesPlayedElement = document.createElement('p');
-                gamesPlayedElement.textContent = `Games played: ${gamesPlayed}`;
-                statsElement.appendChild(gamesPlayedElement);
+                const statMainContainer = document.createElement('div');
+                statMainContainer.classList.add("statistics-main-container");
+                statsElement.appendChild(statMainContainer);
 
-                const bestScore = document.createElement('p');
-                bestScore.textContent = `Best score: ${formatScore(highScore)}`;
-                statsElement.appendChild(bestScore);
+                const gamesPlayedElement = document.createElement('div');
+                gamesPlayedElement.classList.add("statistics-main-item");
+                statMainContainer.appendChild(gamesPlayedElement);
+
+                const gamesPlayedHead = document.createElement('div');
+                gamesPlayedHead.classList.add("statistics-main-head");
+                gamesPlayedHead.textContent = `Games played`;
+                gamesPlayedElement.appendChild(gamesPlayedHead);
+
+                const gamesPlayedValue = document.createElement('div');
+                gamesPlayedValue.classList.add("statistics-main-value");
+                gamesPlayedValue.textContent = gamesPlayed;
+                gamesPlayedElement.appendChild(gamesPlayedValue);
+
+                const bestScoreElement = document.createElement('div');
+                bestScoreElement.classList.add("statistics-main-item");
+                statMainContainer.appendChild(bestScoreElement);
+
+                const bestScoreHead = document.createElement('div');
+                bestScoreHead.classList.add("statistics-main-head");
+                bestScoreHead.textContent = `Best Score`;
+                bestScoreElement.appendChild(bestScoreHead);
+
+                const bestScoreValue = document.createElement('div');
+                bestScoreValue.classList.add("statistics-main-value");
+                bestScoreValue.textContent = formatScore(highScore);
+                bestScoreElement.appendChild(bestScoreValue);
 
                 gameStatisticsContainer.appendChild(statsElement);
             }
@@ -571,6 +646,65 @@ export function updateStatistics() {
     if (totalScoreElement) {
         const totalScore = parseFloat(localStorage.getItem('totalScore') || '0');
         totalScoreElement.textContent = formatScore(totalScore);
+    }
+
+    // Total playtime (across all games)
+    const totalPlaytimeElement = document.getElementById('total-playtime');
+    if (totalPlaytimeElement) {
+        const storedTotalPlaytimeMs = parseInt(localStorage.getItem('totalPlaytime') || '0', 10) || 0;
+        const currentPlaytimeRaw = (gameState.playtimeAccumulated || 0) + (gameState.startedAt ? (Date.now() - gameState.startedAt) : 0);
+        const currentPlaytimeForTotals = gameState.finalized ? 0 : currentPlaytimeRaw;
+        totalPlaytimeElement.textContent = formatDuration(storedTotalPlaytimeMs + currentPlaytimeForTotals);
+    }
+
+    // Total moves (across all games)
+    const totalMovesElement = document.getElementById('total-moves');
+    if (totalMovesElement) {
+        const storedTotalMoves = parseInt(localStorage.getItem('totalMoves') || '0', 10) || 0;
+        const currentMovesForTotals = gameState.finalized ? 0 : (gameState.moves || 0);
+        totalMovesElement.textContent = storedTotalMoves + currentMovesForTotals;
+    }
+
+    // Statistics for the current game
+    const statsGameScoreEl = document.getElementById('stats-game-score');
+    if (statsGameScoreEl) statsGameScoreEl.textContent = formatScore(gameState.score);
+
+    const gamePlaytimeEl = document.getElementById('game-playtime');
+    if (gamePlaytimeEl) {
+        const currentPlaytimeMs = (gameState.playtimeAccumulated || 0) + (gameState.startedAt ? (Date.now() - gameState.startedAt) : 0);
+        gamePlaytimeEl.textContent = formatDuration(currentPlaytimeMs);
+    }
+
+    const gameMovesEl = document.getElementById('game-moves');
+    if (gameMovesEl) gameMovesEl.textContent = (gameState.moves || 0);
+}
+
+export function updateStatisticsLive() {
+    const statsGameScoreEl = document.getElementById('stats-game-score');
+    if (statsGameScoreEl) statsGameScoreEl.textContent = formatScore(gameState.score);
+
+    const gamePlaytimeEl = document.getElementById('game-playtime');
+    if (gamePlaytimeEl) {
+        const currentPlaytimeMs = (gameState.playtimeAccumulated || 0) + (gameState.startedAt ? (Date.now() - gameState.startedAt) : 0);
+        gamePlaytimeEl.textContent = formatDuration(currentPlaytimeMs);
+    }
+
+    const gameMovesEl = document.getElementById('game-moves');
+    if (gameMovesEl) gameMovesEl.textContent = (gameState.moves || 0);
+
+    const totalPlaytimeElement = document.getElementById('total-playtime');
+    if (totalPlaytimeElement) {
+        const storedTotalPlaytimeMs = parseInt(localStorage.getItem('totalPlaytime') || '0', 10) || 0;
+        const currentPlaytimeRaw = (gameState.playtimeAccumulated || 0) + (gameState.startedAt ? (Date.now() - gameState.startedAt) : 0);
+        const currentPlaytimeForTotals = gameState.finalized ? 0 : currentPlaytimeRaw;
+        totalPlaytimeElement.textContent = formatDuration(storedTotalPlaytimeMs + currentPlaytimeForTotals);
+    }
+
+    const totalMovesElement = document.getElementById('total-moves');
+    if (totalMovesElement) {
+        const storedTotalMoves = parseInt(localStorage.getItem('totalMoves') || '0', 10) || 0;
+        const currentMovesForTotals = gameState.finalized ? 0 : (gameState.moves || 0);
+        totalMovesElement.textContent = storedTotalMoves + currentMovesForTotals;
     }
 }
 
