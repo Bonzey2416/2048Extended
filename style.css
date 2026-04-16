@@ -117,6 +117,7 @@ body {
     margin: 0;
     padding: 0;
     color: var(--ui-text);
+    font-size: calc(1rem * var(--font-size-scale));
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -152,7 +153,7 @@ p {
 }
 
 .header h1 {
-    font-size: 2.5rem;
+    font-size: calc(2rem + 0.5rem * var(--font-size-scale));
     font-weight: 700;
     margin: 0;
 }
@@ -329,7 +330,7 @@ p {
 }
 
 .game-over-container .game-over-message p, .game-won-container .game-won-message p {
-    font-size: 2.5rem;
+    font-size: calc(2.5rem * var(--font-size-scale));
     font-weight: 700;
     color: var(--ui-text);
 }
@@ -342,7 +343,7 @@ p {
     margin: 0.2em;
     padding: 0.3em 0.6em;
     font-family: inherit;
-    font-size: 1rem;
+    font-size: calc(1rem * var(--font-size-scale));
     font-weight: 500;
     color: var(--ui-inverse-fixed);
     background: #8f7a66;
@@ -409,13 +410,13 @@ p {
 }
 
 .score-container > div h2 {
-    font-size: 1rem;
+    font-size: calc(0.3rem + 0.7rem * var(--font-size-scale));
     margin: 0 0 -0.3rem;
     opacity: 0.7;
 }
 
 .score-container > div p {
-    font-size: 2rem;
+    font-size: calc(1.2rem + 0.8rem * var(--font-size-scale));
     margin: 0;
 }
 
@@ -455,13 +456,13 @@ p {
     -webkit-backdrop-filter: blur(0.2rem) saturate(150%);
     backdrop-filter: blur(0.2rem) saturate(150%);
     box-shadow: 0 0.05rem 0.1rem #0003;
-    font-size: 0.8rem;
+    font-size: calc(0.6rem + 0.2rem * var(--font-size-scale));
     font-weight: 700;
-    min-width: 0.9rem;
-    padding: 0 0.3rem;
-    height: 1.5rem;
-    line-height: 1.5rem;
-    border-radius: 1rem;
+    min-width: calc(0.7rem + 0.2rem * var(--font-size-scale));
+    padding: 0 calc(0.2rem + 0.1rem * var(--font-size-scale));
+    height: calc(1.2rem + 0.3rem * var(--font-size-scale));
+    line-height: calc(1.2rem + 0.3rem * var(--font-size-scale));
+    border-radius: 5rem;
     transition: all 0.3s;
 }
 
@@ -494,7 +495,7 @@ p {
     margin: 0.5rem;
     padding: 0.5rem 0.5rem 0.5rem 1rem;
     border-radius: 0.5rem;
-    font-size: 1.2rem;
+    font-size: calc(0.8rem + 0.4rem * var(--font-size-scale));
     background-color: var(--ui-accent);
     color: var(--ui-inverse-fixed);
 }
@@ -605,12 +606,12 @@ p {
 
 .overlay-menu h2 {
     margin-top: 0;
-    font-size: 1.5rem;
+    font-size: calc(0.5rem + 1rem * var(--font-size-scale));
     font-weight: 700;
 }
 
 .overlay-menu h3, .settings-menu h3 {
-    font-size: 1.35rem;
+    font-size: calc(0.35rem + 1rem * var(--font-size-scale));
     font-weight: 500;
     margin-bottom: 0.5rem;
     margin-top: 1rem;
@@ -618,7 +619,7 @@ p {
 }
 
 .overlay-menu h4, .settings-menu h4 {
-    font-size: 1.2rem;
+    font-size: calc(0.2rem + 1rem * var(--font-size-scale));
     font-weight: 500;
     margin-bottom: 0.4rem;
     margin-top: 0.8rem;
@@ -642,13 +643,75 @@ a {
     align-items: center;
 }
 
+.slider-container {
+    margin: calc(1vw + 1vh) 0;
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.slider-container input {
+    -webkit-appearance: none;
+    appearance: none;
+    width: calc(100% - 1rem);
+    height: 0.5rem;
+    margin: 0.5rem;
+    grid-area: 2 / 1 / 3 / 3;
+    border: none;
+    border-radius: 0.25rem;  
+    background: linear-gradient(to right, var(--ui-accent) 50%, var(--ui-surface) 50%);
+    outline: none;
+    opacity: 0.7;
+    transition: opacity .2s;
+    padding: 0;
+}
+
+.slider-container input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 2.3rem;
+    height: 1.3rem;
+    border-radius: 0.75rem; 
+    background: var(--ui-surface);
+    border: 0.1rem solid var(--ui-surface);
+    -webkit-backdrop-filter: blur(1rem);
+    backdrop-filter: blur(1rem);
+    box-shadow: 0 0.1rem 0.3rem #0003;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.slider-container input::-webkit-slider-thumb:hover {
+    background: var(--ui-surface-opacity75);
+    transform: scale(1.5);
+}
+
+.slider-container input::-moz-range-thumb {
+    width: 2.8rem;
+    height: 1.3rem;
+    border-radius: 0.75rem; 
+    background: var(--ui-surface);
+    border: 0.1rem solid var(--ui-surface);
+    -webkit-backdrop-filter: blur(1rem);
+    backdrop-filter: blur(1rem);
+    box-shadow: 0 0.1rem 0.3rem #0003;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.slider-container input::-moz-range:hover {
+    background: var(--ui-surface-opacity75);
+    transform: scale(1.5);
+}
+
 .label-title {
-    font-size: 1.1rem;
+    font-size: calc(0.1rem + 1rem * var(--font-size-scale));
     font-weight: 500;
 }
 
 .dropdown-container select, input {
-    font-size: 1.1rem;
+    font-size: calc(0.1rem + 1rem * var(--font-size-scale));
     font-family: inherit;
     font-weight: 400;
     padding: 0.3rem 0.5rem;
@@ -867,7 +930,7 @@ input {
 }
 
 .statistics-main-value {
-    font-size: 2rem;
+    font-size: calc(1rem + 1rem * var(--font-size-scale));
     font-weight: bold;
 }
 
@@ -903,8 +966,8 @@ input {
 }
 
 .contributor-avatar {
-    width: 4rem;
-    height: 4rem;
+    width: calc(3rem + 1rem * var(--font-size-scale));
+    height: calc(3rem + 1rem * var(--font-size-scale));
     border-radius: 50%;
     margin-right: 1rem;
 }
@@ -916,7 +979,7 @@ input {
 }
 
 .contributor-name {
-    font-size: 1.2rem;
+    font-size: calc(0.2rem + 1rem * var(--font-size-scale));
     font-weight: 700 !important;
     margin: 0;
     text-decoration: none !important;
@@ -1017,7 +1080,8 @@ kbd {
 
 .settings-menu-list h2, .settings-menu-content h2 {
     margin-top: 0;
-    font-size: 1.5rem;
+    font-size: calc(1rem + 0.5rem * var(--font-size-scale));
+    line-height: 2.5rem;
     font-weight: 700;
 }
 
@@ -1042,14 +1106,14 @@ kbd {
 }
 
 .settings-menu-list li i::before {
-    font-size: 1.1rem;
-    width: 3rem;
+    font-size: calc(1.1rem * var(--font-size-scale));
+    width: calc(2rem + 1rem * var(--font-size-scale));
     text-align: center;
     display: inline-block;
 }
 
 .settings-menu-list li .setting-title {
-    font-size: 1.1rem;
+    font-size: calc(0.1rem + 1rem * var(--font-size-scale));
     font-weight: 500;
 }
 

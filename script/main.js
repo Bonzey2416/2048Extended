@@ -15,7 +15,8 @@ export let config = {
     grayscaleColors: false,
     theme: 'light',
     syncTilesDarkMode: true,
-    maxUndoMemory: 256
+    maxUndoMemory: 256,
+    fontSizeScale: 1
 };
 
 // Shared game state
@@ -104,6 +105,7 @@ export function loadSettings() {
         config.theme = settings.theme || 'light';
         config.syncTilesDarkMode = settings.syncTilesDarkMode ?? true;
         config.maxUndoMemory = settings.maxUndoMemory || 256;
+        config.fontSizeScale = settings.fontSizeScale || 1;
     }
 }
 
@@ -119,7 +121,8 @@ export function saveSettings() {
         grayscaleColors: config.grayscaleColors,
         theme: config.theme,
         syncTilesDarkMode: config.syncTilesDarkMode,
-        maxUndoMemory: config.maxUndoMemory
+        maxUndoMemory: config.maxUndoMemory,
+        fontSizeScale: config.fontSizeScale
     };
     localStorage.setItem('gameSettings', JSON.stringify(settings));
 }

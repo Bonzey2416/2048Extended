@@ -659,6 +659,31 @@ function setupEventListeners() {
         saveSettings();
     });
 
+    // Font size slider (accessibility)
+    const fontSlider = document.getElementById('font-size-scale-slider');
+    const fontValueEl = document.getElementById('font-size-scale-value');
+    const updateFontScale = (val) => {
+        const f = parseFloat(val);
+        if (!Number.isFinite(f)) return;
+        document.documentElement.style.setProperty('--font-size-scale', f);
+        if (fontValueEl) fontValueEl.textContent = `${Math.round(f * 100)}%`;
+        config.fontSizeScale = f;
+        // compute percent fill based on slider min/max
+        if (fontSlider) {
+            const min = parseFloat(fontSlider.min) || 1;
+            const max = parseFloat(fontSlider.max) || 3;
+            const pct = Math.max(0, Math.min(100, ((f - min) / (max - min)) * 100));
+            fontSlider.style.background = `linear-gradient(to right, var(--ui-accent) ${pct}%, var(--ui-surface) ${pct}%)`;
+        }
+        saveSettings();
+    };
+    if (fontSlider) {
+        // update on input for live feedback and on change to ensure persisted value
+        fontSlider.addEventListener('input', e => updateFontScale(e.target.value));
+        fontSlider.addEventListener('change', e => updateFontScale(e.target.value));
+    }
+
+
     document.querySelectorAll('input[name="theme"]').forEach(radio => {
         radio.addEventListener('change', e => {
             const theme = e.target.value;
@@ -712,6 +737,20 @@ function syncSettingsUI() {
         speedSelect.value = config.animationSpeed;
         // Trigger a change event to apply the style on load
         speedSelect.dispatchEvent(new Event('change'));
+    }
+
+    // Sync font-size scale slider and CSS variable
+    const fontSlider = document.getElementById('font-size-scale-slider');
+    const fontValueEl = document.getElementById('font-size-scale-value');
+    const fontScale = (typeof config.fontSizeScale !== 'undefined') ? config.fontSizeScale : 1;
+    document.documentElement.style.setProperty('--font-size-scale', fontScale);
+    if (fontSlider) fontSlider.value = fontScale;
+    if (fontValueEl) fontValueEl.textContent = `${Math.round(fontScale * 100)}%`;
+    if (fontSlider) {
+        const min = parseFloat(fontSlider.min) || 1;
+        const max = parseFloat(fontSlider.max) || 3;
+        const pct = Math.max(0, Math.min(100, ((fontScale - min) / (max - min)) * 100));
+        fontSlider.style.background = `linear-gradient(to right, var(--ui-accent) ${pct}%, var(--ui-surface) ${pct}%)`;
     }
 }
 
