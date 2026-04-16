@@ -654,9 +654,9 @@ a {
 .slider-container input {
     -webkit-appearance: none;
     appearance: none;
-    width: calc(100% - 1rem);
+    width: calc(100% - 2rem);
     height: 0.5rem;
-    margin: 0.5rem;
+    margin: 0.5rem 1rem;
     grid-area: 2 / 1 / 3 / 3;
     border: none;
     border-radius: 0.25rem;  
@@ -670,9 +670,9 @@ a {
 .slider-container input::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 2.3rem;
-    height: 1.3rem;
-    border-radius: 0.75rem; 
+    width: 2.8rem;
+    height: 1.6rem;
+    border-radius: 0.9rem; 
     background: var(--ui-surface);
     border: 0.1rem solid var(--ui-surface);
     -webkit-backdrop-filter: blur(1rem);

@@ -19,6 +19,10 @@ Available at: https://bonzey2416.github.io/2048Extended/
 * macOS 10.12+ (Safari)
 * Windows 7+ (Chrome/Firefox/Edge)
 ## Changelog
+### Version 0.22.1
+Date of update: 2026-04-16
+* Fixed a bug where, when adjusting H/S/L value(s) in color picker, R/G/B values don't change.
+* Minor bug fixes and improvements to the user interface.
 ### Version 0.22
 Date of update: 2026-04-16
 * You now have the ability to adjust the font size of the user interface.

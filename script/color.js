@@ -359,7 +359,8 @@ function updateColorFromHSL() {
         currentColor.h = h / 360;
         currentColor.s = s / 100;
         currentColor.l = l / 100;
-        updateUI(false, false); // Don't update HSL inputs again
+        // Update RGB (and hex) inputs, but don't overwrite the HSL fields
+        updateUI(true, false);
     }
 }
 
