@@ -108,6 +108,8 @@
     --ui-text-fixed: #776e65;
     --ui-inverse: #f9f6f2;
     --ui-inverse-fixed: #f9f6f2;
+
+    --font-size-scale: 1;
 }
 body {
     font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
@@ -268,6 +270,7 @@ p {
 .tile-individual .tile {
     width: inherit;
     height: inherit;
+    position: relative;
 }
 
 .grid-container.no-animations .tile {
@@ -558,16 +561,22 @@ p {
     transform: translate(-50%, -50%) scale(1);
     background: #faf8ef;
     border-radius: 1rem;
-    padding: 2rem;
+    padding: 1rem;
     box-sizing: border-box;
     width: 80vw;
     max-width: calc(90vh + 10vw);
     max-height: 90vh;
-    overflow-y: auto;
     z-index: 1050;
     pointer-events: auto;
     transition: all 0.3s ease;
     box-shadow: 0 0 1rem #00000055;
+}
+
+.overlay-menu-inner {
+    padding: 1rem;
+    max-height: calc(90vh - 2rem);
+    box-sizing: border-box;
+    overflow-y: auto;
 }
 
 .overlay-menu.overlay-menu2 {
@@ -1210,8 +1219,14 @@ kbd {
         width: auto;
         max-width: 100%;
         max-height: 70vh;
+        padding-bottom: 0;
         overflow-y: auto;
         border-radius: 2rem 2rem 0 0;
+    }
+
+    .overlay-menu-inner {
+        max-height: calc(70vh - 2rem);
+        padding-bottom: 2rem;
     }
 
     .overlay-menu.hidden {

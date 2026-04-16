@@ -72,219 +72,229 @@
         </main>
         <div class="overlay-backdrop hidden" id="overlay-backdrop"></div>
         <div class="overlay-menu hidden" id="modes-menu">
-            <i class="fas fa-times close-button" id="close-modes-menu"></i>
-            <h2>Select Game Mode</h2>
-            <p>Goal: <span class="goal-number">2048</span></p>
-            <div class="toggle-container">
-                <div>
-                    <p class="label-title">Practice mode</p>
-                    <p class="label-subtitle">Enables the ability to undo/redo moves</p>
+            <div class="overlay-menu-inner">
+                <i class="fas fa-times close-button" id="close-modes-menu"></i>
+                <h2>Select Game Mode</h2>
+                <p>Goal: <span class="goal-number">2048</span></p>
+                <div class="toggle-container">
+                    <div>
+                        <p class="label-title">Practice mode</p>
+                        <p class="label-subtitle">Enables the ability to undo/redo moves</p>
+                    </div>
+                    <label class="switch" for="practice-mode-toggle">
+                        <input type="checkbox" id="practice-mode-toggle">
+                        <span class="slider"></span>
+                    </label>
                 </div>
-                <label class="switch" for="practice-mode-toggle">
-                    <input type="checkbox" id="practice-mode-toggle">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="dropdown-container">
-                <label for="game-mode-select">
-                    <p class="label-title">Game mode</p>
-                    <p class="label-subtitle">Choose the mode for your game</p>
-                </label>
-                <select id="game-mode-select">
-                    <option value="classic" selected>Classic</option>
-                    <option value="fibonacci">Fibonacci</option>
-                    <option value="power-of-three">Powers of 3</option>
-                    <option value="supermerging">Supermerging</option>
-                    <option value="dive">DIVE</option>
-                    <option value="zero">Zero</option>
-                    <option value="negative">Negative</option>
-                    <option value="math">Math</option>
-                </select>
-            </div>
-            <div class="dropdown-container">
-                <label for="grid-size-select">
-                    <p class="label-title">Grid size</p>
-                    <p class="label-subtitle">Choose the grid size for your game</p>
-                </label>
-                <select id="grid-size-select">
-                    <option value="3">3x3</option>
-                    <option value="4" selected>4x4</option>
-                    <option value="5">5x5</option>
-                    <option value="6">6x6</option>
-                    <option value="7">7x7</option>
-                    <option value="8">8x8</option>
-                </select>
+                <div class="dropdown-container">
+                    <label for="game-mode-select">
+                        <p class="label-title">Game mode</p>
+                        <p class="label-subtitle">Choose the mode for your game</p>
+                    </label>
+                    <select id="game-mode-select">
+                        <option value="classic" selected>Classic</option>
+                        <option value="fibonacci">Fibonacci</option>
+                        <option value="power-of-three">Powers of 3</option>
+                        <option value="supermerging">Supermerging</option>
+                        <option value="dive">DIVE</option>
+                        <option value="zero">Zero</option>
+                        <option value="negative">Negative</option>
+                        <option value="math">Math</option>
+                    </select>
+                </div>
+                <div class="dropdown-container">
+                    <label for="grid-size-select">
+                        <p class="label-title">Grid size</p>
+                        <p class="label-subtitle">Choose the grid size for your game</p>
+                    </label>
+                    <select id="grid-size-select">
+                        <option value="3">3x3</option>
+                        <option value="4" selected>4x4</option>
+                        <option value="5">5x5</option>
+                        <option value="6">6x6</option>
+                        <option value="7">7x7</option>
+                        <option value="8">8x8</option>
+                    </select>
+                </div>
             </div>
         </div>
         <div class="overlay-menu hidden" id="ai-options-menu">
-            <i class="fas fa-times close-button" id="close-ai-options-menu"></i>
-            <h2>AI Options</h2>
-            <div class="dropdown-container">
-                <label for="ai-strategy-select">
-                    <p class="label-title">AI strategy</p>
-                    <p class="label-subtitle">Choose the strategy for the AI</p>
-                </label>
-                <select id="ai-strategy-select">
-                    <option value="random" selected>Random</option>
-                    <option value="corner">Corner</option>
-                    <option value="swing">Swing</option>
-                    <option value="swirl">Swirl</option>
-                </select>
-            </div>
-            <div class="input-container">
-                <label for="ai-move-duration-input">
-                    <p class="label-title">AI move duration</p>
-                    <p class="label-subtitle">Set the duration for AI moves in milliseconds</p>
-                </label>
-                <input type="number" id="ai-move-duration-input" min="0" value="100">
+            <div class="overlay-menu-inner">
+                <i class="fas fa-times close-button" id="close-ai-options-menu"></i>
+                <h2>AI Options</h2>
+                <div class="dropdown-container">
+                    <label for="ai-strategy-select">
+                        <p class="label-title">AI strategy</p>
+                        <p class="label-subtitle">Choose the strategy for the AI</p>
+                    </label>
+                    <select id="ai-strategy-select">
+                        <option value="random" selected>Random</option>
+                        <option value="corner">Corner</option>
+                        <option value="swing">Swing</option>
+                        <option value="swirl">Swirl</option>
+                    </select>
+                </div>
+                <div class="input-container">
+                    <label for="ai-move-duration-input">
+                        <p class="label-title">AI move duration</p>
+                        <p class="label-subtitle">Set the duration for AI moves in milliseconds</p>
+                    </label>
+                    <input type="number" id="ai-move-duration-input" min="0" value="100">
+                </div>
             </div>
         </div>
         <div class="overlay-menu hidden" id="statistics-menu">
-            <i class="fas fa-times close-button" id="close-statistics-menu"></i>
-            <h2>Statistics</h2>
-            <h3>General statistics</h3>
-            <div class="statistics-main-container">
-                <div class="statistics-main-item">
-                    <p class="statistics-main-head">Games played</p>
-                    <p class="statistics-main-value" id="games-played">0</p>
+            <div class="overlay-menu-inner">
+                <i class="fas fa-times close-button" id="close-statistics-menu"></i>
+                <h2>Statistics</h2>
+                <h3>General statistics</h3>
+                <div class="statistics-main-container">
+                    <div class="statistics-main-item">
+                        <p class="statistics-main-head">Games played</p>
+                        <p class="statistics-main-value" id="games-played">0</p>
+                    </div>
+                    <div class="statistics-main-item">
+                        <p class="statistics-main-head">Total score:</p>
+                        <p class="statistics-main-value" id="total-score">0</p>
+                    </div>
+                    <div class="statistics-main-item">
+                        <p class="statistics-main-head">Total time played:</p>
+                        <p class="statistics-main-value" id="total-playtime">0s</p>
+                    </div>
+                    <div class="statistics-main-item">
+                        <p class="statistics-main-head">Total moves:</p>
+                        <p class="statistics-main-value" id="total-moves">0</p>
+                    </div>
                 </div>
-                <div class="statistics-main-item">
-                    <p class="statistics-main-head">Total score:</p>
-                    <p class="statistics-main-value" id="total-score">0</p>
+                <h3>Statistics for this game</h3>
+                <div class="statistics-main-container">
+                    <div class="statistics-main-item">
+                        <p class="statistics-main-head">Score</p>
+                        <p class="statistics-main-value" id="stats-game-score">0</p>
+                    </div>
+                    <div class="statistics-main-item">
+                        <p class="statistics-main-head">Time played:</p>
+                        <p class="statistics-main-value" id="game-playtime">0s</p>
+                    </div>
+                    <div class="statistics-main-item">
+                        <p class="statistics-main-head">Moves:</p>
+                        <p class="statistics-main-value" id="game-moves">0</p>
+                    </div>
                 </div>
-                <div class="statistics-main-item">
-                    <p class="statistics-main-head">Total time played:</p>
-                    <p class="statistics-main-value" id="total-playtime">0s</p>
-                </div>
-                <div class="statistics-main-item">
-                    <p class="statistics-main-head">Total moves:</p>
-                    <p class="statistics-main-value" id="total-moves">0</p>
-                </div>
+                <h3>Statistics by game</h3>
+                <div id="game-statistics"></div>
             </div>
-            <h3>Statistics for this game</h3>
-            <div class="statistics-main-container">
-                <div class="statistics-main-item">
-                    <p class="statistics-main-head">Score</p>
-                    <p class="statistics-main-value" id="stats-game-score">0</p>
-                </div>
-                <div class="statistics-main-item">
-                    <p class="statistics-main-head">Time played:</p>
-                    <p class="statistics-main-value" id="game-playtime">0s</p>
-                </div>
-                <div class="statistics-main-item">
-                    <p class="statistics-main-head">Moves:</p>
-                    <p class="statistics-main-value" id="game-moves">0</p>
-                </div>
-            </div>
-            <h3>Statistics by game</h3>
-            <div id="game-statistics"></div>
         </div>
         <div class="overlay-backdrop overlay-backdrop2 hidden" id="overlay-backdrop2"></div>
         <div class="overlay-menu overlay-menu2 hidden" id="customize-theme-menu">
-            <i class="fas fa-times close-button" id="close-customize-theme-menu"></i>
-            <h2>Customize Theme</h2>
-            <div class="toggle-container">
-                <div>
-                    <p class="label-title">Apply fallback colors</p>
-                    <p class="label-subtitle">Applies a fallback color scheme where colors are not available.</p>
+            <div class="overlay-menu-inner">
+                <i class="fas fa-times close-button" id="close-customize-theme-menu"></i>
+                <h2>Customize Theme</h2>
+                <div class="toggle-container">
+                    <div>
+                        <p class="label-title">Apply fallback colors</p>
+                        <p class="label-subtitle">Applies a fallback color scheme where colors are not available.</p>
+                    </div>
+                    <label class="switch" for="fallback-colors-toggle">
+                        <input type="checkbox" id="fallback-colors-toggle">
+                        <span class="slider"></span>
+                    </label>
                 </div>
-                <label class="switch" for="fallback-colors-toggle">
-                    <input type="checkbox" id="fallback-colors-toggle">
-                    <span class="slider"></span>
-                </label>
+                <div class="dropdown-container">
+                    <label for="filter-tiles-select">
+                        <p class="label-title">Filter tiles</p>
+                        <p class="label-subtitle">Filter the tiles by game mode.</p>
+                    </label>
+                    <select id="filter-tiles-select">
+                        <option value="all" selected>All</option>
+                        <option value="classic">Classic</option>
+                        <option value="fibonacci">Fibonacci</option>
+                        <option value="negative">Negative</option>
+                        <option value="power-of-three">Powers of 3</option>
+                        <option value="operators">Operators</option>
+                    </select>
+                </div>
+                <div class="menu-button-container">
+                    <label>
+                        <p class="label-title">Reset theme</p>
+                        <p class="label-subtitle">
+                            Reset the theme to default, which will reset the colors and names of the tiles to default.
+                        </p>
+                    </label>
+                    <button class="btn" id="theme-reset">Reset</button>
+                </div>
+                <table class="tile-theme-editor-table">
+                    <thead>
+                        <tr>
+                            <th>Tile</th>
+                            <th>Value</th>
+                            <th>Name</th>
+                            <th>Background</th>
+                            <th>Text color</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tile-theme-editor-table-body">
+                    </tbody>
+                </table>
             </div>
-            <div class="dropdown-container">
-                <label for="filter-tiles-select">
-                    <p class="label-title">Filter tiles</p>
-                    <p class="label-subtitle">Filter the tiles by game mode.</p>
-                </label>
-                <select id="filter-tiles-select">
-                    <option value="all" selected>All</option>
-                    <option value="classic">Classic</option>
-                    <option value="fibonacci">Fibonacci</option>
-                    <option value="negative">Negative</option>
-                    <option value="power-of-three">Powers of 3</option>
-                    <option value="operators">Operators</option>
-                </select>
-            </div>
-            <div class="menu-button-container">
-                <label>
-                    <p class="label-title">Reset theme</p>
-                    <p class="label-subtitle">
-                        Reset the theme to default, which will reset the colors and names of the tiles to default.
-                    </p>
-                </label>
-                <button class="btn" id="theme-reset">Reset</button>
-            </div>
-            <table class="tile-theme-editor-table">
-                <thead>
-                    <tr>
-                        <th>Tile</th>
-                        <th>Value</th>
-                        <th>Name</th>
-                        <th>Background</th>
-                        <th>Text color</th>
-                    </tr>
-                </thead>
-                <tbody id="tile-theme-editor-table-body">
-                </tbody>
-            </table>
         </div>
         <div class="overlay-backdrop overlay-backdrop3 hidden" id="overlay-backdrop3"></div>
         <div class="overlay-menu overlay-menu3 hidden" id="color-picker-menu">
-            <i class="fas fa-times close-button" id="close-color-picker-menu"></i>
-            <h2>Edit color for: <span id="edit-color-element"></span></h2>
-            <div class="color-picker-container">
-                <div class="color-picker-square" id="color-picker-square">
-                    <div class="color-picker-pointer" id="color-picker-pointer"></div>
-                </div>
-                <div class="color-picker-slider-container">
-                    <div class="color-picker-slider-container-inner">
-                        <input type="range" class="color-picker-slider" id="color-picker-slider" value="0">
+            <div class="overlay-menu-inner">
+                <i class="fas fa-times close-button" id="close-color-picker-menu"></i>
+                <h2>Edit color for: <span id="edit-color-element"></span></h2>
+                <div class="color-picker-container">
+                    <div class="color-picker-square" id="color-picker-square">
+                        <div class="color-picker-pointer" id="color-picker-pointer"></div>
+                    </div>
+                    <div class="color-picker-slider-container">
+                        <div class="color-picker-slider-container-inner">
+                            <input type="range" class="color-picker-slider" id="color-picker-slider" value="0">
+                        </div>
+                    </div>
+                    <div class="color-picker-input-container">
+                        <label class="radio">
+                            <input type="radio" value="red" name="color-input-type">
+                            <span class="checkmark"></span>
+                        </label>
+                        <label>R</label>
+                        <input type="number" id="red-amount-input">
+                        <label class="radio">
+                            <input type="radio" value="hue" name="color-input-type">
+                            <span class="checkmark"></span>
+                        </label>
+                        <label>H</label>
+                        <input type="number" id="hue-amount-input">
+                        <label class="radio">
+                            <input type="radio" value="green" name="color-input-type">
+                            <span class="checkmark"></span>
+                        </label>
+                        <label>G</label>
+                        <input type="number" id="green-amount-input">
+                        <label class="radio">
+                            <input type="radio" value="saturation" name="color-input-type"  checked="checked">
+                            <span class="checkmark"></span>
+                        </label>
+                        <label>S</label>
+                        <input type="number" id="saturation-amount-input">
+                        <label class="radio">
+                            <input type="radio" value="blue" name="color-input-type">
+                            <span class="checkmark"></span>
+                        </label>
+                        <label>B</label>
+                        <input type="number" id="blue-amount-input">
+                        <label class="radio">
+                            <input type="radio" value="luminosity" name="color-input-type">
+                            <span class="checkmark"></span>
+                        </label>
+                        <label>L</label>
+                        <input type="number" id="luminosity-amount-input">
+                        <label style="grid-column: 1 / 3;">Hex</label>
+                        <input style="grid-column: 3 / 7;" id="hex-input">
                     </div>
                 </div>
-                <div class="color-picker-input-container">
-                    <label class="radio">
-                        <input type="radio" value="red" name="color-input-type">
-                        <span class="checkmark"></span>
-                    </label>
-                    <label>R</label>
-                    <input type="number" id="red-amount-input">
-                    <label class="radio">
-                        <input type="radio" value="hue" name="color-input-type">
-                        <span class="checkmark"></span>
-                    </label>
-                    <label>H</label>
-                    <input type="number" id="hue-amount-input">
-                    <label class="radio">
-                        <input type="radio" value="green" name="color-input-type">
-                        <span class="checkmark"></span>
-                    </label>
-                    <label>G</label>
-                    <input type="number" id="green-amount-input">
-                    <label class="radio">
-                        <input type="radio" value="saturation" name="color-input-type"  checked="checked">
-                        <span class="checkmark"></span>
-                    </label>
-                    <label>S</label>
-                    <input type="number" id="saturation-amount-input">
-                    <label class="radio">
-                        <input type="radio" value="blue" name="color-input-type">
-                        <span class="checkmark"></span>
-                    </label>
-                    <label>B</label>
-                    <input type="number" id="blue-amount-input">
-                    <label class="radio">
-                        <input type="radio" value="luminosity" name="color-input-type">
-                        <span class="checkmark"></span>
-                    </label>
-                    <label>L</label>
-                    <input type="number" id="luminosity-amount-input">
-                    <label style="grid-column: 1 / 3;">Hex</label>
-                    <input style="grid-column: 3 / 7;" id="hex-input">
-                </div>
+                <button class="btn" id="reset-color-button">Reset to Default</button> <button class="btn" id="apply-color-button">Apply Changes</button>
             </div>
-            <button class="btn" id="reset-color-button">Reset to Default</button> <button class="btn" id="apply-color-button">Apply Changes</button>
         </div>
         <div class="settings-menu hidden" id="settings-menu">
             <div class="settings-menu-inner" id="settings-menu-inner">
@@ -435,7 +445,7 @@
                     </div>
                     <div class="settings-menu-content-inner text-dense" id="settings-about">
                         <h2>About 2048 Extended</h2>
-                        <p style="font-style: italic;">Version 0.21.1. Last updated 2026-04-15.</p>
+                        <p style="font-style: italic;">Version 0.21.2. Last updated 2026-04-16.</p>
                         <p>2048 Extended is an enhanced version of the classic 2048 game, featuring multiple game modes, grid sizes, and an AI mode.</p>
                         <h3>How to play</h3>
                         <p>
@@ -476,6 +486,11 @@
                             Based on 2048 created by Gabriele Cirulli, which was in turn based on 1024 by Veewo Studio and conceptually similar to Threes by Asher Vollmer.
                         </p>
                         <h3>Changelog</h3>
+                        <h4>Version 0.21.2</h4>
+                        <p class="update-date">Date of update: 2026-04-16</p>
+                        <ul>
+                            <li>Minor bug fixes and improvements to the user interface.</li>
+                        </ul>
                         <h4>Version 0.21.1</h4>
                         <p class="update-date">Date of update: 2026-04-15</p>
                         <ul>

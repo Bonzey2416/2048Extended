@@ -19,6 +19,9 @@ Available at: https://bonzey2416.github.io/2048Extended/
 * macOS 10.12+ (Safari)
 * Windows 7+ (Chrome/Firefox/Edge)
 ## Changelog
+### Version 0.21.2
+Date of update: 2026-04-16
+* Minor bug fixes and improvements to the user interface.
 ### Version 0.21.1
 Date of update: 2026-04-15
 * Minor bug fixes and improvements to the color picker.
