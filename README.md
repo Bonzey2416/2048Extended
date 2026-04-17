@@ -19,6 +19,9 @@ Available at: https://bonzey2416.github.io/2048Extended/
 * macOS 10.12+ (Safari)
 * Windows 7+ (Chrome/Firefox/Edge)
 ## Changelog
+### Version 0.22.2
+Date of update: 2026-04-17
+* Improved the legibility of the slider.
 ### Version 0.22.1
 Date of update: 2026-04-16
 * Fixed a bug where, when adjusting H/S/L value(s) in color picker, R/G/B values don't change.
