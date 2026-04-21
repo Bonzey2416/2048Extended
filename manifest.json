@@ -1,0 +1,24 @@
+{
+    "name": "2048 Extended",
+    "start_url": "index.html",
+    "icons": [
+        {
+            "src": "images/2048ExtendedIcon1024.png",
+            "sizes": "1024x1024",
+            "type": "image/png"
+        },
+        {
+            "src": "images/2048ExtendedIcon512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "images/2048ExtendedIcon192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        }
+    ],
+    "background_color": "#faf8ef",
+    "theme_color": "#faf8ef",
+    "display": "standalone"
+}
